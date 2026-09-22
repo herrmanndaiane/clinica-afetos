@@ -3,129 +3,311 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reserva de Sala - Psicologia</title>
+  <title>Agenda da Clínica</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      max-width: 800px; 
-      margin: 20px auto; 
-      padding: 0 15px; 
-      position: relative;
-      min-height: 90vh;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: contain;
+    :root {
+      --primary-color: #1a73e8;
+      --border-color: #dadce0;
+      --free-bg: #e6f4ea;
+      --free-text: #137333;
+      --busy-bg: #feefc3;
+      --busy-text: #b06000;
     }
-    
-    /* Cabeçalho e Logo */
-    .header-container {
+
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+      color: #3c4043;
+    }
+
+    /* Tela de Login */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+
+    .login-card {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .login-card h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--primary-color);
+    }
+
+    /* Cabeçalho e Controles */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .user-info {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 15px;
-      margin-bottom: 20px;
-    }
-    .header-container.flex-reverse {
-      flex-direction: row-reverse;
-    }
-    .header-container.flex-center {
-      flex-direction: column;
-      text-align: center;
-    }
-    
-    .logo-img {
-      max-height: 80px;
-      max-width: 200px;
-      object-fit: contain;
     }
 
-    /* Fundo Marca d'Água */
-    body.logo-fundo {
-      background-size: 300px;
-      background-position: center 150px;
-    }
-    body.logo-fundo .logo-header-wrapper {
-      display: none; /* Esconde do topo se estiver no fundo */
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
-    .card { 
-      border: 1px solid #ccc; 
-      border-radius: 8px; 
-      padding: 15px; 
-      margin-bottom: 15px; 
-      background-color: rgba(255, 255, 255, 0.92); /* Transparência para leitura com fundo */
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      font-weight: 500;
     }
-    .turno { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding: 12px; 
-      margin: 8px 0; 
-      border-radius: 6px; 
-    }
-    .livre { background-color: rgba(232, 245, 233, 0.95); border: 1px solid #a5d6a7; }
-    .ocupado { background-color: rgba(255, 235, 238, 0.95); border: 1px solid #ef9a9a; }
-    
-    button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-    .btn-reservar { background-color: #2e7d32; color: white; }
-    .btn-editar { background-color: #0288d1; color: white; }
-    .btn-cancelar { background-color: #c62828; color: white; margin-left: 5px; }
-    .btn-config { background-color: #616161; color: white; margin-left: 10px; font-size: 0.85em; }
 
-    .config-painel {
-      display: none;
-      background: #f5f5f5;
-      padding: 15px;
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+    }
+
+    .btn-danger {
+      background: #d32f2f;
+      color: white;
+      border: none;
+    }
+
+    .month-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    /* Tabela da Semana (Estilo Google Calendar) */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 120px repeat(7, 1fr);
+      background: white;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .config-painel label { display: block; margin-top: 8px; font-size: 0.9em; }
+
+    .grid-header {
+      background: #f1f3f4;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+    }
+
+    .grid-header.today {
+      color: var(--primary-color);
+      background: #e8f0fe;
+    }
+
+    .time-col {
+      background: #f8f9fa;
+      padding: 15px 10px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .day-slot {
+      padding: 10px;
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      min-height: 90px;
+      transition: background 0.2s;
+    }
+
+    /* Cartões dos Turnos */
+    .slot-card {
+      height: 100%;
+      border-radius: 6px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .slot-card.livre {
+      background: var(--free-bg);
+      border: 1px dashed #a8dab5;
+      color: var(--free-text);
+    }
+
+    .slot-card.ocupado {
+      background: var(--busy-bg);
+      border: 1px solid #fdd835;
+      color: var(--busy-text);
+    }
+
+    .slot-title {
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .slot-info {
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    /* Modal / Janela Flutuante de Edição */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 350px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .modal-content h3 { margin-top: 0; }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="header-container" id="headerContainer">
-    <h2>Painel de Reserva de Sala</h2>
-    <div class="logo-header-wrapper" id="logoHeaderWrapper">
-      <img id="logoImg" class="logo-img" src="" alt="Logo da Clínica" style="display: none;">
+  <!-- Tela de Login -->
+  <div class="login-container" id="telaLogin">
+    <div class="login-card">
+      <h2>Acesso à Agenda</h2>
+      <form onsubmit="realizarLogin(event)">
+        <div class="form-group">
+          <label for="loginUsuario">Usuário</label>
+          <select id="loginUsuario" required>
+            <option value="">Selecione seu usuário...</option>
+            <option value="psicologa1">Dra. Ana Silva</option>
+            <option value="psicologa2">Dr. Carlos Eduardo</option>
+            <option value="psicologa3">Dra. Mariane Costa</option>
+            <option value="recepcao">Recepção / Geral</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="loginSenha">Senha</label>
+          <input type="password" id="loginSenha" placeholder="Digite sua senha" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar</button>
+      </form>
     </div>
   </div>
-  
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div>
-        <label for="dataSelecionada"><strong>Selecione a Data:</strong></label>
-        <input type="date" id="dataSelecionada" onchange="carregarReservas()">
+
+  <!-- Painel do Calendário (Oculto antes do Login) -->
+  <div id="painelCalendario" style="display: none;">
+    <div class="header">
+      <div class="nav-controls">
+        <button class="btn" onclick="mudarSemana(-1)">&lt;</button>
+        <button class="btn" onclick="semanaAtual()">Hoje</button>
+        <button class="btn" onclick="mudarSemana(1)">&gt;</button>
+        <span class="month-title" id="tituloMes">Setembro de 2026</span>
       </div>
-      <button class="btn-config" onclick="alternarPainelConfig()">⚙️ Configurar Logo</button>
+      <div class="user-info">
+        <span id="nomeUsuarioLogado" style="font-weight: bold; color: #1a73e8;"></span>
+        <button class="btn" onclick="realizarLogout()">Sair</button>
+      </div>
     </div>
 
-    <!-- Painel de Configuração do Logo -->
-    <div class="config-painel" id="configPainel">
-      <h4>Configurações da Logo da Clínica</h4>
-      <label>Enviar arquivo de Logo (PNG/JPG):</label>
-      <input type="file" id="logoFileInput" accept="image/*" onchange="uploadLogo(event)">
-      
-      <label>Posição do Logo:</label>
-      <select id="logoPosicaoSelect" onchange="alterarPosicaoLogo(this.value)">
-        <option value="topo-direita">Topo Dir.</option>
-        <option value="topo-esquerda">Topo Esq.</option>
-        <option value="topo-centro">Topo Centro</option>
-        <option value="fundo">Fundo (Marca d'água)</option>
-      </select>
-      
-      <button onclick="removerLogo()" style="margin-top: 10px; background-color: #d32f2f; color: white;">Remover Logo</button>
+    <!-- Grade do Calendário -->
+    <div class="calendar-grid" id="calendarGrid">
+      <!-- Renderizado via JavaScript -->
     </div>
   </div>
 
-  <div id="painelTurnos">
-    <!-- Os turnos serão renderizados via JavaScript -->
+  <!-- Modal para Inclusão e Edição -->
+  <div class="modal" id="modalReserva">
+    <div class="modal-content">
+      <h3 id="modalTitulo">Agendar Turno</h3>
+      <input type="hidden" id="inputData">
+      <input type="hidden" id="inputTurno">
+      
+      <div class="form-group">
+        <label>Data e Horário</label>
+        <input type="text" id="inputInfoDataHorario" readonly style="background: #eee;">
+      </div>
+
+      <div class="form-group">
+        <label for="inputPsicologa">Profissional / Reservado para *</label>
+        <input type="text" id="inputPsicologa" placeholder="Ex: Dra. Ana Silva">
+      </div>
+
+      <div class="form-group">
+        <label for="inputObs">Observação</label>
+        <textarea id="inputObs" rows="3" placeholder="Atendimento presencial, consulta..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="btnExcluir" onclick="excluirReserva()" style="display:none;">Excluir</button>
+        <button class="btn" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarReserva()">Salvar</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Configurações do JSONBin.io
+    // Configuração dos 4 Usuários Nominais e Senhas
+    const USUARIOS = {
+      'psicologa1': { nome: 'Dra. Ana Silva', senha: '123' },
+      'psicologa2': { nome: 'Dr. Carlos Eduardo', senha: '123' },
+      'psicologa3': { nome: 'Dra. Mariane Costa', senha: '123' },
+      'recepcao':   { nome: 'Recepção / Geral', senha: '123' }
+    };
+
     const JSONBIN_CONFIG = {
       binId: '65a12345abc',
       apiKey: '$2a$10$HB3aLXcmVDYDE89zOm.mvuITBZxSjg1WGqEI7FSyZNZLok4QE9t7.',
@@ -133,35 +315,69 @@
     };
 
     const TURNOS = [
-      { id: 'manha', nome: 'Manhã', horario: '08:00 às 12:00' },
-      { id: 'tarde', nome: 'Tarde', horario: '13:00 às 17:00' },
-      { id: 'noite', nome: 'Noite', horario: '17:30 às 21:30' }
+      { id: 'manha', nome: 'Manhã', horario: '08:00 - 12:00' },
+      { id: 'tarde', nome: 'Tarde', horario: '13:00 - 17:00' },
+      { id: 'noite', nome: 'Noite', horario: '17:30 - 21:30' }
     ];
 
-    let dadosJsonBin = { reservas: [], logoUrl: '', logoPosicao: 'topo-direita' };
+    let usuarioAtual = null;
+    let dataAtual = new Date();
+    let dadosJsonBin = { reservas: [] };
 
-    // Define a data de hoje ao carregar
-    document.getElementById('dataSelecionada').value = new Date().toISOString().split('T')[0];
+    // Funções de Autenticação
+    function realizarLogin(event) {
+      event.preventDefault();
+      const userKey = document.getElementById('loginUsuario').value;
+      const senhaDigitada = document.getElementById('loginSenha').value;
 
-    async function buscarDadosJSONBin() {
-      try {
-        const resposta = await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}/latest`, {
-          headers: { 'X-Access-Key': JSONBIN_CONFIG.apiKey }
-        });
-        const resultado = await resposta.json();
-        
-        dadosJsonBin = resultado.record || {};
-        if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
-        
-        aplicarLogo();
-        renderizarTurnos();
-      } catch (erro) {
-        alert('Erro ao carregar dados do JSONBin.');
-        console.error(erro);
+      if (USUARIOS[userKey] && USUARIOS[userKey].senha === senhaDigitada) {
+        usuarioAtual = USUARIOS[userKey];
+        localStorage.setItem('usuarioLogado', userKey);
+        iniciarApp();
+      } else {
+        alert('Senha incorreta!');
       }
     }
 
-    async function salvarDadosJSONBin() {
+    function verificarSessao() {
+      const userKeySalvo = localStorage.getItem('usuarioLogado');
+      if (userKeySalvo && USUARIOS[userKeySalvo]) {
+        usuarioAtual = USUARIOS[userKeySalvo];
+        iniciarApp();
+      }
+    }
+
+    function realizarLogout() {
+      localStorage.removeItem('usuarioLogado');
+      usuarioAtual = null;
+      document.getElementById('telaLogin').style.display = 'flex';
+      document.getElementById('painelCalendario').style.display = 'none';
+      document.getElementById('loginSenha').value = '';
+    }
+
+    function iniciarApp() {
+      document.getElementById('telaLogin').style.display = 'none';
+      document.getElementById('painelCalendario').style.display = 'block';
+      document.getElementById('nomeUsuarioLogado').innerText = `👤 ${usuarioAtual.nome}`;
+      carregarDados();
+    }
+
+    // Carregar dados iniciais do JSONBin
+    async function carregarDados() {
+      try {
+        const res = await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}/latest`, {
+          headers: { 'X-Access-Key': JSONBIN_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        dadosJsonBin = json.record || { reservas: [] };
+        if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
+        renderizarCalendario();
+      } catch (err) {
+        console.error('Erro ao carregar reservas:', err);
+      }
+    }
+
+    async function guardarDados() {
       try {
         await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}`, {
           method: 'PUT',
@@ -171,160 +387,168 @@
           },
           body: JSON.stringify(dadosJsonBin)
         });
-        renderizarTurnos();
-      } catch (erro) {
-        alert('Erro ao salvar no JSONBin.');
-        console.error(erro);
+        renderizarCalendario();
+      } catch (err) {
+        alert('Erro ao guardar alteração.');
       }
     }
 
-    function renderizarTurnos() {
-      const data = document.getElementById('dataSelecionada').value;
-      const conteiner = document.getElementById('painelTurnos');
-      conteiner.innerHTML = '';
+    function getDiasDaSemana(dataRef) {
+      const inicioSemana = new Date(dataRef);
+      inicioSemana.setDate(dataRef.getDate() - dataRef.getDay());
+      
+      const dias = [];
+      for (let i = 0; i < 7; i++) {
+        const dia = new Date(inicioSemana);
+        dia.setDate(inicioSemana.getDate() + i);
+        dias.push(dia);
+      }
+      return dias;
+    }
 
+    function renderizarCalendario() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const diasSemana = getDiasDaSemana(dataAtual);
+      const opcoesMes = { month: 'long', year: 'numeric' };
+      document.getElementById('tituloMes').innerText = dataAtual.toLocaleDateString('pt-BR', opcoesMes);
+
+      // Cabeçalho da tabela
+      const headerVazio = document.createElement('div');
+      headerVazio.className = 'grid-header';
+      headerVazio.innerText = 'Turnos';
+      grid.appendChild(headerVazio);
+
+      const hoje = new Date().toISOString().split('T')[0];
+
+      diasSemana.forEach(dia => {
+        const dataIso = dia.toISOString().split('T')[0];
+        const divHeader = document.createElement('div');
+        divHeader.className = `grid-header ${dataIso === hoje ? 'today' : ''}`;
+        
+        const nomeDia = dia.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase();
+        const numDia = dia.getDate();
+        divHeader.innerHTML = `${nomeDia}<br><span style="font-size: 1.2rem">${numDia}</span>`;
+        grid.appendChild(divHeader);
+      });
+
+      // Linhas dos Turnos
       TURNOS.forEach(turno => {
-        const reserva = dadosJsonBin.reservas ? dadosJsonBin.reservas.find(r => r.data === data && r.turno === turno.id) : null;
-        const div = document.createElement('div');
-        div.className = `turno ${reserva ? 'ocupado' : 'livre'}`;
+        const divTime = document.createElement('div');
+        divTime.className = 'time-col';
+        divTime.innerHTML = `<strong>${turno.nome}</strong><br><small>${turno.horario}</small>`;
+        grid.appendChild(divTime);
 
-        if (reserva) {
-          div.innerHTML = `
-            <div>
-              <strong>${turno.nome} (${turno.horario})</strong><br>
-              <span>Psicóloga: ${reserva.psicologa}</span> ${reserva.observacao ? `<em>(${reserva.observacao})</em>` : ''}
-            </div>
-            <div>
-              <button class="btn-editar" onclick="editarReserva('${reserva.id}')">Editar</button>
-              <button class="btn-cancelar" onclick="cancelarReserva('${reserva.id}')">Excluir</button>
-            </div>
-          `;
-        } else {
-          div.innerHTML = `
-            <div>
-              <strong>${turno.nome} (${turno.horario})</strong><br>
-              <span style="color: green;">Disponível</span>
-            </div>
-            <button class="btn-reservar" onclick="criarReserva('${data}', '${turno.id}')">Reservar</button>
-          `;
-        }
-        conteiner.appendChild(div);
+        diasSemana.forEach(dia => {
+          const dataIso = dia.toISOString().split('T')[0];
+          const divSlot = document.createElement('div');
+          divSlot.className = 'day-slot';
+
+          const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id);
+
+          const card = document.createElement('div');
+          if (reserva) {
+            card.className = 'slot-card ocupado';
+            card.innerHTML = `
+              <div class="slot-title">${reserva.psicologa}</div>
+              <div class="slot-info">${reserva.observacao || 'Reservado'}</div>
+              <div style="font-size: 0.7rem; color: #888; margin-top: 4px;">Por: ${reserva.criadoPor || 'Sistema'}</div>
+            `;
+            card.onclick = () => abrirModal(dataIso, turno, reserva);
+          } else {
+            card.className = 'slot-card livre';
+            card.innerHTML = `
+              <div class="slot-title">Disponível</div>
+              <div class="slot-info">+ Clique p/ agendar</div>
+            `;
+            card.onclick = () => abrirModal(dataIso, turno, null);
+          }
+
+          divSlot.appendChild(card);
+          grid.appendChild(divSlot);
+        });
       });
     }
 
-    async function criarReserva(data, turno) {
-      const psicologa = prompt('Nome da Psicóloga:');
-      if (!psicologa) return;
+    function mudarSemana(offset) {
+      dataAtual.setDate(dataAtual.getDate() + (offset * 7));
+      renderizarCalendario();
+    }
 
-      const observacao = prompt('Observação (opcional):') || '';
+    function semanaAtual() {
+      dataAtual = new Date();
+      renderizarCalendario();
+    }
+
+    function abrirModal(dataIso, turno, reserva) {
+      document.getElementById('inputData').value = dataIso;
+      document.getElementById('inputTurno').value = turno.id;
       
-      const novaReserva = {
-        id: 'res_' + Date.now(),
-        data,
-        turno,
-        psicologa,
-        observacao,
-        criadoEm: new Date().toISOString()
-      };
+      const dataFmt = new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR');
+      document.getElementById('inputInfoDataHorario').value = `${dataFmt} - Turno ${turno.nome} (${turno.horario})`;
 
-      if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
-      dadosJsonBin.reservas.push(novaReserva);
-      await salvarDadosJSONBin();
-    }
-
-    async function editarReserva(id) {
-      const reserva = dadosJsonBin.reservas.find(r => r.id === id);
-      if (!reserva) return;
-
-      const novoNome = prompt('Alterar nome da Psicóloga:', reserva.psicologa);
-      if (novoNome === null) return;
-
-      const novaObs = prompt('Alterar observação:', reserva.observacao);
-      if (novaObs === null) return;
-
-      reserva.psicologa = novoNome;
-      reserva.observacao = novaObs;
-
-      await salvarDadosJSONBin();
-    }
-
-    async function cancelarReserva(id) {
-      if (!confirm('Deseja realmente excluir esta reserva?')) return;
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => r.id !== id);
-      await salvarDadosJSONBin();
-    }
-
-    function carregarReservas() {
-      renderizarTurnos();
-    }
-
-    /* --- Funções de Gestão do Logo --- */
-    function alternarPainelConfig() {
-      const painel = document.getElementById('configPainel');
-      painel.style.display = painel.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function uploadLogo(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        dadosJsonBin.logoUrl = e.target.result; // Salva a imagem convertida em Base64
-        aplicarLogo();
-        await salvarDadosJSONBin();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function alterarPosicaoLogo(posicao) {
-      dadosJsonBin.logoPosicao = posicao;
-      aplicarLogo();
-      await salvarDadosJSONBin();
-    }
-
-    async function removerLogo() {
-      dadosJsonBin.logoUrl = '';
-      aplicarLogo();
-      await salvarDadosJSONBin();
-    }
-
-    function aplicarLogo() {
-      const logoImg = document.getElementById('logoImg');
-      const headerContainer = document.getElementById('headerContainer');
-      const logoPosicao = dadosJsonBin.logoPosicao || 'topo-direita';
-
-      document.body.className = '';
-      document.body.style.backgroundImage = '';
-      headerContainer.className = 'header-container';
-
-      if (dadosJsonBin.logoPosicaoSelect) {
-        document.getElementById('logoPosicaoSelect').value = logoPosicao;
+      if (reserva) {
+        document.getElementById('modalTitulo').innerText = 'Alterar / Excluir Reserva';
+        document.getElementById('inputPsicologa').value = reserva.psicologa;
+        document.getElementById('inputObs').value = reserva.observacao || '';
+        document.getElementById('btnExcluir').style.display = 'inline-block';
+      } else {
+        document.getElementById('modalTitulo').innerText = 'Nova Reserva de Sala';
+        // Preenche automaticamente o nome da psicóloga caso não seja a recepção
+        document.getElementById('inputPsicologa').value = usuarioAtual.nome !== 'Recepção / Geral' ? usuarioAtual.nome : '';
+        document.getElementById('inputObs').value = '';
+        document.getElementById('btnExcluir').style.display = 'none';
       }
 
-      if (!dadosJsonBin.logoUrl) {
-        logoImg.style.display = 'none';
+      document.getElementById('modalReserva').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modalReserva').style.display = 'none';
+    }
+
+    async function salvarReserva() {
+      const dataIso = document.getElementById('inputData').value;
+      const turnoId = document.getElementById('inputTurno').value;
+      const psicologa = document.getElementById('inputPsicologa').value.trim();
+      const observacao = document.getElementById('inputObs').value.trim();
+
+      if (!psicologa) {
+        alert('Por favor, digite o nome do profissional/psicóloga.');
         return;
       }
 
-      if (logoPosicao === 'fundo') {
-        logoImg.style.display = 'none';
-        document.body.classList.add('logo-fundo');
-        document.body.style.backgroundImage = `url('${dadosJsonBin.logoUrl}')`;
-      } else {
-        logoImg.src = dadosJsonBin.logoUrl;
-        logoImg.style.display = 'block';
+      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId));
 
-        if (logoPosicao === 'topo-esquerda') {
-          headerContainer.classList.add('flex-reverse');
-        } else if (logoPosicao === 'topo-centro') {
-          headerContainer.classList.add('flex-center');
-        }
-      }
+      dadosJsonBin.reservas.push({
+        id: 'res_' + Date.now(),
+        data: dataIso,
+        turno: turnoId,
+        psicologa,
+        observacao,
+        criadoPor: usuarioAtual.nome,
+        criadoEm: new Date().toISOString()
+      });
+
+      fecharModal();
+      await guardarDados();
     }
 
-    // Inicialização ao carregar a página
-    buscarDadosJSONBin();
+    async function excluirReserva() {
+      if (!confirm('Tem certeza que deseja excluir esta reserva?')) return;
+
+      const dataIso = document.getElementById('inputData').value;
+      const turnoId = document.getElementById('inputTurno').value;
+
+      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId));
+
+      fecharModal();
+      await guardarDados();
+    }
+
+    // Inicialização da Sessão
+    verificarSessao();
   </script>
 </body>
 </html>
