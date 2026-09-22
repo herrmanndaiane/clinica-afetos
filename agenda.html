@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reserva de Sala - Psicologia</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 800px; 
+      margin: 20px auto; 
+      padding: 0 15px; 
+      position: relative;
+      min-height: 90vh;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+    }
+    
+    /* Cabeçalho e Logo */
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .header-container.flex-reverse {
+      flex-direction: row-reverse;
+    }
+    .header-container.flex-center {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .logo-img {
+      max-height: 80px;
+      max-width: 200px;
+      object-fit: contain;
+    }
+
+    /* Fundo Marca d'Água */
+    body.logo-fundo {
+      background-size: 300px;
+      background-position: center 150px;
+    }
+    body.logo-fundo .logo-header-wrapper {
+      display: none; /* Esconde do topo se estiver no fundo */
+    }
+
+    .card { 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      padding: 15px; 
+      margin-bottom: 15px; 
+      background-color: rgba(255, 255, 255, 0.92); /* Transparência para leitura com fundo */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .turno { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 12px; 
+      margin: 8px 0; 
+      border-radius: 6px; 
+    }
+    .livre { background-color: rgba(232, 245, 233, 0.95); border: 1px solid #a5d6a7; }
+    .ocupado { background-color: rgba(255, 235, 238, 0.95); border: 1px solid #ef9a9a; }
+    
+    button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+    .btn-reservar { background-color: #2e7d32; color: white; }
+    .btn-editar { background-color: #0288d1; color: white; }
+    .btn-cancelar { background-color: #c62828; color: white; margin-left: 5px; }
+    .btn-config { background-color: #616161; color: white; margin-left: 10px; font-size: 0.85em; }
+
+    .config-painel {
+      display: none;
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+    }
+    .config-painel label { display: block; margin-top: 8px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+
+  <div class="header-container" id="headerContainer">
+    <h2>Painel de Reserva de Sala</h2>
+    <div class="logo-header-wrapper" id="logoHeaderWrapper">
+      <img id="logoImg" class="logo-img" src="" alt="Logo da Clínica" style="display: none;">
+    </div>
+  </div>
+  
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <label for="dataSelecionada"><strong>Selecione a Data:</strong></label>
+        <input type="date" id="dataSelecionada" onchange="carregarReservas()">
+      </div>
+      <button class="btn-config" onclick="alternarPainelConfig()">⚙️ Configurar Logo</button>
+    </div>
+
+    <!-- Painel de Configuração do Logo -->
+    <div class="config-painel" id="configPainel">
+      <h4>Configurações da Logo da Clínica</h4>
+      <label>Enviar arquivo de Logo (PNG/JPG):</label>
+      <input type="file" id="logoFileInput" accept="image/*" onchange="uploadLogo(event)">
+      
+      <label>Posição do Logo:</label>
+      <select id="logoPosicaoSelect" onchange="alterarPosicaoLogo(this.value)">
+        <option value="topo-direita">Topo Dir.</option>
+        <option value="topo-esquerda">Topo Esq.</option>
+        <option value="topo-centro">Topo Centro</option>
+        <option value="fundo">Fundo (Marca d'água)</option>
+      </select>
+      
+      <button onclick="removerLogo()" style="margin-top: 10px; background-color: #d32f2f; color: white;">Remover Logo</button>
+    </div>
+  </div>
+
+  <div id="painelTurnos">
+    <!-- Os turnos serão renderizados via JavaScript -->
+  </div>
+
+  <script>
+    // Configurações do JSONBin.io
+    const JSONBIN_CONFIG = {
+      binId: '65a12345abc',
+      apiKey: '$2a$10$HB3aLXcmVDYDE89zOm.mvuITBZxSjg1WGqEI7FSyZNZLok4QE9t7.',
+      url: 'https://api.jsonbin.io/v3/b/'
+    };
+
+    const TURNOS = [
+      { id: 'manha', nome: 'Manhã', horario: '08:00 às 12:00' },
+      { id: 'tarde', nome: 'Tarde', horario: '13:00 às 17:00' },
+      { id: 'noite', nome: 'Noite', horario: '17:30 às 21:30' }
+    ];
+
+    let dadosJsonBin = { reservas: [], logoUrl: '', logoPosicao: 'topo-direita' };
+
+    // Define a data de hoje ao carregar
+    document.getElementById('dataSelecionada').value = new Date().toISOString().split('T')[0];
+
+    async function buscarDadosJSONBin() {
+      try {
+        const resposta = await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}/latest`, {
+          headers: { 'X-Access-Key': JSONBIN_CONFIG.apiKey }
+        });
+        const resultado = await resposta.json();
+        
+        dadosJsonBin = resultado.record || {};
+        if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
+        
+        aplicarLogo();
+        renderizarTurnos();
+      } catch (erro) {
+        alert('Erro ao carregar dados do JSONBin.');
+        console.error(erro);
+      }
+    }
+
+    async function salvarDadosJSONBin() {
+      try {
+        await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Access-Key': JSONBIN_CONFIG.apiKey
+          },
+          body: JSON.stringify(dadosJsonBin)
+        });
+        renderizarTurnos();
+      } catch (erro) {
+        alert('Erro ao salvar no JSONBin.');
+        console.error(erro);
+      }
+    }
+
+    function renderizarTurnos() {
+      const data = document.getElementById('dataSelecionada').value;
+      const conteiner = document.getElementById('painelTurnos');
+      conteiner.innerHTML = '';
+
+      TURNOS.forEach(turno => {
+        const reserva = dadosJsonBin.reservas ? dadosJsonBin.reservas.find(r => r.data === data && r.turno === turno.id) : null;
+        const div = document.createElement('div');
+        div.className = `turno ${reserva ? 'ocupado' : 'livre'}`;
+
+        if (reserva) {
+          div.innerHTML = `
+            <div>
+              <strong>${turno.nome} (${turno.horario})</strong><br>
+              <span>Psicóloga: ${reserva.psicologa}</span> ${reserva.observacao ? `<em>(${reserva.observacao})</em>` : ''}
+            </div>
+            <div>
+              <button class="btn-editar" onclick="editarReserva('${reserva.id}')">Editar</button>
+              <button class="btn-cancelar" onclick="cancelarReserva('${reserva.id}')">Excluir</button>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div>
+              <strong>${turno.nome} (${turno.horario})</strong><br>
+              <span style="color: green;">Disponível</span>
+            </div>
+            <button class="btn-reservar" onclick="criarReserva('${data}', '${turno.id}')">Reservar</button>
+          `;
+        }
+        conteiner.appendChild(div);
+      });
+    }
+
+    async function criarReserva(data, turno) {
+      const psicologa = prompt('Nome da Psicóloga:');
+      if (!psicologa) return;
+
+      const observacao = prompt('Observação (opcional):') || '';
+      
+      const novaReserva = {
+        id: 'res_' + Date.now(),
+        data,
+        turno,
+        psicologa,
+        observacao,
+        criadoEm: new Date().toISOString()
+      };
+
+      if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
+      dadosJsonBin.reservas.push(novaReserva);
+      await salvarDadosJSONBin();
+    }
+
+    async function editarReserva(id) {
+      const reserva = dadosJsonBin.reservas.find(r => r.id === id);
+      if (!reserva) return;
+
+      const novoNome = prompt('Alterar nome da Psicóloga:', reserva.psicologa);
+      if (novoNome === null) return;
+
+      const novaObs = prompt('Alterar observação:', reserva.observacao);
+      if (novaObs === null) return;
+
+      reserva.psicologa = novoNome;
+      reserva.observacao = novaObs;
+
+      await salvarDadosJSONBin();
+    }
+
+    async function cancelarReserva(id) {
+      if (!confirm('Deseja realmente excluir esta reserva?')) return;
+      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => r.id !== id);
+      await salvarDadosJSONBin();
+    }
+
+    function carregarReservas() {
+      renderizarTurnos();
+    }
+
+    /* --- Funções de Gestão do Logo --- */
+    function alternarPainelConfig() {
+      const painel = document.getElementById('configPainel');
+      painel.style.display = painel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function uploadLogo(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        dadosJsonBin.logoUrl = e.target.result; // Salva a imagem convertida em Base64
+        aplicarLogo();
+        await salvarDadosJSONBin();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function alterarPosicaoLogo(posicao) {
+      dadosJsonBin.logoPosicao = posicao;
+      aplicarLogo();
+      await salvarDadosJSONBin();
+    }
+
+    async function removerLogo() {
+      dadosJsonBin.logoUrl = '';
+      aplicarLogo();
+      await salvarDadosJSONBin();
+    }
+
+    function aplicarLogo() {
+      const logoImg = document.getElementById('logoImg');
+      const headerContainer = document.getElementById('headerContainer');
+      const logoPosicao = dadosJsonBin.logoPosicao || 'topo-direita';
+
+      document.body.className = '';
+      document.body.style.backgroundImage = '';
+      headerContainer.className = 'header-container';
+
+      if (dadosJsonBin.logoPosicaoSelect) {
+        document.getElementById('logoPosicaoSelect').value = logoPosicao;
+      }
+
+      if (!dadosJsonBin.logoUrl) {
+        logoImg.style.display = 'none';
+        return;
+      }
+
+      if (logoPosicao === 'fundo') {
+        logoImg.style.display = 'none';
+        document.body.classList.add('logo-fundo');
+        document.body.style.backgroundImage = `url('${dadosJsonBin.logoUrl}')`;
+      } else {
+        logoImg.src = dadosJsonBin.logoUrl;
+        logoImg.style.display = 'block';
+
+        if (logoPosicao === 'topo-esquerda') {
+          headerContainer.classList.add('flex-reverse');
+        } else if (logoPosicao === 'topo-centro') {
+          headerContainer.classList.add('flex-center');
+        }
+      }
+    }
+
+    // Inicialização ao carregar a página
+    buscarDadosJSONBin();
+  </script>
+</body>
+</html>
