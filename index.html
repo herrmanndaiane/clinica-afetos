@@ -7,16 +7,39 @@
   <style>
     :root {
       --primary-color: #6b1d2f;    /* Bordô principal */
-      --primary-hover: #501422;    /* Bordô escuro para hover */
-      --accent-color: #8b263e;     
-      --bg-color: #ffffff;         /* Fundo da página (Branco) */
+      --primary-hover: #501422;    
+      --bg-color: #ffffff;         /* Fundo da página */
       --border-color: #e0e0e0;     
       --free-bg: #f4fbf7;          /* Turno Livre */
       --free-border: #a8dab5;      
       --free-text: #1b5e20;        
-      --busy-bg: #fdf2f4;          /* Turno Ocupado */
-      --busy-border: #e5b0b9;      
-      --busy-text: #6b1d2f;        
+    }
+
+    /* Cores Específicas por Profissional */
+    .slot-card.pro-karine {
+      background-color: #fce4ec !important;
+      border: 1px solid #f8bbd0 !important;
+      color: #880e4f !important;
+    }
+    .slot-card.pro-natalia {
+      background-color: #e3f2fd !important;
+      border: 1px solid #bbdefb !important;
+      color: #0d47a1 !important;
+    }
+    .slot-card.pro-marilia {
+      background-color: #f3e5f5 !important;
+      border: 1px solid #e1bee7 !important;
+      color: #4a148c !important;
+    }
+    .slot-card.pro-recepcao {
+      background-color: #fffde7 !important;
+      border: 1px solid #fff9c4 !important;
+      color: #f57f17 !important;
+    }
+    .slot-card.pro-outros {
+      background-color: #fdf2f4 !important;
+      border: 1px solid #e5b0b9 !important;
+      color: #6b1d2f !important;
     }
 
     body {
@@ -144,6 +167,27 @@
       border-color: var(--primary-color);
     }
 
+    /* Legenda de Cores */
+    .legenda-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      align-items: center;
+    }
+
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legenda-cor {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+
     /* Tabela da Semana */
     .calendar-grid {
       display: grid;
@@ -208,12 +252,6 @@
       color: var(--free-text);
     }
 
-    .slot-card.ocupado {
-      background: var(--busy-bg);
-      border: 1px solid var(--busy-border);
-      color: var(--busy-text);
-    }
-
     .slot-title {
       font-weight: bold;
       font-size: 0.85rem;
@@ -239,7 +277,7 @@
       background: white;
       padding: 25px;
       border-radius: 8px;
-      width: 350px;
+      width: 360px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
@@ -265,6 +303,14 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       box-sizing: border-box;
+    }
+
+    .recorrencia-box {
+      background: #f8f9fa;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      margin-top: 10px;
     }
 
     .modal-actions {
@@ -312,11 +358,9 @@
       </div>
 
       <div class="user-info">
-        <!-- Logo (Sem botão de upload) -->
         <div class="logo-container">
           <img id="imgLogoTopo" class="logo-img" src="" alt="Logo" style="display: none;">
         </div>
-
         <span id="nomeUsuarioLogado" style="font-weight: bold; color: var(--primary-color);"></span>
         <button class="btn" onclick="abrirModalSenha()">🔑 Alterar Senha</button>
         <button class="btn" onclick="realizarLogout()">Sair</button>
@@ -327,6 +371,15 @@
     <div class="tabs-container">
       <button class="tab-btn active" id="tabSala1" onclick="mudarSala('sala1')">Sala 01 - Maior</button>
       <button class="tab-btn" id="tabSala2" onclick="mudarSala('sala2')">Sala 02 - Compartilhada</button>
+    </div>
+
+    <!-- Legenda de Cores -->
+    <div class="legenda-container" style="margin-top: 10px;">
+      <strong>Legenda:</strong>
+      <div class="legenda-item"><div class="legenda-cor" style="background:#fce4ec; border:1px solid #f8bbd0;"></div> Karine</div>
+      <div class="legenda-item"><div class="legenda-cor" style="background:#e3f2fd; border:1px solid #bbdefb;"></div> Natália</div>
+      <div class="legenda-item"><div class="legenda-cor" style="background:#f3e5f5; border:1px solid #e1bee7;"></div> Marília</div>
+      <div class="legenda-item"><div class="legenda-cor" style="background:#fffde7; border:1px solid #fff9c4;"></div> Recepção</div>
     </div>
 
     <!-- Grade do Calendário -->
@@ -354,7 +407,18 @@
 
       <div class="form-group">
         <label for="inputObs">Observação</label>
-        <textarea id="inputObs" rows="3" placeholder="Atendimento presencial, consulta..."></textarea>
+        <textarea id="inputObs" rows="2" placeholder="Atendimento presencial, consulta..."></textarea>
+      </div>
+
+      <!-- Caixa de Recorrência -->
+      <div class="recorrencia-box" id="boxRecorrencia">
+        <label style="font-weight: bold; cursor: pointer;">
+          <input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente neste turno
+        </label>
+        <div id="divDataFimRecorrencia" style="display: none; margin-top: 10px;">
+          <label style="font-size: 0.8rem;">Repetir até a data:</label>
+          <input type="date" id="inputDataFimRecorrencia">
+        </div>
       </div>
 
       <div class="modal-actions">
@@ -390,10 +454,10 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: 'K@r1n&' },
-      'natalia':  { nome: 'Natália', senha: 'N@t4l!4' },
-      'marilia':  { nome: 'Marília', senha: 'M4r!Li4' },
-      'recepcao': { nome: 'Recepção', senha: 'R3cPc@0' }
+      'karine':   { nome: 'Karine', senha: 'K@r1n3' },
+      'natalia':  { nome: 'Natália', senha: 'N4t@L!4' },
+      'marilia':  { nome: 'Marília', senha: 'M4R1Li4' },
+      'recepcao': { nome: 'Recepção', senha: '123' }
     };
 
     const JSONBIN_CONFIG = {
@@ -409,7 +473,7 @@
     ];
 
     let userKeyAtual = null;
-    let salaAtual = 'sala1'; // 'sala1' ou 'sala2'
+    let salaAtual = 'sala1'; 
     let dataAtual = new Date();
     let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, logoUrl: '' };
 
@@ -457,7 +521,6 @@
       }
     }
 
-    /* Abas das Salas */
     function mudarSala(idSala) {
       salaAtual = idSala;
       document.getElementById('tabSala1').classList.toggle('active', idSala === 'sala1');
@@ -465,7 +528,6 @@
       renderizarCalendario();
     }
 
-    /* Login e Sessão */
     function realizarLogin(event) {
       event.preventDefault();
       const key = document.getElementById('loginUsuario').value;
@@ -513,7 +575,6 @@
       renderizarCalendario();
     }
 
-    /* Modal de Senha */
     function abrirModalSenha() {
       document.getElementById('senhaAtual').value = '';
       document.getElementById('novaSenha').value = '';
@@ -548,7 +609,6 @@
       fecharModal('modalSenha');
     }
 
-    /* Renderização do Calendário */
     function getDiasDaSemana(dataRef) {
       const inicioSemana = new Date(dataRef);
       inicioSemana.setDate(dataRef.getDate() - dataRef.getDay());
@@ -560,6 +620,17 @@
         dias.push(dia);
       }
       return dias;
+    }
+
+    // Identificar a classe CSS da cor conforme o nome da profissional
+    function getClasseCorProfissional(nome) {
+      if (!nome) return 'pro-outros';
+      const n = nome.toLowerCase();
+      if (n.includes('karine')) return 'pro-karine';
+      if (n.includes('natália') || n.includes('natalia')) return 'pro-natalia';
+      if (n.includes('marília') || n.includes('marilia')) return 'pro-marilia';
+      if (n.includes('recepção') || n.includes('recepcao')) return 'pro-recepcao';
+      return 'pro-outros';
     }
 
     function renderizarCalendario() {
@@ -603,7 +674,8 @@
 
           const card = document.createElement('div');
           if (reserva) {
-            card.className = 'slot-card ocupado';
+            const classeCor = getClasseCorProfissional(reserva.psicologa);
+            card.className = `slot-card ocupado ${classeCor}`;
             card.innerHTML = `
               <div class="slot-title">${reserva.psicologa}</div>
               <div class="slot-info">${reserva.observacao || 'Reservado'}</div>
@@ -635,7 +707,12 @@
       renderizarCalendario();
     }
 
-    /* Modal de Reservas (Inclusão / Edição / Exclusão) */
+    /* Gestão do Form de Recorrência */
+    function alternarDataFimRecorrencia() {
+      const chk = document.getElementById('chkRecorrente').checked;
+      document.getElementById('divDataFimRecorrencia').style.display = chk ? 'block' : 'none';
+    }
+
     function abrirModalReserva(dataIso, turno, reserva) {
       document.getElementById('inputData').value = dataIso;
       document.getElementById('inputTurno').value = turno.id;
@@ -646,16 +723,26 @@
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
 
+      document.getElementById('chkRecorrente').checked = false;
+      document.getElementById('divDataFimRecorrencia').style.display = 'none';
+
+      // Define uma data limite padrão de 3 meses para a recorrência
+      const dataPadraoFim = new Date(dataIso + 'T00:00:00');
+      dataPadraoFim.setMonth(dataPadraoFim.getMonth() + 3);
+      document.getElementById('inputDataFimRecorrencia').value = dataPadraoFim.toISOString().split('T')[0];
+
       if (reserva) {
         document.getElementById('modalTitulo').innerText = 'Alterar / Excluir Reserva';
         document.getElementById('inputPsicologa').value = reserva.psicologa;
         document.getElementById('inputObs').value = reserva.observacao || '';
         document.getElementById('btnExcluir').style.display = 'inline-block';
+        document.getElementById('boxRecorrencia').style.display = 'none'; // Esconde opção de repetir em edição
       } else {
         document.getElementById('modalTitulo').innerText = 'Nova Reserva de Sala';
         document.getElementById('inputPsicologa').value = usuarioLogado.nome !== 'Recepção' ? usuarioLogado.nome : '';
         document.getElementById('inputObs').value = '';
         document.getElementById('btnExcluir').style.display = 'none';
+        document.getElementById('boxRecorrencia').style.display = 'block';
       }
 
       document.getElementById('modalReserva').style.display = 'flex';
@@ -670,26 +757,56 @@
       const turnoId = document.getElementById('inputTurno').value;
       const psicologa = document.getElementById('inputPsicologa').value.trim();
       const observacao = document.getElementById('inputObs').value.trim();
+      const eRecorrente = document.getElementById('chkRecorrente').checked;
+      const dataFimIso = document.getElementById('inputDataFimRecorrencia').value;
 
       if (!psicologa) {
         alert('Por favor, informe o nome do profissional.');
         return;
       }
 
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
-
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
 
-      dadosJsonBin.reservas.push({
-        id: 'res_' + Date.now(),
-        data: dataIso,
-        turno: turnoId,
-        sala: salaAtual,
-        psicologa,
-        observacao,
-        criadoPor: usuarioLogado.nome,
-        criadoEm: new Date().toISOString()
-      });
+      // Se for marcar recorrência
+      if (eRecorrente && dataFimIso) {
+        let tempDate = new Date(dataIso + 'T00:00:00');
+        const limitDate = new Date(dataFimIso + 'T23:59:59');
+
+        while (tempDate <= limitDate) {
+          const isoCurr = tempDate.toISOString().split('T')[0];
+          
+          // Remove conflito se já existir para a data/turno
+          dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === isoCurr && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
+
+          dadosJsonBin.reservas.push({
+            id: 'res_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            data: isoCurr,
+            turno: turnoId,
+            sala: salaAtual,
+            psicologa,
+            observacao,
+            criadoPor: usuarioLogado.nome,
+            criadoEm: new Date().toISOString()
+          });
+
+          // Avança 7 dias (1 semana)
+          tempDate.setDate(tempDate.getDate() + 7);
+        }
+      } else {
+        // Reserva única normal
+        dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
+
+        dadosJsonBin.reservas.push({
+          id: 'res_' + Date.now(),
+          data: dataIso,
+          turno: turnoId,
+          sala: salaAtual,
+          psicologa,
+          observacao,
+          criadoPor: usuarioLogado.nome,
+          criadoEm: new Date().toISOString()
+        });
+      }
 
       fecharModal('modalReserva');
       await guardarDados();
