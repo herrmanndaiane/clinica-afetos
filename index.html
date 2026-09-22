@@ -5,21 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda da Clínica - Reserva de Salas</title>
   <style>
-    /* =========================================================
-       1. ONDE AJUSTAR AS CORES DO SISTEMA
-       ========================================================= */
     :root {
-      --primary-color: #6b1d2f;    /* Bordô principal (Botões, Títulos, Cabeçalho) */
-      --primary-hover: #501422;    /* Bordô mais escuro para o efeito de clique */
-      --accent-color: #8b263e;     /* Bordô secundário (Aba ativa) */
+      --primary-color: #6b1d2f;    /* Bordô principal */
+      --primary-hover: #501422;    /* Bordô escuro para hover */
+      --accent-color: #8b263e;     
       --bg-color: #ffffff;         /* Fundo da página (Branco) */
-      --border-color: #e0e0e0;     /* Linhas e bordas da grade */
-      --free-bg: #f4fbf7;          /* Fundo do turno Livre (Verde claro) */
-      --free-border: #a8dab5;      /* Borda do turno Livre */
-      --free-text: #1b5e20;        /* Texto do turno Livre */
-      --busy-bg: #fdf2f4;          /* Fundo do turno Ocupado (Bordô bem suave) */
-      --busy-border: #e5b0b9;      /* Borda do turno Ocupado */
-      --busy-text: #6b1d2f;        /* Texto do turno Ocupado */
+      --border-color: #e0e0e0;     
+      --free-bg: #f4fbf7;          /* Turno Livre */
+      --free-border: #a8dab5;      
+      --free-text: #1b5e20;        
+      --busy-bg: #fdf2f4;          /* Turno Ocupado */
+      --busy-border: #e5b0b9;      
+      --busy-text: #6b1d2f;        
     }
 
     body {
@@ -55,7 +52,7 @@
       color: var(--primary-color);
     }
 
-    /* Cabeçalho e Logo */
+    /* Cabeçalho */
     .header {
       display: flex;
       justify-content: space-between;
@@ -77,7 +74,6 @@
     .logo-container {
       display: flex;
       align-items: center;
-      gap: 10px;
     }
 
     .logo-img {
@@ -148,7 +144,7 @@
       border-color: var(--primary-color);
     }
 
-    /* Tabela da Semana (Estilo Google Calendar) */
+    /* Tabela da Semana */
     .calendar-grid {
       display: grid;
       grid-template-columns: 120px repeat(7, 1fr);
@@ -316,11 +312,9 @@
       </div>
 
       <div class="user-info">
-        <!-- Logo e Envio da Logo -->
+        <!-- Logo (Sem botão de upload) -->
         <div class="logo-container">
           <img id="imgLogoTopo" class="logo-img" src="" alt="Logo" style="display: none;">
-          <button class="btn" onclick="document.getElementById('inputUploadLogo').click()" style="font-size: 0.75rem; padding: 4px 8px;">📷 Logo</button>
-          <input type="file" id="inputUploadLogo" accept="image/*" style="display: none;" onchange="uploadLogo(event)">
         </div>
 
         <span id="nomeUsuarioLogado" style="font-weight: bold; color: var(--primary-color);"></span>
@@ -341,7 +335,7 @@
     </div>
   </div>
 
-  <!-- Modal para Inclusão/Edição de Reserva -->
+  <!-- Modal para Inclusão/Edição/Exclusão de Reserva -->
   <div class="modal" id="modalReserva">
     <div class="modal-content">
       <h3 id="modalTitulo">Agendar Turno</h3>
@@ -396,10 +390,10 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: 'K@r1n3#' },
-      'natalia':  { nome: 'Natália', senha: 'n@t4l!@' },
-      'marilia':  { nome: 'Marília', senha: 'M4r!Li@' },
-      'recepcao': { nome: 'Recepção', senha: 'R3c&pc@0' }
+      'karine':   { nome: 'Karine', senha: 'K@r1n&' },
+      'natalia':  { nome: 'Natália', senha: 'N@t4l!4' },
+      'marilia':  { nome: 'Marília', senha: 'M4r!Li4' },
+      'recepcao': { nome: 'Recepção', senha: 'R3cPc@0' }
     };
 
     const JSONBIN_CONFIG = {
@@ -451,20 +445,6 @@
       } catch (err) {
         alert('Erro ao guardar alterações.');
       }
-    }
-
-    /* Gestão da Logo */
-    function uploadLogo(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        dadosJsonBin.logoUrl = e.target.result;
-        exibirLogo();
-        await guardarDados();
-      };
-      reader.readAsDataURL(file);
     }
 
     function exibirLogo() {
@@ -619,7 +599,6 @@
           const divSlot = document.createElement('div');
           divSlot.className = 'day-slot';
 
-          // Filtra pela data, pelo turno E PELA SALA ATUAL
           const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id && (r.sala || 'sala1') === salaAtual);
 
           const card = document.createElement('div');
@@ -656,7 +635,7 @@
       renderizarCalendario();
     }
 
-    /* Modal de Reservas */
+    /* Modal de Reservas (Inclusão / Edição / Exclusão) */
     function abrirModalReserva(dataIso, turno, reserva) {
       document.getElementById('inputData').value = dataIso;
       document.getElementById('inputTurno').value = turno.id;
@@ -697,7 +676,6 @@
         return;
       }
 
-      // Remove reserva existente no mesmo dia, turno e sala
       dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
