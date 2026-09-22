@@ -91,7 +91,7 @@
     .user-info {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .logo-container {
@@ -112,7 +112,7 @@
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 8px 14px;
       border: 1px solid var(--border-color);
       border-radius: 4px;
       background: white;
@@ -174,6 +174,7 @@
       margin-bottom: 12px;
       font-size: 0.85rem;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .legenda-item {
@@ -331,11 +332,7 @@
         <div class="form-group">
           <label for="loginUsuario">Usuário</label>
           <select id="loginUsuario" required>
-            <option value="">Selecione seu usuário...</option>
-            <option value="karine">Karine</option>
-            <option value="natalia">Natália</option>
-            <option value="marilia">Marília</option>
-            <option value="recepcao">Recepção</option>
+            <!-- Opções renderizadas via JS conforme usuárias cadastradas -->
           </select>
         </div>
         <div class="form-group">
@@ -362,6 +359,7 @@
           <img id="imgLogoTopo" class="logo-img" src="" alt="Logo" style="display: none;">
         </div>
         <span id="nomeUsuarioLogado" style="font-weight: bold; color: var(--primary-color);"></span>
+        <button class="btn" onclick="abrirModalNovaProfissional()">➕ Nova Profissional</button>
         <button class="btn" onclick="abrirModalSenha()">🔑 Alterar Senha</button>
         <button class="btn" onclick="realizarLogout()">Sair</button>
       </div>
@@ -452,12 +450,31 @@
     </div>
   </div>
 
+  <!-- Modal para Cadastrar Nova Profissional -->
+  <div class="modal" id="modalNovaProfissional">
+    <div class="modal-content">
+      <h3>Cadastrar Nova Profissional</h3>
+      <div class="form-group">
+        <label for="novoNomeProfissional">Nome da Profissional *</label>
+        <input type="text" id="novoNomeProfissional" placeholder="Ex: Dra. Juliana">
+      </div>
+      <div class="form-group">
+        <label for="novaSenhaProfissional">Senha Inicial *</label>
+        <input type="password" id="novaSenhaProfissional" placeholder="Defina a senha inicial">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="fecharModal('modalNovaProfissional')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarNovaProfissional()">Cadastrar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: 'K@r1n3' },
-      'natalia':  { nome: 'Natália', senha: 'N4t@L!4' },
-      'marilia':  { nome: 'Marília', senha: 'M4R1Li4' },
-      'recepcao': { nome: 'Recepção', senha: '123' }
+      'karine':   { nome: 'Karine', senha: 'K@r!n3' },
+      'natalia':  { nome: 'Natália', senha: 'N@t4L14' },
+      'marilia':  { nome: 'Marília', senha: 'M4r!LI4' },
+      'recepcao': { nome: 'Recepção', senha: 'R3cPc@0' }
     };
 
     const JSONBIN_CONFIG = {
@@ -488,6 +505,7 @@
         if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
         if (!dadosJsonBin.usuarios || !dadosJsonBin.usuarios.karine) dadosJsonBin.usuarios = USUARIOS_PADRAO;
 
+        atualizarSelectUsuariosLogin();
         exibirLogo();
         verificarSessao();
       } catch (err) {
@@ -509,6 +527,19 @@
       } catch (err) {
         alert('Erro ao guardar alterações.');
       }
+    }
+
+    function atualizarSelectUsuariosLogin() {
+      const select = document.getElementById('loginUsuario');
+      select.innerHTML = '<option value="">Selecione seu usuário...</option>';
+      const usuarios = dadosJsonBin.usuarios || USUARIOS_PADRAO;
+
+      Object.keys(usuarios).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = usuarios[key].nome;
+        select.appendChild(opt);
+      });
     }
 
     function exibirLogo() {
@@ -575,6 +606,35 @@
       renderizarCalendario();
     }
 
+    /* Modal Nova Profissional */
+    function abrirModalNovaProfissional() {
+      document.getElementById('novoNomeProfissional').value = '';
+      document.getElementById('novaSenhaProfissional').value = '';
+      document.getElementById('modalNovaProfissional').style.display = 'flex';
+    }
+
+    async function salvarNovaProfissional() {
+      const nome = document.getElementById('novoNomeProfissional').value.trim();
+      const senha = document.getElementById('novaSenhaProfissional').value.trim();
+
+      if (!nome || !senha) {
+        alert('Por favor, preencha o nome e a senha inicial.');
+        return;
+      }
+
+      // Gera uma chave simplificada (sem espaços e acentos)
+      const key = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_') + '_' + Date.now();
+
+      if (!dadosJsonBin.usuarios) dadosJsonBin.usuarios = USUARIOS_PADRAO;
+      dadosJsonBin.usuarios[key] = { nome, senha };
+
+      fecharModal('modalNovaProfissional');
+      atualizarSelectUsuariosLogin();
+      await guardarDados();
+      alert(`Profissional "${nome}" cadastrada com sucesso!`);
+    }
+
+    /* Modal de Senha */
     function abrirModalSenha() {
       document.getElementById('senhaAtual').value = '';
       document.getElementById('novaSenha').value = '';
@@ -622,7 +682,6 @@
       return dias;
     }
 
-    // Identificar a classe CSS da cor conforme o nome da profissional
     function getClasseCorProfissional(nome) {
       if (!nome) return 'pro-outros';
       const n = nome.toLowerCase();
@@ -707,12 +766,12 @@
       renderizarCalendario();
     }
 
-    /* Gestão do Form de Recorrência */
     function alternarDataFimRecorrencia() {
       const chk = document.getElementById('chkRecorrente').checked;
       document.getElementById('divDataFimRecorrencia').style.display = chk ? 'block' : 'none';
     }
 
+    /* Modal de Reservas (Com campo de nome bloqueado) */
     function abrirModalReserva(dataIso, turno, reserva) {
       document.getElementById('inputData').value = dataIso;
       document.getElementById('inputTurno').value = turno.id;
@@ -722,24 +781,38 @@
       document.getElementById('inputInfoDataHorario').value = `${nomeSala} | ${dataFmt} (${turno.nome})`;
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
+      const campoPsicologa = document.getElementById('inputPsicologa');
 
       document.getElementById('chkRecorrente').checked = false;
       document.getElementById('divDataFimRecorrencia').style.display = 'none';
 
-      // Define uma data limite padrão de 3 meses para a recorrência
       const dataPadraoFim = new Date(dataIso + 'T00:00:00');
       dataPadraoFim.setMonth(dataPadraoFim.getMonth() + 3);
       document.getElementById('inputDataFimRecorrencia').value = dataPadraoFim.toISOString().split('T')[0];
 
       if (reserva) {
         document.getElementById('modalTitulo').innerText = 'Alterar / Excluir Reserva';
-        document.getElementById('inputPsicologa').value = reserva.psicologa;
+        campoPsicologa.value = reserva.psicologa;
+        campoPsicologa.readOnly = true; // Bloqueado
+        campoPsicologa.style.background = '#f5f5f5';
+
         document.getElementById('inputObs').value = reserva.observacao || '';
         document.getElementById('btnExcluir').style.display = 'inline-block';
-        document.getElementById('boxRecorrencia').style.display = 'none'; // Esconde opção de repetir em edição
+        document.getElementById('boxRecorrencia').style.display = 'none';
       } else {
         document.getElementById('modalTitulo').innerText = 'Nova Reserva de Sala';
-        document.getElementById('inputPsicologa').value = usuarioLogado.nome !== 'Recepção' ? usuarioLogado.nome : '';
+        
+        // Se for a Recepção, deixa digitar. Se for uma psicóloga, FIXA O NOME dela.
+        if (usuarioLogado.nome.toLowerCase().includes('recepção') || usuarioLogado.nome.toLowerCase().includes('recepcao')) {
+          campoPsicologa.value = '';
+          campoPsicologa.readOnly = false;
+          campoPsicologa.style.background = '#ffffff';
+        } else {
+          campoPsicologa.value = usuarioLogado.nome;
+          campoPsicologa.readOnly = true; // Bloqueado para edição
+          campoPsicologa.style.background = '#f5f5f5';
+        }
+
         document.getElementById('inputObs').value = '';
         document.getElementById('btnExcluir').style.display = 'none';
         document.getElementById('boxRecorrencia').style.display = 'block';
@@ -767,7 +840,6 @@
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
 
-      // Se for marcar recorrência
       if (eRecorrente && dataFimIso) {
         let tempDate = new Date(dataIso + 'T00:00:00');
         const limitDate = new Date(dataFimIso + 'T23:59:59');
@@ -775,7 +847,6 @@
         while (tempDate <= limitDate) {
           const isoCurr = tempDate.toISOString().split('T')[0];
           
-          // Remove conflito se já existir para a data/turno
           dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === isoCurr && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
 
           dadosJsonBin.reservas.push({
@@ -789,11 +860,9 @@
             criadoEm: new Date().toISOString()
           });
 
-          // Avança 7 dias (1 semana)
           tempDate.setDate(tempDate.getDate() + 7);
         }
       } else {
-        // Reserva única normal
         dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
 
         dadosJsonBin.reservas.push({
