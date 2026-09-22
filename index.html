@@ -3,23 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda da Clínica - Formato Google Calendar</title>
+  <title>Agenda da Clínica - Reserva de Salas</title>
   <style>
+    /* =========================================================
+       1. ONDE AJUSTAR AS CORES DO SISTEMA
+       ========================================================= */
     :root {
-      --primary-color: #1a73e8;
-      --border-color: #dadce0;
-      --free-bg: #e6f4ea;
-      --free-text: #137333;
-      --busy-bg: #feefc3;
-      --busy-text: #b06000;
+      --primary-color: #6b1d2f;    /* Bordô principal (Botões, Títulos, Cabeçalho) */
+      --primary-hover: #501422;    /* Bordô mais escuro para o efeito de clique */
+      --accent-color: #8b263e;     /* Bordô secundário (Aba ativa) */
+      --bg-color: #ffffff;         /* Fundo da página (Branco) */
+      --border-color: #e0e0e0;     /* Linhas e bordas da grade */
+      --free-bg: #f4fbf7;          /* Fundo do turno Livre (Verde claro) */
+      --free-border: #a8dab5;      /* Borda do turno Livre */
+      --free-text: #1b5e20;        /* Texto do turno Livre */
+      --busy-bg: #fdf2f4;          /* Fundo do turno Ocupado (Bordô bem suave) */
+      --busy-border: #e5b0b9;      /* Borda do turno Ocupado */
+      --busy-text: #6b1d2f;        /* Texto do turno Ocupado */
     }
 
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f8f9fa;
-      color: #3c4043;
+      background-color: var(--bg-color);
+      color: #333333;
     }
 
     /* Tela de Login */
@@ -34,7 +42,8 @@
       background: white;
       padding: 30px;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 15px rgba(107, 29, 47, 0.15);
+      border: 1px solid var(--border-color);
       width: 100%;
       max-width: 360px;
     }
@@ -46,22 +55,35 @@
       color: var(--primary-color);
     }
 
-    /* Cabeçalho e Controles */
+    /* Cabeçalho e Logo */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       background: white;
       padding: 15px 20px;
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
     }
 
     .user-info {
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-img {
+      max-height: 45px;
+      max-width: 150px;
+      object-fit: contain;
     }
 
     .nav-controls {
@@ -77,6 +99,7 @@
       background: white;
       cursor: pointer;
       font-weight: 500;
+      transition: all 0.2s;
     }
 
     .btn-primary {
@@ -85,15 +108,44 @@
       border: none;
     }
 
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
     .btn-danger {
-      background: #d32f2f;
+      background: #c62828;
       color: white;
       border: none;
     }
 
     .month-title {
-      font-size: 1.25rem;
-      font-weight: 500;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    /* Abas das Salas */
+    .tabs-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: -1px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: #f5f5f5;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      font-weight: bold;
+      color: #666;
+    }
+
+    .tab-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
     }
 
     /* Tabela da Semana (Estilo Google Calendar) */
@@ -102,27 +154,28 @@
       grid-template-columns: 120px repeat(7, 1fr);
       background: white;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 0 8px 8px 8px;
       overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .grid-header {
-      background: #f1f3f4;
+      background: #fafafa;
       padding: 12px;
       text-align: center;
       font-weight: bold;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 2px solid var(--border-color);
       border-right: 1px solid var(--border-color);
+      color: var(--primary-color);
     }
 
     .grid-header.today {
+      background: #fdf2f4;
       color: var(--primary-color);
-      background: #e8f0fe;
     }
 
     .time-col {
-      background: #f8f9fa;
+      background: #fafafa;
       padding: 15px 10px;
       font-size: 0.85rem;
       font-weight: bold;
@@ -131,14 +184,14 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      color: #555;
     }
 
     .day-slot {
-      padding: 10px;
+      padding: 8px;
       border-right: 1px solid var(--border-color);
       border-bottom: 1px solid var(--border-color);
-      min-height: 90px;
-      transition: background 0.2s;
+      min-height: 95px;
     }
 
     /* Cartões dos Turnos */
@@ -155,13 +208,13 @@
 
     .slot-card.livre {
       background: var(--free-bg);
-      border: 1px dashed #a8dab5;
+      border: 1px dashed var(--free-border);
       color: var(--free-text);
     }
 
     .slot-card.ocupado {
       background: var(--busy-bg);
-      border: 1px solid #fdd835;
+      border: 1px solid var(--busy-border);
       color: var(--busy-text);
     }
 
@@ -175,7 +228,7 @@
       margin-top: 4px;
     }
 
-    /* Modal / Janela Flutuante */
+    /* Modais */
     .modal {
       display: none;
       position: fixed;
@@ -191,10 +244,13 @@
       padding: 25px;
       border-radius: 8px;
       width: 350px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
-    .modal-content h3 { margin-top: 0; }
+    .modal-content h3 { 
+      margin-top: 0; 
+      color: var(--primary-color); 
+    }
 
     .form-group {
       margin-bottom: 15px;
@@ -204,6 +260,7 @@
       display: block;
       font-size: 0.85rem;
       margin-bottom: 5px;
+      font-weight: 500;
     }
 
     .form-group input, .form-group select, .form-group textarea {
@@ -248,7 +305,7 @@
     </div>
   </div>
 
-  <!-- Painel do Calendário (Oculto antes do Login) -->
+  <!-- Painel Principal (Calendário) -->
   <div id="painelCalendario" style="display: none;">
     <div class="header">
       <div class="nav-controls">
@@ -257,20 +314,34 @@
         <button class="btn" onclick="mudarSemana(1)">&gt;</button>
         <span class="month-title" id="tituloMes">Setembro de 2026</span>
       </div>
+
       <div class="user-info">
-        <span id="nomeUsuarioLogado" style="font-weight: bold; color: #1a73e8;"></span>
+        <!-- Logo e Envio da Logo -->
+        <div class="logo-container">
+          <img id="imgLogoTopo" class="logo-img" src="" alt="Logo" style="display: none;">
+          <button class="btn" onclick="document.getElementById('inputUploadLogo').click()" style="font-size: 0.75rem; padding: 4px 8px;">📷 Logo</button>
+          <input type="file" id="inputUploadLogo" accept="image/*" style="display: none;" onchange="uploadLogo(event)">
+        </div>
+
+        <span id="nomeUsuarioLogado" style="font-weight: bold; color: var(--primary-color);"></span>
         <button class="btn" onclick="abrirModalSenha()">🔑 Alterar Senha</button>
         <button class="btn" onclick="realizarLogout()">Sair</button>
       </div>
     </div>
 
+    <!-- Abas das Salas -->
+    <div class="tabs-container">
+      <button class="tab-btn active" id="tabSala1" onclick="mudarSala('sala1')">Sala 01 - Maior</button>
+      <button class="tab-btn" id="tabSala2" onclick="mudarSala('sala2')">Sala 02 - Compartilhada</button>
+    </div>
+
     <!-- Grade do Calendário -->
     <div class="calendar-grid" id="calendarGrid">
-      <!-- Renderizado via JavaScript -->
+      <!-- Renderizado via JS -->
     </div>
   </div>
 
-  <!-- Modal para Inclusão e Edição de Reserva -->
+  <!-- Modal para Inclusão/Edição de Reserva -->
   <div class="modal" id="modalReserva">
     <div class="modal-content">
       <h3 id="modalTitulo">Agendar Turno</h3>
@@ -279,7 +350,7 @@
       
       <div class="form-group">
         <label>Data e Horário</label>
-        <input type="text" id="inputInfoDataHorario" readonly style="background: #eee;">
+        <input type="text" id="inputInfoDataHorario" readonly style="background: #f5f5f5;">
       </div>
 
       <div class="form-group">
@@ -306,15 +377,15 @@
       <h3>Alterar Minha Senha</h3>
       <div class="form-group">
         <label for="senhaAtual">Senha Atual *</label>
-        <input type="password" id="senhaAtual" placeholder="Digite a senha atual">
+        <input type="password" id="senhaAtual">
       </div>
       <div class="form-group">
         <label for="novaSenha">Nova Senha *</label>
-        <input type="password" id="novaSenha" placeholder="Digite a nova senha">
+        <input type="password" id="novaSenha">
       </div>
       <div class="form-group">
         <label for="confirmarNovaSenha">Confirmar Nova Senha *</label>
-        <input type="password" id="confirmarNovaSenha" placeholder="Repita a nova senha">
+        <input type="password" id="confirmarNovaSenha">
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="fecharModal('modalSenha')">Cancelar</button>
@@ -324,12 +395,11 @@
   </div>
 
   <script>
-    // Usuários Padrão
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: '123' },
-      'natalia':  { nome: 'Natália', senha: '123' },
-      'marilia':  { nome: 'Marília', senha: '123' },
-      'recepcao': { nome: 'Recepção', senha: '123' }
+      'karine':   { nome: 'Karine', senha: 'K@r1n3#' },
+      'natalia':  { nome: 'Natália', senha: 'n@t4l!@' },
+      'marilia':  { nome: 'Marília', senha: 'M4r!Li@' },
+      'recepcao': { nome: 'Recepção', senha: 'R3c&pc@0' }
     };
 
     const JSONBIN_CONFIG = {
@@ -345,10 +415,10 @@
     ];
 
     let userKeyAtual = null;
+    let salaAtual = 'sala1'; // 'sala1' ou 'sala2'
     let dataAtual = new Date();
-    let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO };
+    let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, logoUrl: '' };
 
-    // Funções de Carregamento e Persistência
     async function carregarDados() {
       try {
         const res = await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}/latest`, {
@@ -358,14 +428,12 @@
         dadosJsonBin = json.record || {};
         
         if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
-        // Atualiza ou inicializa a lista de usuários com os novos nomes
-        if (!dadosJsonBin.usuarios || !dadosJsonBin.usuarios.karine) {
-          dadosJsonBin.usuarios = USUARIOS_PADRAO;
-        }
+        if (!dadosJsonBin.usuarios || !dadosJsonBin.usuarios.karine) dadosJsonBin.usuarios = USUARIOS_PADRAO;
 
+        exibirLogo();
         verificarSessao();
       } catch (err) {
-        console.error('Erro ao carregar dados do JSONBin:', err);
+        console.error('Erro ao carregar dados:', err);
       }
     }
 
@@ -381,11 +449,43 @@
         });
         if (userKeyAtual) renderizarCalendario();
       } catch (err) {
-        alert('Erro ao guardar alteração no banco.');
+        alert('Erro ao guardar alterações.');
       }
     }
 
-    // Login e Sessão
+    /* Gestão da Logo */
+    function uploadLogo(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        dadosJsonBin.logoUrl = e.target.result;
+        exibirLogo();
+        await guardarDados();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function exibirLogo() {
+      const img = document.getElementById('imgLogoTopo');
+      if (dadosJsonBin.logoUrl) {
+        img.src = dadosJsonBin.logoUrl;
+        img.style.display = 'block';
+      } else {
+        img.style.display = 'none';
+      }
+    }
+
+    /* Abas das Salas */
+    function mudarSala(idSala) {
+      salaAtual = idSala;
+      document.getElementById('tabSala1').classList.toggle('active', idSala === 'sala1');
+      document.getElementById('tabSala2').classList.toggle('active', idSala === 'sala2');
+      renderizarCalendario();
+    }
+
+    /* Login e Sessão */
     function realizarLogin(event) {
       event.preventDefault();
       const key = document.getElementById('loginUsuario').value;
@@ -433,7 +533,7 @@
       renderizarCalendario();
     }
 
-    // Modal de Alteração de Senha
+    /* Modal de Senha */
     function abrirModalSenha() {
       document.getElementById('senhaAtual').value = '';
       document.getElementById('novaSenha').value = '';
@@ -449,17 +549,15 @@
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
 
       if (atual !== usuarioLogado.senha) {
-        alert('A senha atual inserida está incorreta.');
+        alert('A senha atual está incorreta.');
         return;
       }
-
       if (!nova || nova.length < 3) {
-        alert('A nova senha deve ter pelo menos 3 caracteres.');
+        alert('A nova senha deve ter no mínimo 3 caracteres.');
         return;
       }
-
       if (nova !== confirmacao) {
-        alert('A nova senha e a confirmação não coincidem.');
+        alert('A confirmação não coincide com a nova senha.');
         return;
       }
 
@@ -470,7 +568,7 @@
       fecharModal('modalSenha');
     }
 
-    // Calendário
+    /* Renderização do Calendário */
     function getDiasDaSemana(dataRef) {
       const inicioSemana = new Date(dataRef);
       inicioSemana.setDate(dataRef.getDate() - dataRef.getDay());
@@ -521,7 +619,8 @@
           const divSlot = document.createElement('div');
           divSlot.className = 'day-slot';
 
-          const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id);
+          // Filtra pela data, pelo turno E PELA SALA ATUAL
+          const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id && (r.sala || 'sala1') === salaAtual);
 
           const card = document.createElement('div');
           if (reserva) {
@@ -529,7 +628,7 @@
             card.innerHTML = `
               <div class="slot-title">${reserva.psicologa}</div>
               <div class="slot-info">${reserva.observacao || 'Reservado'}</div>
-              <div style="font-size: 0.7rem; color: #888; margin-top: 4px;">Por: ${reserva.criadoPor || 'Sistema'}</div>
+              <div style="font-size: 0.7rem; opacity: 0.8; margin-top: 4px;">Por: ${reserva.criadoPor || 'Sistema'}</div>
             `;
             card.onclick = () => abrirModalReserva(dataIso, turno, reserva);
           } else {
@@ -557,13 +656,14 @@
       renderizarCalendario();
     }
 
-    // Modal de Reservas
+    /* Modal de Reservas */
     function abrirModalReserva(dataIso, turno, reserva) {
       document.getElementById('inputData').value = dataIso;
       document.getElementById('inputTurno').value = turno.id;
       
       const dataFmt = new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR');
-      document.getElementById('inputInfoDataHorario').value = `${dataFmt} - Turno ${turno.nome} (${turno.horario})`;
+      const nomeSala = salaAtual === 'sala1' ? 'Sala 01 - Maior' : 'Sala 02 - Compartilhada';
+      document.getElementById('inputInfoDataHorario').value = `${nomeSala} | ${dataFmt} (${turno.nome})`;
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
 
@@ -593,11 +693,12 @@
       const observacao = document.getElementById('inputObs').value.trim();
 
       if (!psicologa) {
-        alert('Por favor, digite o nome do profissional/psicóloga.');
+        alert('Por favor, informe o nome do profissional.');
         return;
       }
 
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId));
+      // Remove reserva existente no mesmo dia, turno e sala
+      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
 
@@ -605,6 +706,7 @@
         id: 'res_' + Date.now(),
         data: dataIso,
         turno: turnoId,
+        sala: salaAtual,
         psicologa,
         observacao,
         criadoPor: usuarioLogado.nome,
@@ -616,18 +718,18 @@
     }
 
     async function excluirReserva() {
-      if (!confirm('Tem certeza que deseja excluir esta reserva?')) return;
+      if (!confirm('Deseja realmente excluir esta reserva?')) return;
 
       const dataIso = document.getElementById('inputData').value;
       const turnoId = document.getElementById('inputTurno').value;
 
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId));
+      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
 
       fecharModal('modalReserva');
       await guardarDados();
     }
 
-    // Inicializar app após carregar o JSONBin
+    // Inicialização
     carregarDados();
   </script>
 </body>
