@@ -578,7 +578,7 @@
       renderizarCalendario();
     }
 
-    /* --- LÓGICA DE PACIENTES COM EXPORTAÇÃO CSV E SOMA --- */
+    /* --- LÓGICA DE PACIENTES (NOVO MÊS COMEÇA EM BRANCO) --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -655,7 +655,17 @@
 
       meusPacientes.forEach(p => {
         const chaveLancamento = `${mesAnoSelected}_${p.id}`;
-        const lanc = dadosJsonBin.lancamentosPacientes[chaveLancamento] || { valor: '', tipo: 'Nota fiscal', emitido: false };
+
+        // Mês novo começa zerado em branco caso ainda não possua dados gravados
+        if (!dadosJsonBin.lancamentosPacientes[chaveLancamento]) {
+          dadosJsonBin.lancamentosPacientes[chaveLancamento] = { 
+            valor: '', 
+            tipo: 'Nota fiscal', 
+            emitido: false 
+          };
+        }
+
+        const lanc = dadosJsonBin.lancamentosPacientes[chaveLancamento];
 
         const numVal = parseValorNumerico(lanc.valor);
         totalRecebidoSum += numVal;
