@@ -8,9 +8,9 @@
     :root {
       --primary-color: #6b1d2f;    /* Bordô principal */
       --primary-hover: #501422;    
-      --bg-color: #ffffff;         /* Fundo da página */
+      --bg-color: #ffffff;         
       --border-color: #e0e0e0;     
-      --free-bg: #f4fbf7;          /* Turno Livre */
+      --free-bg: #f4fbf7;          
       --free-border: #a8dab5;      
       --free-text: #1b5e20;        
     }
@@ -75,7 +75,8 @@
     .panel-content { background: white; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: left; font-size: 0.9rem; }
-    .data-table th { background-color: #d98880; color: white; font-weight: bold; } /* Estilo idêntico à planilha */
+    .data-table th { background-color: #d98880; color: white; font-weight: bold; }
+    .data-table tfoot td { background-color: #f2d7d5; font-weight: bold; color: #6b1d2f; border-top: 2px solid #c0392b; }
     .data-table tr:nth-child(even) { background-color: #fbeee6; }
     .data-table tr:nth-child(odd) { background-color: #ffffff; }
 
@@ -103,6 +104,7 @@
       #containerPacientes, #containerPacientes * { visibility: visible; }
       #containerPacientes { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
+      input, select { border: none !important; background: transparent !important; }
     }
   </style>
 </head>
@@ -175,14 +177,15 @@
         <div style="display: flex; gap: 10px; align-items: center;">
           <label for="selectMesPacientes"><strong>Mês/Ano: </strong></label>
           <input type="month" id="selectMesPacientes" onchange="renderizarPacientes()">
-          <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Novo Paciente</button>
-          <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
+          <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Paciente</button>
+          <button class="btn btn-success" onclick="exportarCSVPacientes()">📥 Exportar Excel (CSV)</button>
+          <button class="btn btn-primary" onclick="window.print()">🖨️ Gerar PDF / Imprimir</button>
         </div>
       </div>
 
       <h4 id="tituloLevantamentoMes" style="margin: 5px 0 15px 0; color: var(--primary-color); text-align: center;">Levantamento Financeiro Mensal</h4>
 
-      <table class="data-table">
+      <table class="data-table" id="tabelaPacientesDOM">
         <thead>
           <tr>
             <th>Nome</th>
@@ -196,6 +199,15 @@
           </tr>
         </thead>
         <tbody id="tbodyPacientes"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2"><strong>TOTAL RECEBIDO NO MÊS</strong></td>
+            <td id="tfootTotalRecebidoPacientes"><strong>R$ 0,00</strong></td>
+            <td colspan="3"></td>
+            <td id="tfootTotalEmitidos" style="text-align: center;"><strong>0/0</strong></td>
+            <td class="no-print"></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
 
@@ -211,7 +223,6 @@
         </div>
       </div>
 
-      <!-- Resumo dos Cards + Taxa de Ocupação -->
       <div class="card-resumo-financeiro">
         <div class="box-resumo box-entradas">
           <h4>Total de Entradas (Salas)</h4>
@@ -231,7 +242,6 @@
         </div>
       </div>
 
-      <!-- Tabela Entradas por Profissional -->
       <h4>Entradas por Profissional (R$ 350,00 por turno fixo mensal)</h4>
       <table class="data-table">
         <thead style="background-color: var(--primary-color);">
@@ -246,7 +256,6 @@
         <tbody id="tbodyEntradas"></tbody>
       </table>
 
-      <!-- Tabela Saídas -->
       <h4 style="margin-top: 30px;">Despesas e Custos do Mês</h4>
       <table class="data-table">
         <thead>
@@ -569,7 +578,7 @@
       renderizarCalendario();
     }
 
-    /* --- LÓGICA DE PACIENTES (SEPARADA POR USUÁRIO) --- */
+    /* --- LÓGICA DE PACIENTES COM EXPORTAÇÃO CSV E SOMA --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -602,13 +611,20 @@
       } else {
         dadosJsonBin.pacientes.push({
           id: 'pac_' + Date.now(),
-          ownerKey: userKeyAtual, // Vincula ao profissional logado
+          ownerKey: userKeyAtual,
           nome, cpf, cep, email
         });
       }
 
       fecharModal('modalPaciente');
       await guardarDados();
+    }
+
+    function parseValorNumerico(str) {
+      if (!str) return 0;
+      let clean = str.replace(/[R$\s.]/g, '').replace(',', '.');
+      let val = parseFloat(clean);
+      return isNaN(val) ? 0 : val;
     }
 
     function renderizarPacientes() {
@@ -623,26 +639,34 @@
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
       const eRecepcao = usuarioLogado.nome.toLowerCase().includes('recepção') || usuarioLogado.nome.toLowerCase().includes('recepcao');
 
-      // Filtra pacientes: profissional vê apenas os seus; recepção vê todos.
       const meusPacientes = (dadosJsonBin.pacientes || []).filter(p => eRecepcao || p.ownerKey === userKeyAtual);
 
       if (meusPacientes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999; padding:20px;">Nenhum paciente cadastrado. Clique em "Cadastrar Novo Paciente" para começar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999; padding:20px;">Nenhum paciente cadastrado. Clique em "Cadastrar Paciente" para começar.</td></tr>';
+        document.getElementById('tfootTotalRecebidoPacientes').innerHTML = '<strong>R$ 0,00</strong>';
+        document.getElementById('tfootTotalEmitidos').innerHTML = '<strong>0/0</strong>';
         return;
       }
 
       if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
 
+      let totalRecebidoSum = 0;
+      let totalEmitidosCount = 0;
+
       meusPacientes.forEach(p => {
         const chaveLancamento = `${mesAnoSelected}_${p.id}`;
         const lanc = dadosJsonBin.lancamentosPacientes[chaveLancamento] || { valor: '', tipo: 'Nota fiscal', emitido: false };
+
+        const numVal = parseValorNumerico(lanc.valor);
+        totalRecebidoSum += numVal;
+        if (lanc.emitido) totalEmitidosCount++;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>${p.nome}</strong></td>
           <td>${p.cpf || '-'}</td>
           <td>
-            <input type="text" style="width: 90px; padding: 4px;" value="${lanc.valor}" placeholder="R$ 0,00"
+            <input type="text" style="width: 100px; padding: 4px;" value="${lanc.valor}" placeholder="R$ 0,00"
               onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'valor', this.value)">
           </td>
           <td>${p.cep || '-'}</td>
@@ -664,6 +688,9 @@
         `;
         tbody.appendChild(tr);
       });
+
+      document.getElementById('tfootTotalRecebidoPacientes').innerHTML = `<strong>R$ ${totalRecebidoSum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
+      document.getElementById('tfootTotalEmitidos').innerHTML = `<strong>${totalEmitidosCount}/${meusPacientes.length}</strong>`;
     }
 
     async function atualizarLancamentoPaciente(chave, campo, valor) {
@@ -680,6 +707,35 @@
       if (!confirm('Tem certeza que deseja excluir este paciente e o histórico dele?')) return;
       dadosJsonBin.pacientes = dadosJsonBin.pacientes.filter(p => p.id !== idPaciente);
       await guardarDados();
+    }
+
+    function exportarCSVPacientes() {
+      const mes = document.getElementById('selectMesPacientes').value;
+      const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
+      const eRecepcao = usuarioLogado.nome.toLowerCase().includes('recepção') || usuarioLogado.nome.toLowerCase().includes('recepcao');
+
+      const meusPacientes = (dadosJsonBin.pacientes || []).filter(p => eRecepcao || p.ownerKey === userKeyAtual);
+
+      let csv = `Levantamento Financeiro Mensal - Mês ${mes}\n\n`;
+      csv += `Nome;CPF;Valor;CEP;E_mail;Nota fiscal ou carne leao;Emitido\n`;
+
+      let totalSum = 0;
+
+      meusPacientes.forEach(p => {
+        const chaveLancamento = `${mes}_${p.id}`;
+        const lanc = dadosJsonBin.lancamentosPacientes[chaveLancamento] || { valor: '', tipo: 'Nota fiscal', emitido: false };
+        totalSum += parseValorNumerico(lanc.valor);
+
+        csv += `"${p.nome}";"${p.cpf || ''}";"${lanc.valor || ''}";"${p.cep || ''}";"${p.email || ''}";"${lanc.tipo}";"${lanc.emitido ? 'Sim' : 'Não'}"\n`;
+      });
+
+      csv += `\nTOTAL RECEBIDO NO MÊS;;R$ ${totalSum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })};;;;\n`;
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Levantamento_Pacientes_${mes}.csv`;
+      link.click();
     }
 
     /* --- LÓGICA DO BALANÇO FINANCEIRO & OCUPAÇÃO --- */
@@ -739,7 +795,6 @@
         });
       }
 
-      /* Cálculo das Despesas */
       let totalSaidasValor = 0;
       const despesasDoMes = (dadosJsonBin.despesas || []).filter(d => d.mesAno === mesAnoSelected);
 
@@ -760,7 +815,6 @@
         });
       }
 
-      /* Taxa de Ocupação (3 turnos x 30 dias x 2 salas = ~180 turnos totais no mês) */
       const capacidadeTotalMes = 180;
       const pctOcupacao = Math.min(100, Math.round((totalTurnosOcupadosGeral / capacidadeTotalMes) * 100));
 
@@ -772,7 +826,6 @@
       document.getElementById('txtTaxaOcupacao').innerText = `${pctOcupacao}%`;
     }
 
-    /* Exportar Excel/CSV */
     function exportarExcelFinanceiro() {
       const mes = document.getElementById('selectMesFinanceiro').value;
       let csv = `Balanço Financeiro - Mês ${mes}\n\n`;
