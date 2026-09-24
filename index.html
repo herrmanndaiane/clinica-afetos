@@ -225,7 +225,7 @@
 
       <div class="card-resumo-financeiro">
         <div class="box-resumo box-entradas">
-          <h4>Total de Entradas (Salas)</h4>
+          <h4>Total de Entradas (Locação + Pacientes)</h4>
           <span id="txtTotalEntrada">R$ 0,00</span>
         </div>
         <div class="box-resumo box-saidas">
@@ -242,7 +242,7 @@
         </div>
       </div>
 
-      <h4>Entradas por Profissional (R$ 350,00 por turno fixo mensal)</h4>
+      <h4>Entradas por Locação de Salas (R$ 350,00 por turno fixo mensal)</h4>
       <table class="data-table">
         <thead style="background-color: var(--primary-color);">
           <tr>
@@ -254,6 +254,19 @@
           </tr>
         </thead>
         <tbody id="tbodyEntradas"></tbody>
+      </table>
+
+      <!-- Nova Tabela: Entradas Diretas de Consultas/Pacientes (Karine) -->
+      <h4 style="margin-top: 30px; color: #2e7d32;">Entradas de Atendimentos Clínicos / Pacientes (Karine)</h4>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="background-color: #2e7d32;">Origem / Profissional</th>
+            <th style="background-color: #2e7d32;">Qtd. de Pacientes no Mês</th>
+            <th style="background-color: #2e7d32;">Total Bruto Recebido</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyEntradasPacientesKarine"></tbody>
       </table>
 
       <h4 style="margin-top: 30px;">Despesas e Custos do Mês</h4>
@@ -421,7 +434,7 @@
     const VALOR_TURNO_MENSAL = 350.00;
 
     const JSONBIN_CONFIG = {
-      binId: '6ab414a3ffd5d16053278750',
+      binId: '6ab27273ffd5d1605322efdf',
       apiKey: '$2a$10$HB3aLXcmVDYDE89zOm.mvuITBZxSjg1WGqEI7FSyZNZLok4QE9t7.',
       url: 'https://api.jsonbin.io/v3/b/'
     };
@@ -656,7 +669,6 @@
       meusPacientes.forEach(p => {
         const chaveLancamento = `${mesAnoSelected}_${p.id}`;
 
-        // Mês novo começa zerado em branco caso ainda não possua dados gravados
         if (!dadosJsonBin.lancamentosPacientes[chaveLancamento]) {
           dadosJsonBin.lancamentosPacientes[chaveLancamento] = { 
             valor: '', 
@@ -748,16 +760,20 @@
       link.click();
     }
 
-    /* --- LÓGICA DO BALANÇO FINANCEIRO & OCUPAÇÃO --- */
+    /* --- LÓGICA DO BALANÇO FINANCEIRO DA CLÍNICA --- */
     function renderizarFinanceiro() {
       const mesAnoSelected = document.getElementById('selectMesFinanceiro').value; 
       if (!mesAnoSelected) return;
 
       const tbodyEntradas = document.getElementById('tbodyEntradas');
       const tbodyDespesas = document.getElementById('tbodyDespesas');
+      const tbodyKarine = document.getElementById('tbodyEntradasPacientesKarine');
+
       tbodyEntradas.innerHTML = '';
       tbodyDespesas.innerHTML = '';
+      tbodyKarine.innerHTML = '';
 
+      /* 1. Cálculo de Locação de Salas */
       const turnosFixosPorProfissional = {};
       let totalTurnosOcupadosGeral = 0;
 
@@ -779,11 +795,11 @@
         }
       });
 
-      let totalEntradasValor = 0;
+      let totalEntradasSalasValor = 0;
       const profissionais = Object.keys(turnosFixosPorProfissional).sort();
 
       if (profissionais.length === 0) {
-        tbodyEntradas.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Nenhuma reserva ativa encontrada para este mês.</td></tr>';
+        tbodyEntradas.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Nenhuma reserva de sala para este mês.</td></tr>';
       } else {
         profissionais.forEach(pro => {
           const s1Count = turnosFixosPorProfissional[pro].sala1.size;
@@ -791,7 +807,7 @@
           const totalTurnosFixos = s1Count + s2Count;
           const subtotalPro = totalTurnosFixos * VALOR_TURNO_MENSAL;
 
-          totalEntradasValor += subtotalPro;
+          totalEntradasSalasValor += subtotalPro;
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -805,6 +821,38 @@
         });
       }
 
+      /* 2. Cálculo de Entradas dos Pacientes da Karine */
+      let totalEntradasKarineValor = 0;
+      let qtdPacientesKarine = 0;
+
+      // Busca a chave do usuário Karine
+      const karineKey = Object.keys(dadosJsonBin.usuarios || {}).find(k => 
+        dadosJsonBin.usuarios[k].nome.toLowerCase().includes('karine')
+      ) || 'karine';
+
+      const pacientesKarine = (dadosJsonBin.pacientes || []).filter(p => p.ownerKey === karineKey);
+
+      pacientesKarine.forEach(p => {
+        const chaveLancamento = `${mesAnoSelected}_${p.id}`;
+        const lanc = (dadosJsonBin.lancamentosPacientes || {})[chaveLancamento];
+        if (lanc && lanc.valor) {
+          const numVal = parseValorNumerico(lanc.valor);
+          if (numVal > 0) {
+            totalEntradasKarineValor += numVal;
+            qtdPacientesKarine++;
+          }
+        }
+      });
+
+      const trK = document.createElement('tr');
+      trK.innerHTML = `
+        <td><strong>Karine (Atendimentos Clínicos)</strong></td>
+        <td>${qtdPacientesKarine} paciente(s) com valor lançado</td>
+        <td><strong>R$ ${totalEntradasKarineValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+      `;
+      tbodyKarine.appendChild(trK);
+
+      /* 3. Cálculo das Despesas */
       let totalSaidasValor = 0;
       const despesasDoMes = (dadosJsonBin.despesas || []).filter(d => d.mesAno === mesAnoSelected);
 
@@ -825,12 +873,13 @@
         });
       }
 
+      /* 4. Totais Finais e Taxa de Ocupação */
+      const totalEntradasGeral = totalEntradasSalasValor + totalEntradasKarineValor;
       const capacidadeTotalMes = 180;
       const pctOcupacao = Math.min(100, Math.round((totalTurnosOcupadosGeral / capacidadeTotalMes) * 100));
+      const lucroLiquido = totalEntradasGeral - totalSaidasValor;
 
-      const lucroLiquido = totalEntradasValor - totalSaidasValor;
-
-      document.getElementById('txtTotalEntrada').innerText = `R$ ${totalEntradasValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('txtTotalEntrada').innerText = `R$ ${totalEntradasGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
       document.getElementById('txtTotalSaida').innerText = `R$ ${totalSaidasValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
       document.getElementById('txtLucroLiquido').innerText = `R$ ${lucroLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
       document.getElementById('txtTaxaOcupacao').innerText = `${pctOcupacao}%`;
@@ -839,7 +888,7 @@
     function exportarExcelFinanceiro() {
       const mes = document.getElementById('selectMesFinanceiro').value;
       let csv = `Balanço Financeiro - Mês ${mes}\n\n`;
-      csv += `Total Entradas;${document.getElementById('txtTotalEntrada').innerText}\n`;
+      csv += `Total Entradas Geral;${document.getElementById('txtTotalEntrada').innerText}\n`;
       csv += `Total Saídas;${document.getElementById('txtTotalSaida').innerText}\n`;
       csv += `Lucro Líquido;${document.getElementById('txtLucroLiquido').innerText}\n`;
       csv += `Taxa Ocupação;${document.getElementById('txtTaxaOcupacao').innerText}\n\n`;
