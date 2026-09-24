@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda da Clínica - Reserva de Salas</title>
+  <title>Agenda da Clínica & Gestão de Pacientes</title>
   <style>
     :root {
       --primary-color: #6b1d2f;    /* Bordô principal */
@@ -16,31 +16,11 @@
     }
 
     /* Cores Específicas por Profissional */
-    .slot-card.pro-karine {
-      background-color: #fce4ec !important;
-      border: 1px solid #f8bbd0 !important;
-      color: #880e4f !important;
-    }
-    .slot-card.pro-natalia {
-      background-color: #e3f2fd !important;
-      border: 1px solid #bbdefb !important;
-      color: #0d47a1 !important;
-    }
-    .slot-card.pro-marilia {
-      background-color: #f3e5f5 !important;
-      border: 1px solid #e1bee7 !important;
-      color: #4a148c !important;
-    }
-    .slot-card.pro-recepcao {
-      background-color: #fffde7 !important;
-      border: 1px solid #fff9c4 !important;
-      color: #f57f17 !important;
-    }
-    .slot-card.pro-outros {
-      background-color: #fdf2f4 !important;
-      border: 1px solid #e5b0b9 !important;
-      color: #6b1d2f !important;
-    }
+    .slot-card.pro-karine { background-color: #fce4ec !important; border: 1px solid #f8bbd0 !important; color: #880e4f !important; }
+    .slot-card.pro-natalia { background-color: #e3f2fd !important; border: 1px solid #bbdefb !important; color: #0d47a1 !important; }
+    .slot-card.pro-marilia { background-color: #f3e5f5 !important; border: 1px solid #e1bee7 !important; color: #4a148c !important; }
+    .slot-card.pro-recepcao { background-color: #fffde7 !important; border: 1px solid #fff9c4 !important; color: #f57f17 !important; }
+    .slot-card.pro-outros { background-color: #fdf2f4 !important; border: 1px solid #e5b0b9 !important; color: #6b1d2f !important; }
 
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -50,275 +30,79 @@
       color: #333333;
     }
 
-    /* Tela de Login */
-    .login-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 80vh;
-    }
+    .login-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
+    .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(107, 29, 47, 0.15); border: 1px solid var(--border-color); width: 100%; max-width: 360px; }
+    .login-card h2 { margin-top: 0; margin-bottom: 20px; text-align: center; color: var(--primary-color); }
 
-    .login-card {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(107, 29, 47, 0.15);
-      border: 1px solid var(--border-color);
-      width: 100%;
-      max-width: 360px;
-    }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .logo-container { display: flex; align-items: center; }
+    .logo-img { max-height: 45px; max-width: 150px; object-fit: contain; }
+    .nav-controls { display: flex; align-items: center; gap: 15px; }
 
-    .login-card h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      text-align: center;
-      color: var(--primary-color);
-    }
+    .btn { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: var(--primary-color); color: white; border: none; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: #2e7d32; color: white; border: none; }
+    .btn-danger { background: #c62828; color: white; border: none; }
 
-    /* Cabeçalho */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      background: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-    }
+    .month-title { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .tabs-container { display: flex; gap: 8px; margin-bottom: -1px; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 18px; background: #f5f5f5; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; color: #666; }
+    .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+    .tab-btn-pacientes { background: #e3f2fd; color: #0d47a1; border-color: #90caf9; }
+    .tab-btn-pacientes.active { background: #0d47a1; color: white; border-color: #0d47a1; }
+    .tab-btn-financeiro { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+    .tab-btn-financeiro.active { background: #2e7d32; color: white; border-color: #2e7d32; }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
+    .legenda-container { display: flex; gap: 15px; margin-bottom: 12px; font-size: 0.85rem; align-items: center; flex-wrap: wrap; }
+    .legenda-item { display: flex; align-items: center; gap: 5px; }
+    .legenda-cor { width: 14px; height: 14px; border-radius: 3px; }
 
-    .logo-img {
-      max-height: 45px;
-      max-width: 150px;
-      object-fit: contain;
-    }
+    .calendar-grid { display: grid; grid-template-columns: 120px repeat(7, 1fr); background: white; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .grid-header { background: #fafafa; padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); color: var(--primary-color); }
+    .grid-header.today { background: #fdf2f4; color: var(--primary-color); }
+    .time-col { background: #fafafa; padding: 15px 10px; font-size: 0.85rem; font-weight: bold; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; color: #555; }
+    .day-slot { padding: 8px; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); min-height: 95px; }
 
-    .nav-controls {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+    .slot-card { height: 100%; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; box-sizing: border-box; }
+    .slot-card.livre { background: var(--free-bg); border: 1px dashed var(--free-border); color: var(--free-text); }
+    .slot-title { font-weight: bold; font-size: 0.85rem; }
+    .slot-info { font-size: 0.8rem; margin-top: 4px; }
 
-    .btn {
-      padding: 8px 14px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: white;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
+    /* Painéis das Abas */
+    .panel-content { background: white; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: left; font-size: 0.9rem; }
+    .data-table th { background-color: #d98880; color: white; font-weight: bold; } /* Estilo idêntico à planilha */
+    .data-table tr:nth-child(even) { background-color: #fbeee6; }
+    .data-table tr:nth-child(odd) { background-color: #ffffff; }
 
-    .btn-primary {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-    }
+    .card-resumo-financeiro { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .box-resumo { padding: 15px; border-radius: 8px; flex: 1; min-width: 180px; border: 1px solid #e0e0e0; }
+    .box-resumo h4 { margin: 0 0 5px 0; font-size: 0.85rem; }
+    .box-resumo span { font-size: 1.4rem; font-weight: bold; }
 
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
+    .box-entradas { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+    .box-saidas { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
+    .box-lucro { background: #e3f2fd; border-color: #90caf9; color: #0d47a1; }
+    .box-ocupacao { background: #fff3e0; border-color: #ffe0b2; color: #e65100; }
 
-    .btn-danger {
-      background: #c62828;
-      color: white;
-      border: none;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; padding: 25px; border-radius: 8px; width: 380px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+    .modal-content h3 { margin-top: 0; color: var(--primary-color); }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 500; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
+    .recorrencia-box { background: #f8f9fa; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; margin-top: 10px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 
-    .month-title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-
-    /* Abas das Salas */
-    .tabs-container {
-      display: flex;
-      gap: 8px;
-      margin-bottom: -1px;
-    }
-
-    .tab-btn {
-      padding: 10px 20px;
-      background: #f5f5f5;
-      border: 1px solid var(--border-color);
-      border-bottom: none;
-      border-radius: 8px 8px 0 0;
-      cursor: pointer;
-      font-weight: bold;
-      color: #666;
-    }
-
-    .tab-btn.active {
-      background: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
-
-    /* Legenda de Cores */
-    .legenda-container {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 12px;
-      font-size: 0.85rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .legenda-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .legenda-cor {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-    }
-
-    /* Tabela da Semana */
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: 120px repeat(7, 1fr);
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0 8px 8px 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .grid-header {
-      background: #fafafa;
-      padding: 12px;
-      text-align: center;
-      font-weight: bold;
-      border-bottom: 2px solid var(--border-color);
-      border-right: 1px solid var(--border-color);
-      color: var(--primary-color);
-    }
-
-    .grid-header.today {
-      background: #fdf2f4;
-      color: var(--primary-color);
-    }
-
-    .time-col {
-      background: #fafafa;
-      padding: 15px 10px;
-      font-size: 0.85rem;
-      font-weight: bold;
-      border-right: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      color: #555;
-    }
-
-    .day-slot {
-      padding: 8px;
-      border-right: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-      min-height: 95px;
-    }
-
-    /* Cartões dos Turnos */
-    .slot-card {
-      height: 100%;
-      border-radius: 6px;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-      box-sizing: border-box;
-    }
-
-    .slot-card.livre {
-      background: var(--free-bg);
-      border: 1px dashed var(--free-border);
-      color: var(--free-text);
-    }
-
-    .slot-title {
-      font-weight: bold;
-      font-size: 0.85rem;
-    }
-
-    .slot-info {
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
-
-    /* Modais */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      width: 360px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    .modal-content h3 { 
-      margin-top: 0; 
-      color: var(--primary-color); 
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-
-    .recorrencia-box {
-      background: #f8f9fa;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      margin-top: 10px;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
+    @media print {
+      body * { visibility: hidden; }
+      #containerPacientes, #containerPacientes * { visibility: visible; }
+      #containerPacientes { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
@@ -331,9 +115,7 @@
       <form onsubmit="realizarLogin(event)">
         <div class="form-group">
           <label for="loginUsuario">Usuário</label>
-          <select id="loginUsuario" required>
-            <!-- Opções renderizadas via JS conforme usuárias cadastradas -->
-          </select>
+          <select id="loginUsuario" required></select>
         </div>
         <div class="form-group">
           <label for="loginSenha">Senha</label>
@@ -344,7 +126,7 @@
     </div>
   </div>
 
-  <!-- Painel Principal (Calendário) -->
+  <!-- Painel Principal -->
   <div id="painelCalendario" style="display: none;">
     <div class="header">
       <div class="nav-controls">
@@ -365,28 +147,123 @@
       </div>
     </div>
 
-    <!-- Abas das Salas -->
+    <!-- Abas do Sistema -->
     <div class="tabs-container">
-      <button class="tab-btn active" id="tabSala1" onclick="mudarSala('sala1')">Sala 01 - Maior</button>
-      <button class="tab-btn" id="tabSala2" onclick="mudarSala('sala2')">Sala 02 - Compartilhada</button>
+      <button class="tab-btn active" id="tabSala1" onclick="mudarAba('sala1')">Sala 01 - Maior</button>
+      <button class="tab-btn" id="tabSala2" onclick="mudarAba('sala2')">Sala 02 - Compartilhada</button>
+      <button class="tab-btn tab-btn-pacientes" id="tabPacientes" onclick="mudarAba('pacientes')">📋 Levantamento de Pacientes</button>
+      <button class="tab-btn tab-btn-financeiro" id="tabFinanceiro" onclick="mudarAba('financeiro')" style="display: none;">📊 Financeiro da Clínica</button>
     </div>
 
-    <!-- Legenda de Cores -->
-    <div class="legenda-container" style="margin-top: 10px;">
-      <strong>Legenda:</strong>
-      <div class="legenda-item"><div class="legenda-cor" style="background:#fce4ec; border:1px solid #f8bbd0;"></div> Karine</div>
-      <div class="legenda-item"><div class="legenda-cor" style="background:#e3f2fd; border:1px solid #bbdefb;"></div> Natália</div>
-      <div class="legenda-item"><div class="legenda-cor" style="background:#f3e5f5; border:1px solid #e1bee7;"></div> Marília</div>
-      <div class="legenda-item"><div class="legenda-cor" style="background:#fffde7; border:1px solid #fff9c4;"></div> Recepção</div>
+    <!-- Conteúdo 1: Grade de Agendamento -->
+    <div id="containerCalendario">
+      <div class="legenda-container" style="margin-top: 10px;">
+        <strong>Legenda:</strong>
+        <div class="legenda-item"><div class="legenda-cor" style="background:#fce4ec; border:1px solid #f8bbd0;"></div> Karine</div>
+        <div class="legenda-item"><div class="legenda-cor" style="background:#e3f2fd; border:1px solid #bbdefb;"></div> Natália</div>
+        <div class="legenda-item"><div class="legenda-cor" style="background:#f3e5f5; border:1px solid #e1bee7;"></div> Marília</div>
+        <div class="legenda-item"><div class="legenda-cor" style="background:#fffde7; border:1px solid #fff9c4;"></div> Recepção</div>
+      </div>
+
+      <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
-    <!-- Grade do Calendário -->
-    <div class="calendar-grid" id="calendarGrid">
-      <!-- Renderizado via JS -->
+    <!-- Conteúdo 2: Levantamento Financeiro Mensal de Pacientes -->
+    <div id="containerPacientes" class="panel-content" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;" class="no-print">
+        <h3 style="margin:0; color: var(--primary-color);">Levantamento Financeiro Mensal de Pacientes</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label for="selectMesPacientes"><strong>Mês/Ano: </strong></label>
+          <input type="month" id="selectMesPacientes" onchange="renderizarPacientes()">
+          <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Novo Paciente</button>
+          <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
+        </div>
+      </div>
+
+      <h4 id="tituloLevantamentoMes" style="margin: 5px 0 15px 0; color: var(--primary-color); text-align: center;">Levantamento Financeiro Mensal</h4>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th style="width: 120px;">Valor (R$)</th>
+            <th>CEP</th>
+            <th>E_mail</th>
+            <th style="width: 180px;">Nota fiscal ou carnê leão</th>
+            <th style="width: 80px; text-align: center;">Emitido</th>
+            <th style="width: 60px; text-align: center;" class="no-print">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyPacientes"></tbody>
+      </table>
     </div>
+
+    <!-- Conteúdo 3: Painel Financeiro da Clínica -->
+    <div id="containerFinanceiro" class="panel-content" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin:0; color: var(--primary-color);">Balanço Financeiro da Clínica</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label for="selectMesFinanceiro"><strong>Mês de Referência: </strong></label>
+          <input type="month" id="selectMesFinanceiro" onchange="renderizarFinanceiro()">
+          <button class="btn btn-primary" onclick="abrirModalDespesa()">➕ Adicionar Despesa</button>
+          <button class="btn btn-success" onclick="exportarExcelFinanceiro()">📥 Exportar Excel/CSV</button>
+        </div>
+      </div>
+
+      <!-- Resumo dos Cards + Taxa de Ocupação -->
+      <div class="card-resumo-financeiro">
+        <div class="box-resumo box-entradas">
+          <h4>Total de Entradas (Salas)</h4>
+          <span id="txtTotalEntrada">R$ 0,00</span>
+        </div>
+        <div class="box-resumo box-saidas">
+          <h4>Total de Saídas (Custos)</h4>
+          <span id="txtTotalSaida">R$ 0,00</span>
+        </div>
+        <div class="box-resumo box-lucro">
+          <h4>Lucro Líquido do Mês</h4>
+          <span id="txtLucroLiquido">R$ 0,00</span>
+        </div>
+        <div class="box-resumo box-ocupacao">
+          <h4>Taxa de Ocupação Geral</h4>
+          <span id="txtTaxaOcupacao">0%</span>
+        </div>
+      </div>
+
+      <!-- Tabela Entradas por Profissional -->
+      <h4>Entradas por Profissional (R$ 350,00 por turno fixo mensal)</h4>
+      <table class="data-table">
+        <thead style="background-color: var(--primary-color);">
+          <tr>
+            <th style="background-color: var(--primary-color);">Profissional</th>
+            <th style="background-color: var(--primary-color);">Turnos Fixos (Sala 01)</th>
+            <th style="background-color: var(--primary-color);">Turnos Fixos (Sala 02)</th>
+            <th style="background-color: var(--primary-color);">Total de Turnos Fixos</th>
+            <th style="background-color: var(--primary-color);">Valor Mensal Devido</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyEntradas"></tbody>
+      </table>
+
+      <!-- Tabela Saídas -->
+      <h4 style="margin-top: 30px;">Despesas e Custos do Mês</h4>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="background-color: #c62828;">Descrição da Despesa</th>
+            <th style="background-color: #c62828;">Categoria</th>
+            <th style="background-color: #c62828;">Valor (R$)</th>
+            <th style="width: 80px; text-align: center; background-color: #c62828;">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyDespesas"></tbody>
+      </table>
+    </div>
+
   </div>
 
-  <!-- Modal para Inclusão/Edição/Exclusão de Reserva -->
+  <!-- Modal Inclusão/Edição de Reserva -->
   <div class="modal" id="modalReserva">
     <div class="modal-content">
       <h3 id="modalTitulo">Agendar Turno</h3>
@@ -408,7 +285,6 @@
         <textarea id="inputObs" rows="2" placeholder="Atendimento presencial, consulta..."></textarea>
       </div>
 
-      <!-- Caixa de Recorrência -->
       <div class="recorrencia-box" id="boxRecorrencia">
         <label style="font-weight: bold; cursor: pointer;">
           <input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente neste turno
@@ -427,7 +303,63 @@
     </div>
   </div>
 
-  <!-- Modal para Alteração de Senha -->
+  <!-- Modal Cadastro de Paciente -->
+  <div class="modal" id="modalPaciente">
+    <div class="modal-content">
+      <h3 id="modalPacienteTitulo">Cadastrar Novo Paciente</h3>
+      <input type="hidden" id="pacienteIdEdit">
+      <div class="form-group">
+        <label for="pacienteNome">Nome Completo *</label>
+        <input type="text" id="pacienteNome" placeholder="Ex: Ana Laura">
+      </div>
+      <div class="form-group">
+        <label for="pacienteCPF">CPF</label>
+        <input type="text" id="pacienteCPF" placeholder="000.000.000-00">
+      </div>
+      <div class="form-group">
+        <label for="pacienteCEP">CEP</label>
+        <input type="text" id="pacienteCEP" placeholder="00000-000">
+      </div>
+      <div class="form-group">
+        <label for="pacienteEmail">E-mail</label>
+        <input type="email" id="pacienteEmail" placeholder="exemplo@gmail.com">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="fecharModal('modalPaciente')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarPaciente()">Salvar Paciente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Adicionar Despesa -->
+  <div class="modal" id="modalDespesa">
+    <div class="modal-content">
+      <h3>Adicionar Custo / Despesa</h3>
+      <div class="form-group">
+        <label for="despesaDescricao">Descrição do Custo *</label>
+        <input type="text" id="despesaDescricao" placeholder="Ex: Aluguel da Sala">
+      </div>
+      <div class="form-group">
+        <label for="despesaCategoria">Categoria</label>
+        <select id="despesaCategoria">
+          <option value="Fixa">Custo Fixo (Aluguel, Luz, Internet)</option>
+          <option value="Material">Materiais de Escritório/Limpeza</option>
+          <option value="Manutenção">Manutenção / Reparos</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="despesaValor">Valor (R$) *</label>
+        <input type="number" id="despesaValor" step="0.01" placeholder="Ex: 150.00">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="fecharModal('modalDespesa')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarDespesa()">Adicionar Custo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alteração de Senha -->
   <div class="modal" id="modalSenha">
     <div class="modal-content">
       <h3>Alterar Minha Senha</h3>
@@ -450,7 +382,7 @@
     </div>
   </div>
 
-  <!-- Modal para Cadastrar Nova Profissional -->
+  <!-- Modal Cadastrar Nova Profissional -->
   <div class="modal" id="modalNovaProfissional">
     <div class="modal-content">
       <h3>Cadastrar Nova Profissional</h3>
@@ -471,11 +403,13 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: 'K@r!n3' },
-      'natalia':  { nome: 'Natália', senha: 'N@t4L14' },
-      'marilia':  { nome: 'Marília', senha: 'M4r!LI4' },
-      'recepcao': { nome: 'Recepção', senha: 'R3cPc@0' }
+      'karine':   { nome: 'Karine', senha: '123' },
+      'natalia':  { nome: 'Natália', senha: '123' },
+      'marilia':  { nome: 'Marília', senha: '123' },
+      'recepcao': { nome: 'Recepção', senha: '123' }
     };
+
+    const VALOR_TURNO_MENSAL = 350.00;
 
     const JSONBIN_CONFIG = {
       binId: '65a12345abc',
@@ -490,9 +424,9 @@
     ];
 
     let userKeyAtual = null;
-    let salaAtual = 'sala1'; 
+    let abaAtual = 'sala1'; 
     let dataAtual = new Date();
-    let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, logoUrl: '' };
+    let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, despesas: [], pacientes: [], lancamentosPacientes: {}, logoUrl: '' };
 
     async function carregarDados() {
       try {
@@ -503,6 +437,9 @@
         dadosJsonBin = json.record || {};
         
         if (!dadosJsonBin.reservas) dadosJsonBin.reservas = [];
+        if (!dadosJsonBin.despesas) dadosJsonBin.despesas = [];
+        if (!dadosJsonBin.pacientes) dadosJsonBin.pacientes = [];
+        if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
         if (!dadosJsonBin.usuarios || !dadosJsonBin.usuarios.karine) dadosJsonBin.usuarios = USUARIOS_PADRAO;
 
         atualizarSelectUsuariosLogin();
@@ -523,7 +460,11 @@
           },
           body: JSON.stringify(dadosJsonBin)
         });
-        if (userKeyAtual) renderizarCalendario();
+        if (userKeyAtual) {
+          if (abaAtual === 'financeiro') renderizarFinanceiro();
+          else if (abaAtual === 'pacientes') renderizarPacientes();
+          else renderizarCalendario();
+        }
       } catch (err) {
         alert('Erro ao guardar alterações.');
       }
@@ -552,11 +493,20 @@
       }
     }
 
-    function mudarSala(idSala) {
-      salaAtual = idSala;
-      document.getElementById('tabSala1').classList.toggle('active', idSala === 'sala1');
-      document.getElementById('tabSala2').classList.toggle('active', idSala === 'sala2');
-      renderizarCalendario();
+    function mudarAba(idAba) {
+      abaAtual = idAba;
+      document.getElementById('tabSala1').classList.toggle('active', idAba === 'sala1');
+      document.getElementById('tabSala2').classList.toggle('active', idAba === 'sala2');
+      document.getElementById('tabPacientes').classList.toggle('active', idAba === 'pacientes');
+      document.getElementById('tabFinanceiro').classList.toggle('active', idAba === 'financeiro');
+
+      document.getElementById('containerCalendario').style.display = (idAba === 'sala1' || idAba === 'sala2') ? 'block' : 'none';
+      document.getElementById('containerPacientes').style.display = (idAba === 'pacientes') ? 'block' : 'none';
+      document.getElementById('containerFinanceiro').style.display = (idAba === 'financeiro') ? 'block' : 'none';
+
+      if (idAba === 'financeiro') renderizarFinanceiro();
+      else if (idAba === 'pacientes') renderizarPacientes();
+      else renderizarCalendario();
     }
 
     function realizarLogin(event) {
@@ -603,10 +553,281 @@
       document.getElementById('telaLogin').style.display = 'none';
       document.getElementById('painelCalendario').style.display = 'block';
       document.getElementById('nomeUsuarioLogado').innerText = `👤 ${usuarioLogado.nome}`;
+
+      const nomeLower = usuarioLogado.nome.toLowerCase();
+      if (nomeLower.includes('karine') || nomeLower.includes('recepção') || nomeLower.includes('recepcao')) {
+        document.getElementById('tabFinanceiro').style.display = 'inline-block';
+      } else {
+        document.getElementById('tabFinanceiro').style.display = 'none';
+        if (abaAtual === 'financeiro') abaAtual = 'sala1';
+      }
+
+      const anoMesAtual = new Date().toISOString().substr(0, 7);
+      document.getElementById('selectMesFinanceiro').value = anoMesAtual;
+      document.getElementById('selectMesPacientes').value = anoMesAtual;
+
       renderizarCalendario();
     }
 
-    /* Modal Nova Profissional */
+    /* --- LÓGICA DE PACIENTES (SEPARADA POR USUÁRIO) --- */
+    function abrirModalNovoPaciente() {
+      document.getElementById('pacienteIdEdit').value = '';
+      document.getElementById('pacienteNome').value = '';
+      document.getElementById('pacienteCPF').value = '';
+      document.getElementById('pacienteCEP').value = '';
+      document.getElementById('pacienteEmail').value = '';
+      document.getElementById('modalPacienteTitulo').innerText = 'Cadastrar Novo Paciente';
+      document.getElementById('modalPaciente').style.display = 'flex';
+    }
+
+    async function salvarPaciente() {
+      const nome = document.getElementById('pacienteNome').value.trim();
+      const cpf = document.getElementById('pacienteCPF').value.trim();
+      const cep = document.getElementById('pacienteCEP').value.trim();
+      const email = document.getElementById('pacienteEmail').value.trim();
+      const idEdit = document.getElementById('pacienteIdEdit').value;
+
+      if (!nome) {
+        alert('Por favor, informe o nome do paciente.');
+        return;
+      }
+
+      if (!dadosJsonBin.pacientes) dadosJsonBin.pacientes = [];
+
+      if (idEdit) {
+        const p = dadosJsonBin.pacientes.find(x => x.id === idEdit);
+        if (p) {
+          p.nome = nome; p.cpf = cpf; p.cep = cep; p.email = email;
+        }
+      } else {
+        dadosJsonBin.pacientes.push({
+          id: 'pac_' + Date.now(),
+          ownerKey: userKeyAtual, // Vincula ao profissional logado
+          nome, cpf, cep, email
+        });
+      }
+
+      fecharModal('modalPaciente');
+      await guardarDados();
+    }
+
+    function renderizarPacientes() {
+      const mesAnoSelected = document.getElementById('selectMesPacientes').value;
+      if (!mesAnoSelected) return;
+
+      document.getElementById('tituloLevantamentoMes').innerText = `Levantamento Financeiro Mensal - ${mesAnoSelected}`;
+
+      const tbody = document.getElementById('tbodyPacientes');
+      tbody.innerHTML = '';
+
+      const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
+      const eRecepcao = usuarioLogado.nome.toLowerCase().includes('recepção') || usuarioLogado.nome.toLowerCase().includes('recepcao');
+
+      // Filtra pacientes: profissional vê apenas os seus; recepção vê todos.
+      const meusPacientes = (dadosJsonBin.pacientes || []).filter(p => eRecepcao || p.ownerKey === userKeyAtual);
+
+      if (meusPacientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999; padding:20px;">Nenhum paciente cadastrado. Clique em "Cadastrar Novo Paciente" para começar.</td></tr>';
+        return;
+      }
+
+      if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
+
+      meusPacientes.forEach(p => {
+        const chaveLancamento = `${mesAnoSelected}_${p.id}`;
+        const lanc = dadosJsonBin.lancamentosPacientes[chaveLancamento] || { valor: '', tipo: 'Nota fiscal', emitido: false };
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${p.nome}</strong></td>
+          <td>${p.cpf || '-'}</td>
+          <td>
+            <input type="text" style="width: 90px; padding: 4px;" value="${lanc.valor}" placeholder="R$ 0,00"
+              onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'valor', this.value)">
+          </td>
+          <td>${p.cep || '-'}</td>
+          <td>${p.email || '-'}</td>
+          <td>
+            <select style="width: 100%; padding: 4px;" onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'tipo', this.value)">
+              <option value="Nota fiscal" ${lanc.tipo === 'Nota fiscal' ? 'selected' : ''}>Nota fiscal</option>
+              <option value="Carnê leão" ${lanc.tipo === 'Carnê leão' ? 'selected' : ''}>Carnê leão</option>
+              <option value="não precisa nota" ${lanc.tipo === 'não precisa nota' ? 'selected' : ''}>não precisa nota</option>
+            </select>
+          </td>
+          <td style="text-align:center;">
+            <input type="checkbox" style="transform: scale(1.3); cursor:pointer;" ${lanc.emitido ? 'checked' : ''}
+              onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'emitido', this.checked)">
+          </td>
+          <td style="text-align:center;" class="no-print">
+            <button class="btn btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="excluirPaciente('${p.id}')">X</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function atualizarLancamentoPaciente(chave, campo, valor) {
+      if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
+      if (!dadosJsonBin.lancamentosPacientes[chave]) {
+        dadosJsonBin.lancamentosPacientes[chave] = { valor: '', tipo: 'Nota fiscal', emitido: false };
+      }
+
+      dadosJsonBin.lancamentosPacientes[chave][campo] = valor;
+      await guardarDados();
+    }
+
+    async function excluirPaciente(idPaciente) {
+      if (!confirm('Tem certeza que deseja excluir este paciente e o histórico dele?')) return;
+      dadosJsonBin.pacientes = dadosJsonBin.pacientes.filter(p => p.id !== idPaciente);
+      await guardarDados();
+    }
+
+    /* --- LÓGICA DO BALANÇO FINANCEIRO & OCUPAÇÃO --- */
+    function renderizarFinanceiro() {
+      const mesAnoSelected = document.getElementById('selectMesFinanceiro').value; 
+      if (!mesAnoSelected) return;
+
+      const tbodyEntradas = document.getElementById('tbodyEntradas');
+      const tbodyDespesas = document.getElementById('tbodyDespesas');
+      tbodyEntradas.innerHTML = '';
+      tbodyDespesas.innerHTML = '';
+
+      const turnosFixosPorProfissional = {};
+      let totalTurnosOcupadosGeral = 0;
+
+      dadosJsonBin.reservas.forEach(r => {
+        if (r.data && r.data.startsWith(mesAnoSelected)) {
+          totalTurnosOcupadosGeral++;
+          const pro = r.psicologa.trim();
+          if (!turnosFixosPorProfissional[pro]) {
+            turnosFixosPorProfissional[pro] = { sala1: new Set(), sala2: new Set() };
+          }
+          
+          const dt = new Date(r.data + 'T00:00:00');
+          const diaDaSemana = dt.getDay();
+          const chaveTurno = `${diaDaSemana}_${r.turno}`;
+
+          const sala = r.sala || 'sala1';
+          if (sala === 'sala2') turnosFixosPorProfissional[pro].sala2.add(chaveTurno);
+          else turnosFixosPorProfissional[pro].sala1.add(chaveTurno);
+        }
+      });
+
+      let totalEntradasValor = 0;
+      const profissionais = Object.keys(turnosFixosPorProfissional).sort();
+
+      if (profissionais.length === 0) {
+        tbodyEntradas.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Nenhuma reserva ativa encontrada para este mês.</td></tr>';
+      } else {
+        profissionais.forEach(pro => {
+          const s1Count = turnosFixosPorProfissional[pro].sala1.size;
+          const s2Count = turnosFixosPorProfissional[pro].sala2.size;
+          const totalTurnosFixos = s1Count + s2Count;
+          const subtotalPro = totalTurnosFixos * VALOR_TURNO_MENSAL;
+
+          totalEntradasValor += subtotalPro;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${pro}</strong></td>
+            <td>${s1Count} turno(s) fixo(s)</td>
+            <td>${s2Count} turno(s) fixo(s)</td>
+            <td><strong>${totalTurnosFixos} turno(s)</strong></td>
+            <td><strong>R$ ${subtotalPro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+          `;
+          tbodyEntradas.appendChild(tr);
+        });
+      }
+
+      /* Cálculo das Despesas */
+      let totalSaidasValor = 0;
+      const despesasDoMes = (dadosJsonBin.despesas || []).filter(d => d.mesAno === mesAnoSelected);
+
+      if (despesasDoMes.length === 0) {
+        tbodyDespesas.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum custo/despesa cadastrado neste mês.</td></tr>';
+      } else {
+        despesasDoMes.forEach(d => {
+          totalSaidasValor += parseFloat(d.valor || 0);
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${d.descricao}</td>
+            <td><span style="font-size:0.85rem; background:#f0f0f0; padding:3px 8px; border-radius:4px;">${d.categoria}</span></td>
+            <td>R$ ${parseFloat(d.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+            <td style="text-align:center;"><button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="excluirDespesa('${d.id}')">Excluir</button></td>
+          `;
+          tbodyDespesas.appendChild(tr);
+        });
+      }
+
+      /* Taxa de Ocupação (3 turnos x 30 dias x 2 salas = ~180 turnos totais no mês) */
+      const capacidadeTotalMes = 180;
+      const pctOcupacao = Math.min(100, Math.round((totalTurnosOcupadosGeral / capacidadeTotalMes) * 100));
+
+      const lucroLiquido = totalEntradasValor - totalSaidasValor;
+
+      document.getElementById('txtTotalEntrada').innerText = `R$ ${totalEntradasValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('txtTotalSaida').innerText = `R$ ${totalSaidasValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('txtLucroLiquido').innerText = `R$ ${lucroLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('txtTaxaOcupacao').innerText = `${pctOcupacao}%`;
+    }
+
+    /* Exportar Excel/CSV */
+    function exportarExcelFinanceiro() {
+      const mes = document.getElementById('selectMesFinanceiro').value;
+      let csv = `Balanço Financeiro - Mês ${mes}\n\n`;
+      csv += `Total Entradas;${document.getElementById('txtTotalEntrada').innerText}\n`;
+      csv += `Total Saídas;${document.getElementById('txtTotalSaida').innerText}\n`;
+      csv += `Lucro Líquido;${document.getElementById('txtLucroLiquido').innerText}\n`;
+      csv += `Taxa Ocupação;${document.getElementById('txtTaxaOcupacao').innerText}\n\n`;
+
+      csv += `Profissional;Turnos Sala 1;Turnos Sala 2;Total Turnos;Valor Devido\n`;
+      const rows = document.querySelectorAll('#tbodyEntradas tr');
+      rows.forEach(tr => {
+        const cols = tr.querySelectorAll('td');
+        if (cols.length >= 5) {
+          csv += `${cols[0].innerText};${cols[1].innerText};${cols[2].innerText};${cols[3].innerText};${cols[4].innerText}\n`;
+        }
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Balanco_Financeiro_${mes}.csv`;
+      link.click();
+    }
+
+    /* Modais Gerais */
+    function abrirModalDespesa() {
+      document.getElementById('despesaDescricao').value = '';
+      document.getElementById('despesaValor').value = '';
+      document.getElementById('modalDespesa').style.display = 'flex';
+    }
+
+    async function salvarDespesa() {
+      const descricao = document.getElementById('despesaDescricao').value.trim();
+      const categoria = document.getElementById('despesaCategoria').value;
+      const valor = parseFloat(document.getElementById('despesaValor').value);
+      const mesAnoSelected = document.getElementById('selectMesFinanceiro').value;
+
+      if (!descricao || isNaN(valor) || valor <= 0) {
+        alert('Por favor, informe a descrição e um valor válido.');
+        return;
+      }
+
+      if (!dadosJsonBin.despesas) dadosJsonBin.despesas = [];
+      dadosJsonBin.despesas.push({ id: 'desp_' + Date.now(), mesAno: mesAnoSelected, descricao, categoria, valor });
+
+      fecharModal('modalDespesa');
+      await guardarDados();
+    }
+
+    async function excluirDespesa(idDespesa) {
+      if (!confirm('Deseja excluir este custo?')) return;
+      dadosJsonBin.despesas = dadosJsonBin.despesas.filter(d => d.id !== idDespesa);
+      await guardarDados();
+    }
+
     function abrirModalNovaProfissional() {
       document.getElementById('novoNomeProfissional').value = '';
       document.getElementById('novaSenhaProfissional').value = '';
@@ -622,9 +843,7 @@
         return;
       }
 
-      // Gera uma chave simplificada (sem espaços e acentos)
       const key = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_') + '_' + Date.now();
-
       if (!dadosJsonBin.usuarios) dadosJsonBin.usuarios = USUARIOS_PADRAO;
       dadosJsonBin.usuarios[key] = { nome, senha };
 
@@ -634,7 +853,6 @@
       alert(`Profissional "${nome}" cadastrada com sucesso!`);
     }
 
-    /* Modal de Senha */
     function abrirModalSenha() {
       document.getElementById('senhaAtual').value = '';
       document.getElementById('novaSenha').value = '';
@@ -664,7 +882,6 @@
 
       dadosJsonBin.usuarios[userKeyAtual].senha = nova;
       await guardarDados();
-
       alert('Senha alterada com sucesso!');
       fecharModal('modalSenha');
     }
@@ -672,7 +889,6 @@
     function getDiasDaSemana(dataRef) {
       const inicioSemana = new Date(dataRef);
       inicioSemana.setDate(dataRef.getDate() - dataRef.getDay());
-      
       const dias = [];
       for (let i = 0; i < 7; i++) {
         const dia = new Date(inicioSemana);
@@ -729,7 +945,7 @@
           const divSlot = document.createElement('div');
           divSlot.className = 'day-slot';
 
-          const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id && (r.sala || 'sala1') === salaAtual);
+          const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id && (r.sala || 'sala1') === abaAtual);
 
           const card = document.createElement('div');
           if (reserva) {
@@ -771,17 +987,17 @@
       document.getElementById('divDataFimRecorrencia').style.display = chk ? 'block' : 'none';
     }
 
-    /* Modal de Reservas (Com campo de nome bloqueado) */
     function abrirModalReserva(dataIso, turno, reserva) {
       document.getElementById('inputData').value = dataIso;
       document.getElementById('inputTurno').value = turno.id;
       
       const dataFmt = new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR');
-      const nomeSala = salaAtual === 'sala1' ? 'Sala 01 - Maior' : 'Sala 02 - Compartilhada';
+      const nomeSala = abaAtual === 'sala1' ? 'Sala 01 - Maior' : 'Sala 02 - Compartilhada';
       document.getElementById('inputInfoDataHorario').value = `${nomeSala} | ${dataFmt} (${turno.nome})`;
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
       const campoPsicologa = document.getElementById('inputPsicologa');
+      const eRecepcao = usuarioLogado.nome.toLowerCase().includes('recepção') || usuarioLogado.nome.toLowerCase().includes('recepcao');
 
       document.getElementById('chkRecorrente').checked = false;
       document.getElementById('divDataFimRecorrencia').style.display = 'none';
@@ -793,8 +1009,14 @@
       if (reserva) {
         document.getElementById('modalTitulo').innerText = 'Alterar / Excluir Reserva';
         campoPsicologa.value = reserva.psicologa;
-        campoPsicologa.readOnly = true; // Bloqueado
-        campoPsicologa.style.background = '#f5f5f5';
+
+        if (eRecepcao) {
+          campoPsicologa.readOnly = false;
+          campoPsicologa.style.background = '#ffffff';
+        } else {
+          campoPsicologa.readOnly = true;
+          campoPsicologa.style.background = '#f5f5f5';
+        }
 
         document.getElementById('inputObs').value = reserva.observacao || '';
         document.getElementById('btnExcluir').style.display = 'inline-block';
@@ -802,14 +1024,13 @@
       } else {
         document.getElementById('modalTitulo').innerText = 'Nova Reserva de Sala';
         
-        // Se for a Recepção, deixa digitar. Se for uma psicóloga, FIXA O NOME dela.
-        if (usuarioLogado.nome.toLowerCase().includes('recepção') || usuarioLogado.nome.toLowerCase().includes('recepcao')) {
+        if (eRecepcao) {
           campoPsicologa.value = '';
           campoPsicologa.readOnly = false;
           campoPsicologa.style.background = '#ffffff';
         } else {
           campoPsicologa.value = usuarioLogado.nome;
-          campoPsicologa.readOnly = true; // Bloqueado para edição
+          campoPsicologa.readOnly = true;
           campoPsicologa.style.background = '#f5f5f5';
         }
 
@@ -847,13 +1068,13 @@
         while (tempDate <= limitDate) {
           const isoCurr = tempDate.toISOString().split('T')[0];
           
-          dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === isoCurr && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
+          dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === isoCurr && r.turno === turnoId && (r.sala || 'sala1') === abaAtual));
 
           dadosJsonBin.reservas.push({
             id: 'res_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
             data: isoCurr,
             turno: turnoId,
-            sala: salaAtual,
+            sala: abaAtual,
             psicologa,
             observacao,
             criadoPor: usuarioLogado.nome,
@@ -863,13 +1084,13 @@
           tempDate.setDate(tempDate.getDate() + 7);
         }
       } else {
-        dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
+        dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === abaAtual));
 
         dadosJsonBin.reservas.push({
           id: 'res_' + Date.now(),
           data: dataIso,
           turno: turnoId,
-          sala: salaAtual,
+          sala: abaAtual,
           psicologa,
           observacao,
           criadoPor: usuarioLogado.nome,
@@ -887,7 +1108,7 @@
       const dataIso = document.getElementById('inputData').value;
       const turnoId = document.getElementById('inputTurno').value;
 
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === salaAtual));
+      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && (r.sala || 'sala1') === abaAtual));
 
       fecharModal('modalReserva');
       await guardarDados();
