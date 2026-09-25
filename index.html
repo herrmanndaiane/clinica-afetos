@@ -153,7 +153,7 @@
 
     <!-- Abas do Sistema -->
     <div class="tabs-container">
-      <button class="tab-btn active" id="tabSala1" onclick="mudarAba('sala1')">Sala 01 - Maior</button>
+      <button class="tab-btn active" id="tabSala1" onclick="mudarAba('sala1')">Sala 01 - Estante</button>
       <button class="tab-btn" id="tabSala2" onclick="mudarAba('sala2')">Sala 02 - Compartilhada</button>
       <button class="tab-btn tab-btn-pacientes" id="tabPacientes" onclick="mudarAba('pacientes')">📋 Levantamento de Pacientes</button>
       <button class="tab-btn tab-btn-financeiro" id="tabFinanceiro" onclick="mudarAba('financeiro')" style="display: none;">📊 Financeiro da Clínica</button>
@@ -178,7 +178,7 @@
         <h3 style="margin:0; color: var(--primary-color);">Levantamento Financeiro Mensal de Pacientes</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
           <label for="selectMesPacientes"><strong>Mês/Ano: </strong></label>
-          <input type="month" id="selectMesPacientes" onchange="renderizarPacientes()">
+          <select id="selectMesPacientes" onchange="renderizarPacientes()"></select>
           <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Paciente</button>
           <button class="btn btn-success" onclick="exportarCSVPacientes()">📥 Exportar Excel (CSV)</button>
           <button class="btn btn-primary" onclick="window.print()">🖨️ Gerar PDF / Imprimir</button>
@@ -219,7 +219,7 @@
         <h3 style="margin:0; color: var(--primary-color);">Balanço Financeiro da Clínica</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
           <label for="selectMesFinanceiro"><strong>Mês de Referência: </strong></label>
-          <input type="month" id="selectMesFinanceiro" onchange="renderizarFinanceiro()">
+          <select id="selectMesFinanceiro" onchange="renderizarFinanceiro()"></select>
           <button class="btn btn-primary" onclick="abrirModalDespesa()">➕ Adicionar Despesa</button>
           <button class="btn btn-success" onclick="exportarExcelFinanceiro()">📥 Exportar Excel/CSV</button>
         </div>
@@ -244,7 +244,7 @@
         </div>
       </div>
 
-      <h4>Entradas por Locação de Salas (R$ 350,00 por turno fixo mensal)</h4>
+      <h4>Entradas por Locação de Salas (R$ 350,00 por turno fixo mensal - Isento para Karine)</h4>
       <table class="data-table">
         <thead style="background-color: var(--primary-color);">
           <tr>
@@ -426,17 +426,17 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: '123' },
-      'natalia':  { nome: 'Natália', senha: '123' },
-      'marilia':  { nome: 'Marília', senha: '123' },
-      'recepcao': { nome: 'Recepção', senha: '123' }
+      'karine':   { nome: 'Karine', senha: 'K4r1n3' },
+      'natalia':  { nome: 'Natália', senha: 'N4t@lia' },
+      'marilia':  { nome: 'Marília', senha: 'M4rili@' },
+      'recepcao': { nome: 'Recepção', senha: '1Atpd@VPGC@' }
     };
 
     const VALOR_TURNO_MENSAL = 350.00;
-    const CHAVE_CRIPTOGRAFIA = 'MinhaChaveSecretaClinica2026'; // Chave para encriptar dados sensíveis
+    const CHAVE_CRIPTOGRAFIA = 'MinhaChaveSecretaClinica2026';
 
     const JSONBIN_CONFIG = {
-      binId: '6ab27273ffd5d1605322efdf',
+      binId: '65a12345abc',
       apiKey: '$2a$10$HB3aLXcmVDYDE89zOm.mvuITBZxSjg1WGqEI7FSyZNZLok4QE9t7.',
       url: 'https://api.jsonbin.io/v3/b/'
     };
@@ -463,7 +463,7 @@
       try {
         const bytes = CryptoJS.AES.decrypt(ciphertext, CHAVE_CRIPTOGRAFIA);
         const original = bytes.toString(CryptoJS.enc.Utf8);
-        return original || ciphertext; // Caso seja texto antigo não criptografado, retorna o texto original
+        return original || ciphertext;
       } catch (e) {
         return ciphertext;
       }
@@ -484,6 +484,7 @@
         if (!dadosJsonBin.usuarios || !dadosJsonBin.usuarios.karine) dadosJsonBin.usuarios = USUARIOS_PADRAO;
 
         atualizarSelectUsuariosLogin();
+        populasSelectsMeses();
         exibirLogo();
         verificarSessao();
       } catch (err) {
@@ -491,9 +492,39 @@
       }
     }
 
+    /* Popula os seletores de mês do ano corrente até Dezembro */
+    function populasSelectsMeses() {
+      const selectPacientes = document.getElementById('selectMesPacientes');
+      const selectFinanceiro = document.getElementById('selectMesFinanceiro');
+      selectPacientes.innerHTML = '';
+      selectFinanceiro.innerHTML = '';
+
+      const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+      const anoAtual = new Date().getFullYear();
+
+      for (let m = 0; m < 12; m++) {
+        const mesPad = String(m + 1).padStart(2, '0');
+        const valorIso = `${anoAtual}-${mesPad}`;
+        const labelExibicao = `${mesesNomes[m]} / ${anoAtual}`;
+
+        const opt1 = document.createElement('option');
+        opt1.value = valorIso;
+        opt1.innerText = labelExibicao;
+        selectPacientes.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = valorIso;
+        opt2.innerText = labelExibicao;
+        selectFinanceiro.appendChild(opt2);
+      }
+
+      const mesAtualIso = new Date().toISOString().substr(0, 7);
+      selectPacientes.value = mesAtualIso;
+      selectFinanceiro.value = mesAtualIso;
+    }
+
     async function guardarDados() {
       try {
-        // Cria uma cópia com os dados dos pacientes criptografados antes de salvar no JSONBin
         const copiaParaSalvar = JSON.parse(JSON.stringify(dadosJsonBin));
 
         if (copiaParaSalvar.pacientes) {
@@ -617,14 +648,10 @@
         if (abaAtual === 'financeiro') abaAtual = 'sala1';
       }
 
-      const anoMesAtual = new Date().toISOString().substr(0, 7);
-      document.getElementById('selectMesFinanceiro').value = anoMesAtual;
-      document.getElementById('selectMesPacientes').value = anoMesAtual;
-
       renderizarCalendario();
     }
 
-    /* --- LÓGICA DE PACIENTES (DESCRIPTOGRAFADOS LOCALMENTE) --- */
+    /* --- LÓGICA DE PACIENTES (CADA MÊS É UM OBJETO INDEPENDENTE) --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -702,6 +729,7 @@
       meusPacientes.forEach(p => {
         const chaveLancamento = `${mesAnoSelected}_${p.id}`;
 
+        // Cria um objeto isolado em branco caso o mês selecionado ainda não possua dados gravados
         if (!dadosJsonBin.lancamentosPacientes[chaveLancamento]) {
           dadosJsonBin.lancamentosPacientes[chaveLancamento] = { 
             valor: '', 
@@ -716,7 +744,6 @@
         totalRecebidoSum += numVal;
         if (lanc.emitido) totalEmitidosCount++;
 
-        // Descriptografa os dados do paciente para exibição
         const nomeDec = decriptarTexto(p.nome);
         const cpfDec = decriptarTexto(p.cpf);
         const cepDec = decriptarTexto(p.cep);
@@ -756,8 +783,13 @@
 
     async function atualizarLancamentoPaciente(chave, campo, valor) {
       if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
+      
+      // Cria uma cópia independente se não existir
       if (!dadosJsonBin.lancamentosPacientes[chave]) {
         dadosJsonBin.lancamentosPacientes[chave] = { valor: '', tipo: 'Nota fiscal', emitido: false };
+      } else {
+        // Assegura que estamos alterando apenas este mês especifico
+        dadosJsonBin.lancamentosPacientes[chave] = { ...dadosJsonBin.lancamentosPacientes[chave] };
       }
 
       dadosJsonBin.lancamentosPacientes[chave][campo] = valor;
@@ -817,7 +849,7 @@
       tbodyDespesas.innerHTML = '';
       tbodyKarine.innerHTML = '';
 
-      /* 1. Cálculo de Locação de Salas */
+      /* 1. Cálculo de Locação de Salas (ISENTO PARA KARINE) */
       const turnosFixosPorProfissional = {};
       let totalTurnosOcupadosGeral = 0;
 
@@ -849,13 +881,16 @@
           const s1Count = turnosFixosPorProfissional[pro].sala1.size;
           const s2Count = turnosFixosPorProfissional[pro].sala2.size;
           const totalTurnosFixos = s1Count + s2Count;
-          const subtotalPro = totalTurnosFixos * VALOR_TURNO_MENSAL;
+          
+          // REGRA DE ISENÇÃO: Karine não paga locação de turnos (R$ 0,00)
+          const eKarine = pro.toLowerCase().includes('karine');
+          const subtotalPro = eKarine ? 0 : (totalTurnosFixos * VALOR_TURNO_MENSAL);
 
           totalEntradasSalasValor += subtotalPro;
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><strong>${pro}</strong></td>
+            <td><strong>${pro} ${eKarine ? '<small style="color:#2e7d32;">(Isenta)</small>' : ''}</strong></td>
             <td>${s1Count} turno(s) fixo(s)</td>
             <td>${s2Count} turno(s) fixo(s)</td>
             <td><strong>${totalTurnosFixos} turno(s)</strong></td>
