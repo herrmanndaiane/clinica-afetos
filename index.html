@@ -176,10 +176,15 @@
     <div id="containerPacientes" class="panel-content" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;" class="no-print">
         <h3 style="margin:0; color: var(--primary-color);">Levantamento Financeiro Mensal de Pacientes</h3>
-        <div style="display: flex; gap: 10px; align-items: center;">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
           <label for="selectMesPacientes"><strong>Mês/Ano: </strong></label>
           <select id="selectMesPacientes" onchange="renderizarPacientes()"></select>
           <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Paciente</button>
+          
+          <!-- Botão e Input de Importação Massiva -->
+          <button class="btn" onclick="document.getElementById('inputImportarCSV').click()" style="background:#f39c12; color:white; border:none;">📤 Importar CSV</button>
+          <input type="file" id="inputImportarCSV" accept=".csv" style="display:none;" onchange="importarCSVPacientes(event)">
+
           <button class="btn btn-success" onclick="exportarCSVPacientes()">📥 Exportar Excel (CSV)</button>
           <button class="btn btn-primary" onclick="window.print()">🖨️ Gerar PDF / Imprimir</button>
         </div>
@@ -426,9 +431,9 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: 'K4r1n3' },
-      'natalia':  { nome: 'Natália', senha: 'N4t@lia' },
-      'marilia':  { nome: 'Marília', senha: 'M4rili@' },
+      'karine':   { nome: 'Karine', senha: 'K@r1n3' },
+      'natalia':  { nome: 'Natália', senha: 'N4t@L!A' },
+      'marilia':  { nome: 'Marília', senha: 'M4RiL!4' },
       'recepcao': { nome: 'Recepção', senha: '1Atpd@VPGC@' }
     };
 
@@ -492,7 +497,6 @@
       }
     }
 
-    /* Popula os seletores de mês do ano corrente até Dezembro */
     function populasSelectsMeses() {
       const selectPacientes = document.getElementById('selectMesPacientes');
       const selectFinanceiro = document.getElementById('selectMesFinanceiro');
@@ -500,7 +504,7 @@
       selectFinanceiro.innerHTML = '';
 
       const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-      const anoAtual = new Date().getFullYear();
+      const anoAtual = 2026;
 
       for (let m = 0; m < 12; m++) {
         const mesPad = String(m + 1).padStart(2, '0');
@@ -518,9 +522,9 @@
         selectFinanceiro.appendChild(opt2);
       }
 
-      const mesAtualIso = new Date().toISOString().substr(0, 7);
-      selectPacientes.value = mesAtualIso;
-      selectFinanceiro.value = mesAtualIso;
+      const mesIsoAgenda = dataAtual.toISOString().substr(0, 7);
+      selectPacientes.value = mesIsoAgenda;
+      selectFinanceiro.value = mesIsoAgenda;
     }
 
     async function guardarDados() {
@@ -651,7 +655,7 @@
       renderizarCalendario();
     }
 
-    /* --- LÓGICA DE PACIENTES (CADA MÊS É UM OBJETO INDEPENDENTE) --- */
+    /* --- LÓGICA DE PACIENTES (COM IMPORTAÇÃO MASSIVA CSV) --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -683,7 +687,7 @@
         }
       } else {
         dadosJsonBin.pacientes.push({
-          id: 'pac_' + Date.now(),
+          id: 'pac_' + Date.now() + '_' + Math.random().toString(36).substr(2, 3),
           ownerKey: userKeyAtual,
           nome, cpf, cep, email
         });
@@ -715,7 +719,7 @@
       const meusPacientes = (dadosJsonBin.pacientes || []).filter(p => eRecepcao || p.ownerKey === userKeyAtual);
 
       if (meusPacientes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999; padding:20px;">Nenhum paciente cadastrado. Clique em "Cadastrar Paciente" para começar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999; padding:20px;">Nenhum paciente cadastrado. Clique em "Cadastrar Paciente" ou "Importar CSV".</td></tr>';
         document.getElementById('tfootTotalRecebidoPacientes').innerHTML = '<strong>R$ 0,00</strong>';
         document.getElementById('tfootTotalEmitidos').innerHTML = '<strong>0/0</strong>';
         return;
@@ -729,7 +733,6 @@
       meusPacientes.forEach(p => {
         const chaveLancamento = `${mesAnoSelected}_${p.id}`;
 
-        // Cria um objeto isolado em branco caso o mês selecionado ainda não possua dados gravados
         if (!dadosJsonBin.lancamentosPacientes[chaveLancamento]) {
           dadosJsonBin.lancamentosPacientes[chaveLancamento] = { 
             valor: '', 
@@ -754,7 +757,7 @@
           <td><strong>${nomeDec}</strong></td>
           <td>${cpfDec || '-'}</td>
           <td>
-            <input type="text" style="width: 100px; padding: 4px;" value="${lanc.valor}" placeholder="R$ 0,00"
+            <input type="text" style="width: 100px; padding: 4px;" value="${lanc.valor || ''}" placeholder="R$ 0,00"
               onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'valor', this.value)">
           </td>
           <td>${cepDec || '-'}</td>
@@ -784,11 +787,9 @@
     async function atualizarLancamentoPaciente(chave, campo, valor) {
       if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
       
-      // Cria uma cópia independente se não existir
       if (!dadosJsonBin.lancamentosPacientes[chave]) {
         dadosJsonBin.lancamentosPacientes[chave] = { valor: '', tipo: 'Nota fiscal', emitido: false };
       } else {
-        // Assegura que estamos alterando apenas este mês especifico
         dadosJsonBin.lancamentosPacientes[chave] = { ...dadosJsonBin.lancamentosPacientes[chave] };
       }
 
@@ -834,6 +835,48 @@
       link.href = URL.createObjectURL(blob);
       link.download = `Levantamento_Pacientes_${mes}.csv`;
       link.click();
+    }
+
+    /* Importação Massiva de Pacientes via CSV */
+    async function importarCSVPacientes(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const texto = e.target.result;
+        const linhas = texto.split(/\r\n|\n/);
+        
+        let qtdImportados = 0;
+        if (!dadosJsonBin.pacientes) dadosJsonBin.pacientes = [];
+
+        linhas.forEach((linha, idx) => {
+          if (idx === 0 || !linha.trim()) return; // Pula cabeçalho e linhas vazias
+          
+          // Separa por ponto e vírgula ou vírgula
+          const colunas = linha.split(/;|,/).map(c => c.replace(/^"|"$/g, '').trim());
+
+          if (colunas.length > 0 && colunas[0]) {
+            const nome = colunas[0];
+            const cpf = colunas[1] || '';
+            const cep = colunas[2] || '';
+            const email = colunas[3] || '';
+
+            dadosJsonBin.pacientes.push({
+              id: 'pac_' + Date.now() + '_' + idx,
+              ownerKey: userKeyAtual,
+              nome, cpf, cep, email
+            });
+            qtdImportados++;
+          }
+        });
+
+        event.target.value = ''; // Limpa input de arquivo
+        await guardarDados();
+        alert(`${qtdImportados} paciente(s) importado(s) com sucesso!`);
+      };
+
+      reader.readAsText(file, 'UTF-8');
     }
 
     /* --- LÓGICA DO BALANÇO FINANCEIRO DA CLÍNICA --- */
@@ -882,7 +925,6 @@
           const s2Count = turnosFixosPorProfissional[pro].sala2.size;
           const totalTurnosFixos = s1Count + s2Count;
           
-          // REGRA DE ISENÇÃO: Karine não paga locação de turnos (R$ 0,00)
           const eKarine = pro.toLowerCase().includes('karine');
           const subtotalPro = eKarine ? 0 : (totalTurnosFixos * VALOR_TURNO_MENSAL);
 
@@ -1104,7 +1146,15 @@
 
       const diasSemana = getDiasDaSemana(dataAtual);
       const opcoesMes = { month: 'long', year: 'numeric' };
-      document.getElementById('tituloMes').innerText = dataAtual.toLocaleDateString('pt-BR', opcoesMes);
+      const tituloFormatado = dataAtual.toLocaleDateString('pt-BR', opcoesMes);
+      document.getElementById('tituloMes').innerText = tituloFormatado;
+
+      const mesIso = dataAtual.toISOString().substr(0, 7);
+      const selPacientes = document.getElementById('selectMesPacientes');
+      const selFinanceiro = document.getElementById('selectMesFinanceiro');
+      
+      if (selPacientes && selPacientes.querySelector(`option[value="${mesIso}"]`)) selPacientes.value = mesIso;
+      if (selFinanceiro && selFinanceiro.querySelector(`option[value="${mesIso}"]`)) selFinanceiro.value = mesIso;
 
       const headerVazio = document.createElement('div');
       headerVazio.className = 'grid-header';
@@ -1182,7 +1232,7 @@
       document.getElementById('inputTurno').value = turno.id;
       
       const dataFmt = new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR');
-      const nomeSala = abaAtual === 'sala1' ? 'Sala 01 - Maior' : 'Sala 02 - Compartilhada';
+      const nomeSala = abaAtual === 'sala1' ? 'Sala 01 - Estante' : 'Sala 02 - Compartilhada';
       document.getElementById('inputInfoDataHorario').value = `${nomeSala} | ${dataFmt} (${turno.nome})`;
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
