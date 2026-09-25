@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda da Clínica & Gestão de Pacientes</title>
+  <!-- Biblioteca CryptoJS para Criptografia AES-256 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <style>
     :root {
       --primary-color: #6b1d2f;    /* Bordô principal */
@@ -256,7 +258,6 @@
         <tbody id="tbodyEntradas"></tbody>
       </table>
 
-      <!-- Nova Tabela: Entradas Diretas de Consultas/Pacientes (Karine) -->
       <h4 style="margin-top: 30px; color: #2e7d32;">Entradas de Atendimentos Clínicos / Pacientes (Karine)</h4>
       <table class="data-table">
         <thead>
@@ -432,6 +433,7 @@
     };
 
     const VALOR_TURNO_MENSAL = 350.00;
+    const CHAVE_CRIPTOGRAFIA = 'MinhaChaveSecretaClinica2026'; // Chave para encriptar dados sensíveis
 
     const JSONBIN_CONFIG = {
       binId: '6ab27273ffd5d1605322efdf',
@@ -449,6 +451,23 @@
     let abaAtual = 'sala1'; 
     let dataAtual = new Date();
     let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, despesas: [], pacientes: [], lancamentosPacientes: {}, logoUrl: '' };
+
+    /* --- FUNÇÕES AUXILIARES DE CRIPTOGRAFIA (AES-256) --- */
+    function encriptarTexto(texto) {
+      if (!texto) return '';
+      return CryptoJS.AES.encrypt(texto, CHAVE_CRIPTOGRAFIA).toString();
+    }
+
+    function decriptarTexto(ciphertext) {
+      if (!ciphertext) return '';
+      try {
+        const bytes = CryptoJS.AES.decrypt(ciphertext, CHAVE_CRIPTOGRAFIA);
+        const original = bytes.toString(CryptoJS.enc.Utf8);
+        return original || ciphertext; // Caso seja texto antigo não criptografado, retorna o texto original
+      } catch (e) {
+        return ciphertext;
+      }
+    }
 
     async function carregarDados() {
       try {
@@ -474,14 +493,28 @@
 
     async function guardarDados() {
       try {
+        // Cria uma cópia com os dados dos pacientes criptografados antes de salvar no JSONBin
+        const copiaParaSalvar = JSON.parse(JSON.stringify(dadosJsonBin));
+
+        if (copiaParaSalvar.pacientes) {
+          copiaParaSalvar.pacientes = copiaParaSalvar.pacientes.map(p => ({
+            ...p,
+            nome: encriptarTexto(p.nome),
+            cpf: encriptarTexto(p.cpf),
+            cep: encriptarTexto(p.cep),
+            email: encriptarTexto(p.email)
+          }));
+        }
+
         await fetch(`${JSONBIN_CONFIG.url}${JSONBIN_CONFIG.binId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-Access-Key': JSONBIN_CONFIG.apiKey
           },
-          body: JSON.stringify(dadosJsonBin)
+          body: JSON.stringify(copiaParaSalvar)
         });
+
         if (userKeyAtual) {
           if (abaAtual === 'financeiro') renderizarFinanceiro();
           else if (abaAtual === 'pacientes') renderizarPacientes();
@@ -591,7 +624,7 @@
       renderizarCalendario();
     }
 
-    /* --- LÓGICA DE PACIENTES (NOVO MÊS COMEÇA EM BRANCO) --- */
+    /* --- LÓGICA DE PACIENTES (DESCRIPTOGRAFADOS LOCALMENTE) --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -683,16 +716,22 @@
         totalRecebidoSum += numVal;
         if (lanc.emitido) totalEmitidosCount++;
 
+        // Descriptografa os dados do paciente para exibição
+        const nomeDec = decriptarTexto(p.nome);
+        const cpfDec = decriptarTexto(p.cpf);
+        const cepDec = decriptarTexto(p.cep);
+        const emailDec = decriptarTexto(p.email);
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${p.nome}</strong></td>
-          <td>${p.cpf || '-'}</td>
+          <td><strong>${nomeDec}</strong></td>
+          <td>${cpfDec || '-'}</td>
           <td>
             <input type="text" style="width: 100px; padding: 4px;" value="${lanc.valor}" placeholder="R$ 0,00"
               onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'valor', this.value)">
           </td>
-          <td>${p.cep || '-'}</td>
-          <td>${p.email || '-'}</td>
+          <td>${cepDec || '-'}</td>
+          <td>${emailDec || '-'}</td>
           <td>
             <select style="width: 100%; padding: 4px;" onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'tipo', this.value)">
               <option value="Nota fiscal" ${lanc.tipo === 'Nota fiscal' ? 'selected' : ''}>Nota fiscal</option>
@@ -748,7 +787,12 @@
         const lanc = dadosJsonBin.lancamentosPacientes[chaveLancamento] || { valor: '', tipo: 'Nota fiscal', emitido: false };
         totalSum += parseValorNumerico(lanc.valor);
 
-        csv += `"${p.nome}";"${p.cpf || ''}";"${lanc.valor || ''}";"${p.cep || ''}";"${p.email || ''}";"${lanc.tipo}";"${lanc.emitido ? 'Sim' : 'Não'}"\n`;
+        const nomeDec = decriptarTexto(p.nome);
+        const cpfDec = decriptarTexto(p.cpf);
+        const cepDec = decriptarTexto(p.cep);
+        const emailDec = decriptarTexto(p.email);
+
+        csv += `"${nomeDec}";"${cpfDec || ''}";"${lanc.valor || ''}";"${cepDec || ''}";"${emailDec || ''}";"${lanc.tipo}";"${lanc.emitido ? 'Sim' : 'Não'}"\n`;
       });
 
       csv += `\nTOTAL RECEBIDO NO MÊS;;R$ ${totalSum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })};;;;\n`;
@@ -825,7 +869,6 @@
       let totalEntradasKarineValor = 0;
       let qtdPacientesKarine = 0;
 
-      // Busca a chave do usuário Karine
       const karineKey = Object.keys(dadosJsonBin.usuarios || {}).find(k => 
         dadosJsonBin.usuarios[k].nome.toLowerCase().includes('karine')
       ) || 'karine';
