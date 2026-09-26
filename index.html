@@ -28,7 +28,7 @@
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: var(--bg-color); /* Fundo Bordô Transparente */
+      background-color: var(--bg-color);
       color: #333333;
     }
 
@@ -55,6 +55,8 @@
     .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
     .tab-btn-pacientes { background: #e3f2fd; color: #0d47a1; border-color: #90caf9; }
     .tab-btn-pacientes.active { background: #0d47a1; color: white; border-color: #0d47a1; }
+    .tab-btn-limpeza { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+    .tab-btn-limpeza.active { background: #e65100; color: white; border-color: #e65100; }
     .tab-btn-financeiro { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
     .tab-btn-financeiro.active { background: #2e7d32; color: white; border-color: #2e7d32; }
 
@@ -156,6 +158,7 @@
       <button class="tab-btn active" id="tabSala1" onclick="mudarAba('sala1')">Sala 01 - Maior</button>
       <button class="tab-btn" id="tabSala2" onclick="mudarAba('sala2')">Sala 02 - Compartilhada</button>
       <button class="tab-btn tab-btn-pacientes" id="tabPacientes" onclick="mudarAba('pacientes')">📋 Levantamento de Pacientes</button>
+      <button class="tab-btn tab-btn-limpeza" id="tabLimpeza" onclick="mudarAba('limpeza')">🧹 Escala de Limpeza</button>
       <button class="tab-btn tab-btn-financeiro" id="tabFinanceiro" onclick="mudarAba('financeiro')" style="display: none;">📊 Financeiro da Clínica</button>
     </div>
 
@@ -217,7 +220,29 @@
       </table>
     </div>
 
-    <!-- Conteúdo 3: Painel Financeiro da Clínica -->
+    <!-- Conteúdo 3: Escala de Limpeza -->
+    <div id="containerLimpeza" class="panel-content" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin:0; color: #e65100;">🧹 Escala Semanal de Limpeza (Rodízio das Psicólogas)</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label for="selectMesLimpeza"><strong>Mês/Ano: </strong></label>
+          <select id="selectMesLimpeza" onchange="renderizarEscalaLimpeza()"></select>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="background-color: #e65100;">Semana / Período</th>
+            <th style="background-color: #e65100;">Psicóloga Responsável</th>
+            <th style="width: 120px; text-align: center; background-color: #e65100;">Concluído?</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyEscalaLimpeza"></tbody>
+      </table>
+    </div>
+
+    <!-- Conteúdo 4: Painel Financeiro da Clínica -->
     <div id="containerFinanceiro" class="panel-content" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="margin:0; color: var(--primary-color);">Balanço Financeiro da Clínica</h3>
@@ -431,8 +456,8 @@
   <script>
     const USUARIOS_PADRAO = {
       'karine':   { nome: 'Karine', senha: 'K4R!n3' },
-      'natalia':  { nome: 'Natália', senha: 'N4t4L!4' },
-      'marilia':  { nome: 'Marília', senha: 'M4RiL!@' },
+      'natalia':  { nome: 'Natália', senha: 'N4T4l!@' },
+      'marilia':  { nome: 'Marília', senha: 'M4RiLia' },
       'recepcao': { nome: 'Recepção', senha: '1Atpd@VPGC!' }
     };
 
@@ -454,7 +479,7 @@
     let userKeyAtual = null;
     let abaAtual = 'sala1'; 
     let dataAtual = new Date();
-    let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, despesas: [], pacientes: [], lancamentosPacientes: {}, logoUrl: '' };
+    let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, despesas: [], pacientes: [], lancamentosPacientes: {}, escalaLimpeza: {}, logoUrl: '' };
 
     /* --- FUNÇÕES AUXILIARES DE CRIPTOGRAFIA (AES-256) --- */
     function encriptarTexto(texto) {
@@ -485,6 +510,7 @@
         if (!dadosJsonBin.despesas) dadosJsonBin.despesas = [];
         if (!dadosJsonBin.pacientes) dadosJsonBin.pacientes = [];
         if (!dadosJsonBin.lancamentosPacientes) dadosJsonBin.lancamentosPacientes = {};
+        if (!dadosJsonBin.escalaLimpeza) dadosJsonBin.escalaLimpeza = {};
         if (!dadosJsonBin.usuarios || !dadosJsonBin.usuarios.karine) dadosJsonBin.usuarios = USUARIOS_PADRAO;
 
         atualizarSelectUsuariosLogin();
@@ -499,8 +525,11 @@
     function populasSelectsMeses() {
       const selectPacientes = document.getElementById('selectMesPacientes');
       const selectFinanceiro = document.getElementById('selectMesFinanceiro');
+      const selectLimpeza = document.getElementById('selectMesLimpeza');
+
       selectPacientes.innerHTML = '';
       selectFinanceiro.innerHTML = '';
+      selectLimpeza.innerHTML = '';
 
       const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
       const anoAtual = 2026;
@@ -519,11 +548,24 @@
         opt2.value = valorIso;
         opt2.innerText = labelExibicao;
         selectFinanceiro.appendChild(opt2);
+
+        // Aba de Limpeza disponível a partir de Outubro de 2026 (m >= 9)
+        if (m >= 9) {
+          const opt3 = document.createElement('option');
+          opt3.value = valorIso;
+          opt3.innerText = labelExibicao;
+          selectLimpeza.appendChild(opt3);
+        }
       }
 
       const mesIsoAgenda = dataAtual.toISOString().substr(0, 7);
       selectPacientes.value = mesIsoAgenda;
       selectFinanceiro.value = mesIsoAgenda;
+      if (selectLimpeza.querySelector(`option[value="${mesIsoAgenda}"]`)) {
+        selectLimpeza.value = mesIsoAgenda;
+      } else {
+        selectLimpeza.value = '2026-10'; // Padrão Outubro/2026
+      }
     }
 
     async function guardarDados() {
@@ -552,6 +594,7 @@
         if (userKeyAtual) {
           if (abaAtual === 'financeiro') renderizarFinanceiro();
           else if (abaAtual === 'pacientes') renderizarPacientes();
+          else if (abaAtual === 'limpeza') renderizarEscalaLimpeza();
           else renderizarCalendario();
         }
       } catch (err) {
@@ -587,14 +630,17 @@
       document.getElementById('tabSala1').classList.toggle('active', idAba === 'sala1');
       document.getElementById('tabSala2').classList.toggle('active', idAba === 'sala2');
       document.getElementById('tabPacientes').classList.toggle('active', idAba === 'pacientes');
+      document.getElementById('tabLimpeza').classList.toggle('active', idAba === 'limpeza');
       document.getElementById('tabFinanceiro').classList.toggle('active', idAba === 'financeiro');
 
       document.getElementById('containerCalendario').style.display = (idAba === 'sala1' || idAba === 'sala2') ? 'block' : 'none';
       document.getElementById('containerPacientes').style.display = (idAba === 'pacientes') ? 'block' : 'none';
+      document.getElementById('containerLimpeza').style.display = (idAba === 'limpeza') ? 'block' : 'none';
       document.getElementById('containerFinanceiro').style.display = (idAba === 'financeiro') ? 'block' : 'none';
 
       if (idAba === 'financeiro') renderizarFinanceiro();
       else if (idAba === 'pacientes') renderizarPacientes();
+      else if (idAba === 'limpeza') renderizarEscalaLimpeza();
       else renderizarCalendario();
     }
 
@@ -652,6 +698,100 @@
       }
 
       renderizarCalendario();
+    }
+
+    /* --- LÓGICA DA ESCALA DE LIMPEZA (A PARTIR DE OUTUBRO/2026) --- */
+    function renderizarEscalaLimpeza() {
+      const mesAnoSelected = document.getElementById('selectMesLimpeza').value; // YYYY-MM
+      if (!mesAnoSelected) return;
+
+      const tbody = document.getElementById('tbodyEscalaLimpeza');
+      tbody.innerHTML = '';
+
+      // Lista de Psicólogas para o rodízio (exclui recepção)
+      const usuarios = dadosJsonBin.usuarios || USUARIOS_PADRAO;
+      const psicologas = Object.values(usuarios)
+        .map(u => u.nome)
+        .filter(n => !n.toLowerCase().includes('recepção') && !n.toLowerCase().includes('recepcao'));
+
+      if (psicologas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999; padding:20px;">Nenhuma psicóloga cadastrada para a escala.</td></tr>';
+        return;
+      }
+
+      const [anoStr, mesStr] = mesAnoSelected.split('-');
+      const ano = parseInt(anoStr);
+      const mes = parseInt(mesStr) - 1; // 0-indexed
+
+      // Calcula as semanas do mês selecionado
+      const dataInicioMes = new Date(ano, mes, 1);
+      const dataFimMes = new Date(ano, mes + 1, 0);
+
+      let dataSemanaCorr = new Date(dataInicioMes);
+      // Ajusta para a primeira Segunda-feira do mês
+      while (dataSemanaCorr.getDay() !== 1 && dataSemanaCorr <= dataFimMes) {
+        dataSemanaCorr.setDate(dataSemanaCorr.getDate() + 1);
+      }
+
+      let semanaIndex = 1;
+      if (!dadosJsonBin.escalaLimpeza) dadosJsonBin.escalaLimpeza = {};
+
+      // Rodízio acumulado a partir de Outubro/2026
+      const mesOutubroOffset = (ano - 2026) * 12 + (mes - 9);
+
+      while (dataSemanaCorr <= dataFimMes) {
+        const inicioIso = dataSemanaCorr.toISOString().split('T')[0];
+        const dataFimSemana = new Date(dataSemanaCorr);
+        dataFimSemana.setDate(dataFimSemana.getDate() + 6);
+        const fimIso = dataFimSemana.toISOString().split('T')[0];
+
+        const chaveSemana = `${mesAnoSelected}_semana${semanaIndex}`;
+        
+        // Define responsável padrão pelo rodízio circular
+        const indicePsicologa = (Math.max(0, mesOutubroOffset) * 4 + (semanaIndex - 1)) % psicologas.length;
+        const psicologaPadrao = psicologas[indicePsicologa] || psicologas[0];
+
+        if (!dadosJsonBin.escalaLimpeza[chaveSemana]) {
+          dadosJsonBin.escalaLimpeza[chaveSemana] = {
+            responsavel: psicologaPadrao,
+            concluido: false
+          };
+        }
+
+        const reg = dadosJsonBin.escalaLimpeza[chaveSemana];
+
+        const dtIniFmt = dataSemanaCorr.toLocaleDateString('pt-BR');
+        const dtFimFmt = dataFimSemana.toLocaleDateString('pt-BR');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>Semana ${semanaIndex}</strong> (${dtIniFmt} até ${dtFimFmt})</td>
+          <td>
+            <select style="padding: 4px; border-radius:4px; font-weight:bold;" onchange="atualizarEscalaLimpeza('${chaveSemana}', 'responsavel', this.value)">
+              ${psicologas.map(p => `<option value="${p}" ${reg.responsavel === p ? 'selected' : ''}>${p}</option>`).join('')}
+            </select>
+          </td>
+          <td style="text-align:center;">
+            <input type="checkbox" style="transform: scale(1.4); cursor:pointer;" ${reg.concluido ? 'checked' : ''}
+              onchange="atualizarEscalaLimpeza('${chaveSemana}', 'concluido', this.checked)">
+          </td>
+        `;
+        tbody.appendChild(tr);
+
+        // Avança 7 dias
+        dataSemanaCorr.setDate(dataSemanaCorr.getDate() + 7);
+        semanaIndex++;
+      }
+    }
+
+    async function atualizarEscalaLimpeza(chaveSemana, campo, valor) {
+      if (!dadosJsonBin.escalaLimpeza) dadosJsonBin.escalaLimpeza = {};
+      if (!dadosJsonBin.escalaLimpeza[chaveSemana]) {
+        dadosJsonBin.escalaLimpeza[chaveSemana] = { responsavel: '', concluido: false };
+      }
+
+      dadosJsonBin.escalaLimpeza[chaveSemana][campo] = valor;
+      await guardarDados();
     }
 
     /* --- LÓGICA DE PACIENTES (SEPARADO POR MÊS - CADA MÊS É UM REGISTRO INDEPENDENTE) --- */
@@ -1150,9 +1290,11 @@
       const mesIso = dataAtual.toISOString().substr(0, 7);
       const selPacientes = document.getElementById('selectMesPacientes');
       const selFinanceiro = document.getElementById('selectMesFinanceiro');
+      const selLimpeza = document.getElementById('selectMesLimpeza');
 
       if (selPacientes && selPacientes.querySelector(`option[value="${mesIso}"]`)) selPacientes.value = mesIso;
       if (selFinanceiro && selFinanceiro.querySelector(`option[value="${mesIso}"]`)) selFinanceiro.value = mesIso;
+      if (selLimpeza && selLimpeza.querySelector(`option[value="${mesIso}"]`)) selLimpeza.value = mesIso;
 
       const headerVazio = document.createElement('div');
       headerVazio.className = 'grid-header';
