@@ -10,40 +10,33 @@
     :root {
       --primary-color: #6b1d2f;    /* Bordô principal */
       --primary-hover: #501422;    
-      --bg-color: #ffffff;         
+      --bg-color: rgba(107, 29, 47, 0.08); /* Fundo Bordô Suave Transparente */         
       --border-color: #e0e0e0;     
-      --free-bg: rgba(244, 251, 247, 0.9);          
+      --free-bg: rgba(244, 251, 247, 0.95);          
       --free-border: #a8dab5;      
       --free-text: #1b5e20;        
     }
 
     /* Cores Específicas por Profissional */
-    .slot-card.pro-karine { background-color: rgba(252, 228, 236, 0.9) !important; border: 1px solid #f8bbd0 !important; color: #880e4f !important; }
-    .slot-card.pro-natalia { background-color: rgba(227, 242, 253, 0.9) !important; border: 1px solid #bbdefb !important; color: #0d47a1 !important; }
-    .slot-card.pro-marilia { background-color: rgba(243, 229, 245, 0.9) !important; border: 1px solid #e1bee7 !important; color: #4a148c !important; }
-    .slot-card.pro-recepcao { background-color: rgba(255, 253, 231, 0.9) !important; border: 1px solid #fff9c4 !important; color: #f57f17 !important; }
-    .slot-card.pro-outros { background-color: rgba(253, 242, 244, 0.9) !important; border: 1px solid #e5b0b9 !important; color: #6b1d2f !important; }
+    .slot-card.pro-karine { background-color: rgba(252, 228, 236, 0.95) !important; border: 1px solid #f8bbd0 !important; color: #880e4f !important; }
+    .slot-card.pro-natalia { background-color: rgba(227, 242, 253, 0.95) !important; border: 1px solid #bbdefb !important; color: #0d47a1 !important; }
+    .slot-card.pro-marilia { background-color: rgba(243, 229, 245, 0.95) !important; border: 1px solid #e1bee7 !important; color: #4a148c !important; }
+    .slot-card.pro-recepcao { background-color: rgba(255, 253, 231, 0.95) !important; border: 1px solid #fff9c4 !important; color: #f57f17 !important; }
+    .slot-card.pro-outros { background-color: rgba(253, 242, 244, 0.95) !important; border: 1px solid #e5b0b9 !important; color: #6b1d2f !important; }
 
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: var(--bg-color);
+      background-color: var(--bg-color); /* Fundo Bordô Transparente */
       color: #333333;
-
-      /* Personalização da Logo no Fundo */
-      background-image: url('file.jpg'); /* Insira o link ou arquivo local 'logo.png' */
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-attachment: fixed;
-      background-size: 450px;
     }
 
     .login-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
-    .login-card { background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(107, 29, 47, 0.15); border: 1px solid var(--border-color); width: 100%; max-width: 360px; }
+    .login-card { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(107, 29, 47, 0.15); border: 1px solid var(--border-color); width: 100%; max-width: 360px; }
     .login-card h2 { margin-top: 0; margin-bottom: 20px; text-align: center; color: var(--primary-color); }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(255, 255, 255, 0.95); padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #ffffff; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
     .user-info { display: flex; align-items: center; gap: 10px; }
     .logo-container { display: flex; align-items: center; }
     .logo-img { max-height: 45px; max-width: 150px; object-fit: contain; }
@@ -65,14 +58,14 @@
     .tab-btn-financeiro { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
     .tab-btn-financeiro.active { background: #2e7d32; color: white; border-color: #2e7d32; }
 
-    .legenda-container { display: flex; gap: 15px; margin-bottom: 12px; font-size: 0.85rem; align-items: center; flex-wrap: wrap; background: rgba(255, 255, 255, 0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); }
+    .legenda-container { display: flex; gap: 15px; margin-bottom: 12px; font-size: 0.85rem; align-items: center; flex-wrap: wrap; background: #ffffff; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); }
     .legenda-item { display: flex; align-items: center; gap: 5px; }
     .legenda-cor { width: 14px; height: 14px; border-radius: 3px; }
 
-    .calendar-grid { display: grid; grid-template-columns: 120px repeat(7, 1fr); background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .grid-header { background: rgba(250, 250, 250, 0.95); padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); color: var(--primary-color); }
+    .calendar-grid { display: grid; grid-template-columns: 120px repeat(7, 1fr); background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .grid-header { background: #fafafa; padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); color: var(--primary-color); }
     .grid-header.today { background: #fdf2f4; color: var(--primary-color); }
-    .time-col { background: rgba(250, 250, 250, 0.95); padding: 15px 10px; font-size: 0.85rem; font-weight: bold; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; color: #555; }
+    .time-col { background: #fafafa; padding: 15px 10px; font-size: 0.85rem; font-weight: bold; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; color: #555; }
     .day-slot { padding: 8px; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); min-height: 95px; }
 
     .slot-card { height: 100%; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; box-sizing: border-box; }
@@ -80,14 +73,14 @@
     .slot-title { font-weight: bold; font-size: 0.85rem; }
     .slot-info { font-size: 0.8rem; margin-top: 4px; }
 
-    /* Painéis das Abas com Leve Transparência */
-    .panel-content { background: rgba(255, 255, 255, 0.94); border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    /* Painéis das Abas */
+    .panel-content { background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: left; font-size: 0.9rem; }
     .data-table th { background-color: #d98880; color: white; font-weight: bold; }
     .data-table tfoot td { background-color: #f2d7d5; font-weight: bold; color: #6b1d2f; border-top: 2px solid #c0392b; }
-    .data-table tr:nth-child(even) { background-color: rgba(251, 238, 230, 0.85); }
-    .data-table tr:nth-child(odd) { background-color: rgba(255, 255, 255, 0.85); }
+    .data-table tr:nth-child(even) { background-color: #fbeee6; }
+    .data-table tr:nth-child(odd) { background-color: #ffffff; }
 
     .card-resumo-financeiro { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
     .box-resumo { padding: 15px; border-radius: 8px; flex: 1; min-width: 180px; border: 1px solid #e0e0e0; }
@@ -437,10 +430,10 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: '123' },
-      'natalia':  { nome: 'Natália', senha: '123' },
-      'marilia':  { nome: 'Marília', senha: '123' },
-      'recepcao': { nome: 'Recepção', senha: '123' }
+      'karine':   { nome: 'Karine', senha: 'K4R!n3' },
+      'natalia':  { nome: 'Natália', senha: 'N4t4L!4' },
+      'marilia':  { nome: 'Marília', senha: 'M4RiL!@' },
+      'recepcao': { nome: 'Recepção', senha: '1Atpd@VPGC!' }
     };
 
     const VALOR_TURNO_MENSAL = 350.00;
