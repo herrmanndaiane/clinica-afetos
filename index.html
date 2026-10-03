@@ -3,105 +3,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda da Clínica & Gestão de Pacientes</title>
+  <title>Painel da Clínica & Gestão de Pacientes</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Biblioteca CryptoJS para Criptografia AES-256 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
   <style>
     :root {
-      --primary-color: #6b1d2f;    /* Bordô principal */
-      --primary-hover: #501422;    
-      --bg-color: rgba(107, 29, 47, 0.08); /* Fundo Bordô Suave Transparente */         
-      --border-color: #e0e0e0;     
-      --free-bg: rgba(244, 251, 247, 0.95);          
-      --free-border: #a8dab5;      
-      --free-text: #1b5e20;        
+      --primary-color: #6b1d2f;        /* Bordô Principal */
+      --primary-hover: #501422;        
+      --primary-light: #fdf2f4;
+      --bg-color: #f8f9fa;             /* Fundo neutro moderno */
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      
+      --free-bg: #f0fdf4;              /* Turno Livre */
+      --free-border: #bbf7d0;      
+      --free-text: #166534;        
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(107, 29, 47, 0.08);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
     }
 
-    /* Cores Específicas por Profissional */
-    .slot-card.pro-karine { background-color: rgba(252, 228, 236, 0.95) !important; border: 1px solid #f8bbd0 !important; color: #880e4f !important; }
-    .slot-card.pro-natalia { background-color: rgba(227, 242, 253, 0.95) !important; border: 1px solid #bbdefb !important; color: #0d47a1 !important; }
-    .slot-card.pro-marilia { background-color: rgba(243, 229, 245, 0.95) !important; border: 1px solid #e1bee7 !important; color: #4a148c !important; }
-    .slot-card.pro-recepcao { background-color: rgba(255, 253, 231, 0.95) !important; border: 1px solid #fff9c4 !important; color: #f57f17 !important; }
-    .slot-card.pro-outros { background-color: rgba(253, 242, 244, 0.95) !important; border: 1px solid #e5b0b9 !important; color: #6b1d2f !important; }
+    /* Cores das Profissionais */
+    .slot-card.pro-karine { background-color: #fce4ec !important; border: 1px solid #f8bbd0 !important; color: #880e4f !important; }
+    .slot-card.pro-natalia { background-color: #e3f2fd !important; border: 1px solid #bbdefb !important; color: #0d47a1 !important; }
+    .slot-card.pro-marilia { background-color: #f3e5f5 !important; border: 1px solid #e1bee7 !important; color: #4a148c !important; }
+    .slot-card.pro-recepcao { background-color: #fffde7 !important; border: 1px solid #fff9c4 !important; color: #f57f17 !important; }
+    .slot-card.pro-outros { background-color: var(--primary-light) !important; border: 1px solid #e5b0b9 !important; color: var(--primary-color) !important; }
+
+    * { box-sizing: border-box; }
 
     body {
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 24px;
       background-color: var(--bg-color);
-      color: #333333;
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .login-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
-    .login-card { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(107, 29, 47, 0.15); border: 1px solid var(--border-color); width: 100%; max-width: 360px; }
-    .login-card h2 { margin-top: 0; margin-bottom: 20px; text-align: center; color: var(--primary-color); }
+    /* Tela de Login */
+    .login-container { display: flex; justify-content: center; align-items: center; min-height: 85vh; }
+    .login-card { 
+      background: var(--card-bg); 
+      padding: 40px; 
+      border-radius: var(--radius-lg); 
+      box-shadow: var(--shadow-lg); 
+      border: 1px solid var(--border-color); 
+      width: 100%; 
+      max-width: 380px; 
+    }
+    .login-card h2 { 
+      margin-top: 0; 
+      margin-bottom: 24px; 
+      text-align: center; 
+      color: var(--primary-color); 
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #ffffff; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-    .user-info { display: flex; align-items: center; gap: 10px; }
+    /* Cabeçalho */
+    .header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 20px; 
+      background: var(--card-bg); 
+      padding: 16px 24px; 
+      border-radius: var(--radius-md); 
+      border: 1px solid var(--border-color); 
+      box-shadow: var(--shadow-sm); 
+    }
+    .user-info { display: flex; align-items: center; gap: 12px; }
     .logo-container { display: flex; align-items: center; }
-    .logo-img { max-height: 45px; max-width: 150px; object-fit: contain; }
-    .nav-controls { display: flex; align-items: center; gap: 15px; }
+    .logo-img { max-height: 42px; max-width: 160px; object-fit: contain; }
+    .nav-controls { display: flex; align-items: center; gap: 12px; }
 
-    .btn { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    /* Botões */
+    .btn { 
+      padding: 9px 16px; 
+      border: 1px solid var(--border-color); 
+      border-radius: var(--radius-sm); 
+      background: #ffffff; 
+      cursor: pointer; 
+      font-weight: 500; 
+      font-size: 0.875rem;
+      transition: all 0.2s ease; 
+      color: var(--text-main);
+    }
+    .btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
     .btn-primary { background: var(--primary-color); color: white; border: none; }
     .btn-primary:hover { background: var(--primary-hover); }
-    .btn-success { background: #2e7d32; color: white; border: none; }
-    .btn-danger { background: #c62828; color: white; border: none; }
+    .btn-success { background: #166534; color: white; border: none; }
+    .btn-success:hover { background: #14532d; }
+    .btn-danger { background: #991b1b; color: white; border: none; }
+    .btn-danger:hover { background: #7f1d1d; }
 
-    .month-title { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
+    .month-title { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); letter-spacing: -0.02em; }
 
-    .tabs-container { display: flex; gap: 8px; margin-bottom: -1px; flex-wrap: wrap; }
-    .tab-btn { padding: 10px 18px; background: #f5f5f5; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; color: #666; }
+    /* Navegação por Abas */
+    .tabs-container { display: flex; gap: 6px; margin-bottom: -1px; flex-wrap: wrap; }
+    .tab-btn { 
+      padding: 12px 20px; 
+      background: #f1f5f9; 
+      border: 1px solid var(--border-color); 
+      border-bottom: none; 
+      border-radius: var(--radius-md) var(--radius-md) 0 0; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 0.875rem;
+      color: var(--text-muted); 
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover { background: #e2e8f0; color: var(--text-main); }
     .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-    .tab-btn-pacientes { background: #e3f2fd; color: #0d47a1; border-color: #90caf9; }
-    .tab-btn-pacientes.active { background: #0d47a1; color: white; border-color: #0d47a1; }
-    .tab-btn-limpeza { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
-    .tab-btn-limpeza.active { background: #e65100; color: white; border-color: #e65100; }
-    .tab-btn-financeiro { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
-    .tab-btn-financeiro.active { background: #2e7d32; color: white; border-color: #2e7d32; }
+    
+    .tab-btn-pacientes { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+    .tab-btn-pacientes.active { background: #0284c7; color: white; border-color: #0284c7; }
+    
+    .tab-btn-limpeza { background: #fff7ed; color: #c2410c; border-color: #ffedd5; }
+    .tab-btn-limpeza.active { background: #ea580c; color: white; border-color: #ea580c; }
+    
+    .tab-btn-financeiro { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .tab-btn-financeiro.active { background: #16a34a; color: white; border-color: #16a34a; }
 
-    .legenda-container { display: flex; gap: 15px; margin-bottom: 12px; font-size: 0.85rem; align-items: center; flex-wrap: wrap; background: #ffffff; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); }
-    .legenda-item { display: flex; align-items: center; gap: 5px; }
-    .legenda-cor { width: 14px; height: 14px; border-radius: 3px; }
+    /* Legendas */
+    .legenda-container { 
+      display: flex; 
+      gap: 16px; 
+      margin-top: 12px;
+      margin-bottom: 16px; 
+      font-size: 0.85rem; 
+      align-items: center; 
+      flex-wrap: wrap; 
+      background: var(--card-bg); 
+      padding: 12px 18px; 
+      border-radius: var(--radius-md); 
+      border: 1px solid var(--border-color); 
+      box-shadow: var(--shadow-sm);
+    }
+    .legenda-item { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+    .legenda-cor { width: 14px; height: 14px; border-radius: 4px; }
 
-    .calendar-grid { display: grid; grid-template-columns: 120px repeat(7, 1fr); background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .grid-header { background: #fafafa; padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); color: var(--primary-color); }
-    .grid-header.today { background: #fdf2f4; color: var(--primary-color); }
-    .time-col { background: #fafafa; padding: 15px 10px; font-size: 0.85rem; font-weight: bold; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; color: #555; }
-    .day-slot { padding: 8px; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); min-height: 95px; }
+    /* Grade do Calendário */
+    .calendar-grid { 
+      display: grid; 
+      grid-template-columns: 110px repeat(7, 1fr); 
+      background: var(--card-bg); 
+      border: 1px solid var(--border-color); 
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); 
+      overflow: hidden; 
+      box-shadow: var(--shadow-md); 
+    }
+    .grid-header { 
+      background: #f8fafc; 
+      padding: 14px 8px; 
+      text-align: center; 
+      font-weight: 600; 
+      font-size: 0.85rem;
+      border-bottom: 2px solid var(--border-color); 
+      border-right: 1px solid var(--border-color); 
+      color: var(--primary-color); 
+    }
+    .grid-header.today { background: var(--primary-light); color: var(--primary-color); }
+    .time-col { 
+      background: #f8fafc; 
+      padding: 16px 10px; 
+      font-size: 0.8rem; 
+      font-weight: 600; 
+      border-right: 1px solid var(--border-color); 
+      border-bottom: 1px solid var(--border-color); 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      color: var(--text-muted); 
+    }
+    .day-slot { padding: 8px; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); min-height: 100px; }
 
-    .slot-card { height: 100%; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; box-sizing: border-box; }
+    .slot-card { 
+      height: 100%; 
+      border-radius: var(--radius-sm); 
+      padding: 10px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      cursor: pointer; 
+      box-sizing: border-box; 
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .slot-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
     .slot-card.livre { background: var(--free-bg); border: 1px dashed var(--free-border); color: var(--free-text); }
-    .slot-title { font-weight: bold; font-size: 0.85rem; }
-    .slot-info { font-size: 0.8rem; margin-top: 4px; }
+    .slot-title { font-weight: 600; font-size: 0.85rem; }
+    .slot-info { font-size: 0.78rem; margin-top: 4px; }
 
-    /* Painéis das Abas */
-    .panel-content { background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: left; font-size: 0.9rem; }
-    .data-table th { background-color: #d98880; color: white; font-weight: bold; }
-    .data-table tfoot td { background-color: #f2d7d5; font-weight: bold; color: #6b1d2f; border-top: 2px solid #c0392b; }
-    .data-table tr:nth-child(even) { background-color: #fbeee6; }
-    .data-table tr:nth-child(odd) { background-color: #ffffff; }
+    /* Container dos Painéis */
+    .panel-content { 
+      background: var(--card-bg); 
+      border: 1px solid var(--border-color); 
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); 
+      padding: 24px; 
+      box-shadow: var(--shadow-md); 
+    }
 
-    .card-resumo-financeiro { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .box-resumo { padding: 15px; border-radius: 8px; flex: 1; min-width: 180px; border: 1px solid #e0e0e0; }
-    .box-resumo h4 { margin: 0 0 5px 0; font-size: 0.85rem; }
-    .box-resumo span { font-size: 1.4rem; font-weight: bold; }
+    /* Tabelas */
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 16px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-color); }
+    .data-table th, .data-table td { padding: 12px 14px; text-align: left; font-size: 0.875rem; border-bottom: 1px solid var(--border-color); }
+    .data-table th { background-color: #e2e8f0; color: var(--text-main); font-weight: 600; }
+    .data-table tfoot td { background-color: #f1f5f9; font-weight: 700; color: var(--primary-color); border-top: 2px solid var(--primary-color); }
+    .data-table tr:nth-child(even) { background-color: #f8fafc; }
+    .data-table tr:hover { background-color: #f1f5f9; }
 
-    .box-entradas { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
-    .box-saidas { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
-    .box-lucro { background: #e3f2fd; border-color: #90caf9; color: #0d47a1; }
-    .box-ocupacao { background: #fff3e0; border-color: #ffe0b2; color: #e65100; }
+    /* Cards do Financeiro */
+    .card-resumo-financeiro { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .box-resumo { padding: 20px; border-radius: var(--radius-md); flex: 1; min-width: 200px; border: 1px solid var(--border-color); background: #ffffff; box-shadow: var(--shadow-sm); }
+    .box-resumo h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .box-resumo span { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
 
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: white; padding: 25px; border-radius: 8px; width: 380px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-    .modal-content h3 { margin-top: 0; color: var(--primary-color); }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 500; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
-    .recorrencia-box { background: #f8f9fa; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; margin-top: 10px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .box-entradas { border-left: 4px solid #16a34a; }
+    .box-entradas span { color: #15803d; }
+    .box-saidas { border-left: 4px solid #dc2626; }
+    .box-saidas span { color: #b91c1c; }
+    .box-lucro { border-left: 4px solid #2563eb; }
+    .box-lucro span { color: #1d4ed8; }
+    .box-ocupacao { border-left: 4px solid #ea580c; }
+    .box-ocupacao span { color: #c2410c; }
+
+    /* Modais */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: #ffffff; padding: 28px; border-radius: var(--radius-lg); width: 400px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto; }
+    .modal-content h3 { margin-top: 0; color: var(--primary-color); font-weight: 700; font-size: 1.2rem; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500; color: var(--text-main); }
+    .form-group input, .form-group select, .form-group textarea { 
+      width: 100%; 
+      padding: 10px 12px; 
+      border: 1px solid var(--border-color); 
+      border-radius: var(--radius-sm); 
+      box-sizing: border-box; 
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: border-color 0.15s ease;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    .recorrencia-box { background: #f8fafc; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-top: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
 
     @media print {
       body * { visibility: hidden; }
@@ -146,7 +304,7 @@
         <div class="logo-container">
           <img id="imgLogoTopo" class="logo-img" src="" alt="Logo" style="display: none;">
         </div>
-        <span id="nomeUsuarioLogado" style="font-weight: bold; color: var(--primary-color);"></span>
+        <span id="nomeUsuarioLogado" style="font-weight: 600; color: var(--primary-color);"></span>
         <button class="btn" onclick="abrirModalNovaProfissional()">➕ Nova Profissional</button>
         <button class="btn" onclick="abrirModalSenha()">🔑 Alterar Senha</button>
         <button class="btn" onclick="realizarLogout()">Sair</button>
@@ -164,7 +322,7 @@
 
     <!-- Conteúdo 1: Grade de Agendamento -->
     <div id="containerCalendario">
-      <div class="legenda-container" style="margin-top: 10px;">
+      <div class="legenda-container">
         <strong>Legenda:</strong>
         <div class="legenda-item"><div class="legenda-cor" style="background:#fce4ec; border:1px solid #f8bbd0;"></div> Karine</div>
         <div class="legenda-item"><div class="legenda-cor" style="background:#e3f2fd; border:1px solid #bbdefb;"></div> Natália</div>
@@ -184,11 +342,11 @@
           <select id="selectMesPacientes" onchange="renderizarPacientes()"></select>
           <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Paciente</button>
           
-          <button class="btn" onclick="document.getElementById('inputImportarCSV').click()" style="background:#f39c12; color:white; border:none;">📤 Importar CSV</button>
+          <button class="btn" onclick="document.getElementById('inputImportarCSV').click()" style="background:#f59e0b; color:white; border:none;">📤 Importar CSV</button>
           <input type="file" id="inputImportarCSV" accept=".csv" style="display:none;" onchange="importarCSVPacientes(event)">
 
           <button class="btn btn-success" onclick="exportarCSVPacientes()">📥 Exportar Excel (CSV)</button>
-          <button class="btn btn-primary" onclick="window.print()">🖨️ Gerar PDF / Imprimir</button>
+          <button class="btn btn-primary" onclick="window.print()">🖨️️ Gerar PDF / Imprimir</button>
         </div>
       </div>
 
@@ -223,7 +381,7 @@
     <!-- Conteúdo 3: Escala de Limpeza -->
     <div id="containerLimpeza" class="panel-content" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin:0; color: #e65100;">🧹 Escala Semanal de Limpeza (Rodízio das Psicólogas)</h3>
+        <h3 style="margin:0; color: #ea580c;">🧹 Escala Semanal de Limpeza (Sábado a Sexta-feira)</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
           <label for="selectMesLimpeza"><strong>Mês/Ano: </strong></label>
           <select id="selectMesLimpeza" onchange="renderizarEscalaLimpeza()"></select>
@@ -233,9 +391,9 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th style="background-color: #e65100;">Semana / Período</th>
-            <th style="background-color: #e65100;">Psicóloga Responsável</th>
-            <th style="width: 120px; text-align: center; background-color: #e65100;">Concluído?</th>
+            <th style="background-color: #ea580c; color: white;">Semana / Período (Sáb - Sex)</th>
+            <th style="background-color: #ea580c; color: white;">Psicóloga Responsável</th>
+            <th style="width: 120px; text-align: center; background-color: #ea580c; color: white;">Concluído?</th>
           </tr>
         </thead>
         <tbody id="tbodyEscalaLimpeza"></tbody>
@@ -273,40 +431,40 @@
         </div>
       </div>
 
-      <h4>Entradas por Locação de Salas (R$ 350,00 por turno fixo mensal - Isento para Karine)</h4>
+      <h4 style="color: var(--primary-color); margin-top: 24px;">Entradas por Locação de Salas (R$ 350,00 por turno fixo mensal - Isento para Karine)</h4>
       <table class="data-table">
-        <thead style="background-color: var(--primary-color);">
+        <thead>
           <tr>
-            <th style="background-color: var(--primary-color);">Profissional</th>
-            <th style="background-color: var(--primary-color);">Turnos Fixos (Sala 01)</th>
-            <th style="background-color: var(--primary-color);">Turnos Fixos (Sala 02)</th>
-            <th style="background-color: var(--primary-color);">Total de Turnos Fixos</th>
-            <th style="background-color: var(--primary-color);">Valor Mensal Devido</th>
+            <th>Profissional</th>
+            <th>Turnos Fixos (Sala 01)</th>
+            <th>Turnos Fixos (Sala 02)</th>
+            <th>Total de Turnos Fixos</th>
+            <th>Valor Mensal Devido</th>
           </tr>
         </thead>
         <tbody id="tbodyEntradas"></tbody>
       </table>
 
-      <h4 style="margin-top: 30px; color: #2e7d32;">Entradas de Atendimentos Clínicos / Pacientes (Karine)</h4>
+      <h4 style="margin-top: 30px; color: #166534;">Entradas de Atendimentos Clínicos / Pacientes (Karine)</h4>
       <table class="data-table">
         <thead>
           <tr>
-            <th style="background-color: #2e7d32;">Origem / Profissional</th>
-            <th style="background-color: #2e7d32;">Qtd. de Pacientes no Mês</th>
-            <th style="background-color: #2e7d32;">Total Bruto Recebido</th>
+            <th style="background-color: #166534; color: white;">Origem / Profissional</th>
+            <th style="background-color: #166534; color: white;">Qtd. de Pacientes no Mês</th>
+            <th style="background-color: #166534; color: white;">Total Bruto Recebido</th>
           </tr>
         </thead>
         <tbody id="tbodyEntradasPacientesKarine"></tbody>
       </table>
 
-      <h4 style="margin-top: 30px;">Despesas e Custos do Mês</h4>
+      <h4 style="margin-top: 30px; color: #991b1b;">Despesas e Custos do Mês</h4>
       <table class="data-table">
         <thead>
           <tr>
-            <th style="background-color: #c62828;">Descrição da Despesa</th>
-            <th style="background-color: #c62828;">Categoria</th>
-            <th style="background-color: #c62828;">Valor (R$)</th>
-            <th style="width: 80px; text-align: center; background-color: #c62828;">Ação</th>
+            <th style="background-color: #991b1b; color: white;">Descrição da Despesa</th>
+            <th style="background-color: #991b1b; color: white;">Categoria</th>
+            <th style="background-color: #991b1b; color: white;">Valor (R$)</th>
+            <th style="width: 80px; text-align: center; background-color: #991b1b; color: white;">Ação</th>
           </tr>
         </thead>
         <tbody id="tbodyDespesas"></tbody>
@@ -324,7 +482,7 @@
       
       <div class="form-group">
         <label>Data e Horário</label>
-        <input type="text" id="inputInfoDataHorario" readonly style="background: #f5f5f5;">
+        <input type="text" id="inputInfoDataHorario" readonly style="background: #f8fafc;">
       </div>
 
       <div class="form-group">
@@ -338,7 +496,7 @@
       </div>
 
       <div class="recorrencia-box" id="boxRecorrencia">
-        <label style="font-weight: bold; cursor: pointer;">
+        <label style="font-weight: 500; cursor: pointer;">
           <input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente neste turno
         </label>
         <div id="divDataFimRecorrencia" style="display: none; margin-top: 10px;">
@@ -455,17 +613,17 @@
 
   <script>
     const USUARIOS_PADRAO = {
-      'karine':   { nome: 'Karine', senha: 'K4R!n3' },
-      'natalia':  { nome: 'Natália', senha: 'N4T@li4' },
-      'marilia':  { nome: 'Marília', senha: 'M4RiLi4' },
-      'recepcao': { nome: 'Recepção', senha: '1Atpd@VPGC!' }
+      'karine':   { nome: 'Karine', senha: '123' },
+      'natalia':  { nome: 'Natália', senha: '123' },
+      'marilia':  { nome: 'Marília', senha: '123' },
+      'recepcao': { nome: 'Recepção', senha: '123' }
     };
 
     const VALOR_TURNO_MENSAL = 350.00;
     const CHAVE_CRIPTOGRAFIA = 'MinhaChaveSecretaClinica2026';
 
     const JSONBIN_CONFIG = {
-      binId: '6ab27273ffd5d1605322efdf',
+      binId: '65a12345abc',
       apiKey: '$2a$10$HB3aLXcmVDYDE89zOm.mvuITBZxSjg1WGqEI7FSyZNZLok4QE9t7.',
       url: 'https://api.jsonbin.io/v3/b/'
     };
@@ -686,7 +844,6 @@
       const usuarios = dadosJsonBin.usuarios || USUARIOS_PADRAO;
       const usuarioLogado = usuarios[userKeyAtual];
 
-      // Oculta completamente a tela de login e exibe o painel principal
       document.getElementById('telaLogin').style.display = 'none';
       document.getElementById('painelCalendario').style.display = 'block';
       document.getElementById('nomeUsuarioLogado').innerText = `👤 ${usuarioLogado.nome}`;
@@ -728,7 +885,7 @@
       const dataFimMes = new Date(ano, mes + 1, 0);
 
       let dataSemanaCorr = new Date(dataInicioMes);
-      while (dataSemanaCorr.getDay() !== 1 && dataSemanaCorr <= dataFimMes) {
+      while (dataSemanaCorr.getDay() !== 6 && dataSemanaCorr <= dataFimMes) {
         dataSemanaCorr.setDate(dataSemanaCorr.getDate() + 1);
       }
 
@@ -765,7 +922,7 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>Semana ${semanaIndex}</strong> (${dtIniFmt} até ${dtFimFmt})</td>
+          <td><strong>Semana ${semanaIndex}</strong> (${dtIniFmt} [Sáb] até ${dtFimFmt} [Sex])</td>
           <td>
             <select style="padding: 4px; border-radius:4px; font-weight:bold;" onchange="atualizarEscalaLimpeza('${chaveSemana}', 'responsavel', this.value)">
               ${opcoesSelect}
@@ -1069,7 +1226,7 @@
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><strong>${pro} ${eKarine ? '<small style="color:#2e7d32;">(Isenta)</small>' : ''}</strong></td>
+            <td><strong>${pro} ${eKarine ? '<small style="color:#166534;">(Isenta)</small>' : ''}</strong></td>
             <td>${s1Count} turno(s) fixo(s)</td>
             <td>${s2Count} turno(s) fixo(s)</td>
             <td><strong>${totalTurnosFixos} turno(s)</strong></td>
@@ -1309,7 +1466,7 @@
         
         const nomeDia = dia.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase();
         const numDia = dia.getDate();
-        divHeader.innerHTML = `${nomeDia}<br><span style="font-size: 1.2rem">${numDia}</span>`;
+        divHeader.innerHTML = `${nomeDia}<br><span style="font-size: 1.1rem; font-weight: 700;">${numDia}</span>`;
         grid.appendChild(divHeader);
       });
 
@@ -1394,7 +1551,7 @@
           campoPsicologa.style.background = '#ffffff';
         } else {
           campoPsicologa.readOnly = true;
-          campoPsicologa.style.background = '#f5f5f5';
+          campoPsicologa.style.background = '#f8fafc';
         }
 
         document.getElementById('inputObs').value = reserva.observacao || '';
@@ -1410,7 +1567,7 @@
         } else {
           campoPsicologa.value = usuarioLogado.nome;
           campoPsicologa.readOnly = true;
-          campoPsicologa.style.background = '#f5f5f5';
+          campoPsicologa.style.background = '#f8fafc';
         }
 
         document.getElementById('inputObs').value = '';
