@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Gestão — Clínica de Psicologia</title>
+  <title>Painel da Clínica & Gestão de Pacientes</title>
   
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Plus Jakarta Sans (Tipografia Executiva/Profissional) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Biblioteca CryptoJS para Criptografia AES-256 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -24,34 +24,34 @@
       --verde-hover: #14361E;
       --verde-light: #EDF4EE;
 
-      --off-white-bg: #F9F8F6;
+      --off-white-bg: #F8F7F4;
       --off-white-card: #FFFFFF;
-      --off-white-sidebar: #F3F0EC;
+      --off-white-sidebar: #EFECE6;
       
-      --border-color: #E5E0DA;
-      --text-main: #2C2A29;
-      --text-muted: #736E6B;
+      --border-color: #E2DDD7;
+      --text-main: #221F1E;
+      --text-muted: #6B6562;
       
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
       
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 12px rgba(107, 29, 47, 0.06);
-      --shadow-lg: 0 12px 28px rgba(0,0,0,0.08);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.03);
+      --shadow-md: 0 6px 16px rgba(107, 29, 47, 0.06);
+      --shadow-lg: 0 14px 32px rgba(0,0,0,0.08);
     }
 
-    /* Cores das Profissionais na Agenda */
-    .slot-card.pro-karine { background-color: #FCE4EC !important; border: 1px solid #F8BBD0 !important; color: #880E4F !important; }
-    .slot-card.pro-natalia { background-color: #E3F2FD !important; border: 1px solid #BBDEFB !important; color: #0D47A1 !important; }
-    .slot-card.pro-marilia { background-color: #F3E5F5 !important; border: 1px solid #E1BEE7 !important; color: #4A148C !important; }
-    .slot-card.pro-recepcao { background-color: #FFFDE7 !important; border: 1px solid #FFF9C4 !important; color: #F57F17 !important; }
-    .slot-card.pro-outros { background-color: var(--bordo-light) !important; border: 1px solid #E5B0B9 !important; color: var(--bordo-primary) !important; }
+    /* Cores Fortes Especificas por Profissional (Bordôs e Verdes Escuros) */
+    .slot-card.pro-karine { background-color: #501422 !important; border: 1px solid #3A0F19 !important; color: #FFFFFF !important; }
+    .slot-card.pro-natalia { background-color: #14361E !important; border: 1px solid #0D2413 !important; color: #FFFFFF !important; }
+    .slot-card.pro-marilia { background-color: #80263B !important; border: 1px solid #5C1A29 !important; color: #FFFFFF !important; }
+    .slot-card.pro-recepcao { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
+    .slot-card.pro-outros { background-color: #6B1D2F !important; border: 1px solid #4A1220 !important; color: #FFFFFF !important; }
 
     * { box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       margin: 0;
       padding: 0;
       background-color: var(--off-white-bg);
@@ -59,7 +59,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Layout da Aplicação (Sidebar + Main Content) */
+    /* Layout da Aplicação */
     .app-layout {
       display: flex;
       min-height: 100vh;
@@ -89,11 +89,11 @@
     }
 
     .brand-title {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 800;
       color: var(--bordo-primary);
       margin: 0;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
     }
 
     .sidebar-menu {
@@ -105,14 +105,14 @@
     .sidebar-btn {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       padding: 12px 16px;
       border-radius: var(--radius-md);
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.9rem;
+      font-weight: 600;
+      font-size: 0.88rem;
       cursor: pointer;
       text-align: left;
       transition: all 0.2s ease;
@@ -120,42 +120,68 @@
     }
 
     .sidebar-btn:hover {
-      background-color: rgba(107, 29, 47, 0.05);
+      background-color: rgba(107, 29, 47, 0.06);
       color: var(--bordo-primary);
     }
 
     .sidebar-btn.active {
       background-color: var(--bordo-primary);
       color: #ffffff;
-      font-weight: 600;
+      font-weight: 700;
       box-shadow: var(--shadow-sm);
     }
+
+    /* Sub-menu Reserva de Salas */
+    .submenu-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-left: 18px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .submenu-btn {
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .submenu-btn:hover { color: var(--bordo-primary); background: rgba(107, 29, 47, 0.05); }
+    .submenu-btn.active { color: var(--bordo-primary); font-weight: 700; background: var(--bordo-light); }
 
     .sidebar-user {
       padding-top: 20px;
       border-top: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .user-profile {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       background: var(--off-white-card);
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
     }
 
     .user-name {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.875rem;
       color: var(--bordo-primary);
     }
 
-    /* Conteúdo Principal à Direita */
+    /* Conteúdo Principal */
     .main-content {
       margin-left: 280px;
       flex: 1;
@@ -176,9 +202,9 @@
 
     .month-title {
       font-size: 1.35rem;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--bordo-primary);
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
     }
 
     /* Botões Padrão */
@@ -188,7 +214,7 @@
       border-radius: var(--radius-sm);
       background: var(--off-white-card);
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 0.875rem;
       transition: all 0.2s ease;
       color: var(--text-main);
@@ -215,7 +241,53 @@
       color: #ffffff;
       border: none;
     }
-    .btn-danger:hover { background-color: #7F1D1D; }
+
+    /* Tela de Início / Dashboard */
+    .dashboard-home {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .welcome-card {
+      background: linear-gradient(135deg, var(--bordo-primary), var(--bordo-hover));
+      color: white;
+      padding: 36px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .welcome-card h2 { margin: 0 0 10px 0; font-size: 1.8rem; font-weight: 800; }
+    .welcome-card p { margin: 0; opacity: 0.9; font-size: 1rem; }
+
+    .cards-salas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    .card-sala-select {
+      background: var(--off-white-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-sala-select:hover {
+      border-color: var(--bordo-primary);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-sala-title { font-size: 1.3rem; font-weight: 800; color: var(--bordo-primary); margin: 0 0 10px 0; }
+    .card-sala-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
 
     /* Legenda */
     .legenda-container {
@@ -231,7 +303,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
     }
-    .legenda-item { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+    .legenda-item { display: flex; align-items: center; gap: 6px; font-weight: 600; }
     .legenda-cor { width: 14px; height: 14px; border-radius: 4px; }
 
     /* Grade da Agenda */
@@ -246,10 +318,10 @@
     }
 
     .grid-header {
-      background: #F3F0EC;
+      background: #EFECE6;
       padding: 16px 8px;
       text-align: center;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.85rem;
       border-bottom: 2px solid var(--border-color);
       border-right: 1px solid var(--border-color);
@@ -262,10 +334,10 @@
     }
 
     .time-col {
-      background: #F3F0EC;
+      background: #EFECE6;
       padding: 16px 10px;
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 700;
       border-right: 1px solid var(--border-color);
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -294,8 +366,8 @@
 
     .slot-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
     .slot-card.livre { background: var(--verde-light); border: 1px dashed #A3C9A8; color: var(--verde-floresta); }
-    .slot-title { font-weight: 600; font-size: 0.85rem; }
-    .slot-info { font-size: 0.78rem; margin-top: 4px; }
+    .slot-title { font-weight: 700; font-size: 0.85rem; }
+    .slot-info { font-size: 0.78rem; margin-top: 4px; opacity: 0.9; }
 
     /* Painéis de Conteúdo (Tabelas) */
     .panel-card {
@@ -326,17 +398,17 @@
     .data-table th {
       background-color: var(--bordo-primary);
       color: #ffffff;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .data-table tfoot td {
       background-color: var(--bordo-light);
-      font-weight: 700;
+      font-weight: 800;
       color: var(--bordo-primary);
       border-top: 2px solid var(--bordo-primary);
     }
 
-    .data-table tr:nth-child(even) { background-color: #FAFA9; }
+    .data-table tr:nth-child(even) { background-color: #FAF9F6; }
     .data-table tr:hover { background-color: #F3F0EC; }
 
     /* Resumos do Financeiro */
@@ -351,8 +423,8 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .box-resumo h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-    .box-resumo span { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+    .box-resumo h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .box-resumo span { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
 
     .box-entradas { border-left: 5px solid var(--verde-floresta); }
     .box-entradas span { color: var(--verde-floresta); }
@@ -383,7 +455,7 @@
       margin-bottom: 24px;
       text-align: center;
       color: var(--bordo-primary);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     /* Modais */
@@ -410,10 +482,10 @@
       overflow-y: auto;
     }
 
-    .modal-content h3 { margin-top: 0; color: var(--bordo-primary); font-weight: 700; }
+    .modal-content h3 { margin-top: 0; color: var(--bordo-primary); font-weight: 800; }
 
     .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500; }
+    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
     .form-group input, .form-group select, .form-group textarea {
       width: 100%;
       padding: 10px 12px;
@@ -465,12 +537,26 @@
         </div>
 
         <nav class="sidebar-menu">
-          <button class="sidebar-btn active" id="tabSala1" onclick="mudarAba('sala1')">
-            🚪 Sala 01 - Maior
+          <!-- Início / Dashboard -->
+          <button class="sidebar-btn active" id="tabHome" onclick="mudarAba('home')">
+            🏠 Início
           </button>
-          <button class="sidebar-btn" id="tabSala2" onclick="mudarAba('sala2')">
-            🛋️ Sala 02 - Compartilhada
+
+          <!-- Menu Agrupado de Reserva de Salas -->
+          <button class="sidebar-btn" id="btnGroupSalas" onclick="alternarSubmenuSalas()">
+            <span>🚪 Reserva de Salas</span>
+            <span id="setaSalas">▼</span>
           </button>
+          
+          <div class="submenu-container" id="submenuSalas">
+            <button class="submenu-btn" id="tabSala1" onclick="mudarAba('sala1')">
+              • Sala 01 (Estante)
+            </button>
+            <button class="submenu-btn" id="tabSala2" onclick="mudarAba('sala2')">
+              • Sala 02 (Divã)
+            </button>
+          </div>
+
           <button class="sidebar-btn" id="tabPacientes" onclick="mudarAba('pacientes')">
             📋 Levantamento Pacientes
           </button>
@@ -496,8 +582,8 @@
     <!-- Conteúdo Principal -->
     <main class="main-content">
       
-      <!-- Top Bar da Agenda -->
-      <div class="top-bar no-print">
+      <!-- Top Bar da Agenda (Exibida apenas nas abas de agenda) -->
+      <div class="top-bar no-print" id="topBarAgenda" style="display: none;">
         <div class="nav-controls">
           <button class="btn" onclick="mudarSemana(-1)">&lt;</button>
           <button class="btn" onclick="semanaAtual()">Hoje</button>
@@ -506,14 +592,40 @@
         </div>
       </div>
 
+      <!-- Conteúdo 0: Tela Inicial (Dashboard / Seleção de Sala) -->
+      <div id="containerHome" class="dashboard-home">
+        <div class="welcome-card">
+          <h2>Bem-vinda ao Painel da Clínica</h2>
+          <p>Selecione a sala desejada abaixo para visualizar os horários ou utilizar as funções de gestão no menu lateral.</p>
+        </div>
+
+        <div class="cards-salas-grid">
+          <div class="card-sala-select" onclick="mudarAba('sala1')">
+            <div>
+              <h3 class="card-sala-title">Sala 01 (Estante)</h3>
+              <p class="card-sala-desc">Espaço amplo equipado com estante de livros, mesa de atendimento e poltronas individuais.</p>
+            </div>
+            <button class="btn btn-bordo">Acessar Agenda da Sala 01 &rarr;</button>
+          </div>
+
+          <div class="card-sala-select" onclick="mudarAba('sala2')">
+            <div>
+              <h3 class="card-sala-title">Sala 02 (Divã)</h3>
+              <p class="card-sala-desc">Ambiente aconchegante com divã para psicanálise e consultas individuais.</p>
+            </div>
+            <button class="btn btn-verde">Acessar Agenda da Sala 02 &rarr;</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Conteúdo 1: Grade de Agendamento -->
-      <div id="containerCalendario">
+      <div id="containerCalendario" style="display: none;">
         <div class="legenda-container">
           <strong>Legenda:</strong>
-          <div class="legenda-item"><div class="legenda-cor" style="background:#FCE4EC; border:1px solid #F8BBD0;"></div> Karine</div>
-          <div class="legenda-item"><div class="legenda-cor" style="background:#E3F2FD; border:1px solid #BBDEFB;"></div> Natália</div>
-          <div class="legenda-item"><div class="legenda-cor" style="background:#F3E5F5; border:1px solid #E1BEE7;"></div> Marília</div>
-          <div class="legenda-item"><div class="legenda-cor" style="background:#FFFDE7; border:1px solid #FFF9C4;"></div> Recepção</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#501422;"></div> Karine</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#14361E;"></div> Natália</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#80263B;"></div> Marília</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#2D5A38;"></div> Recepção</div>
         </div>
 
         <div class="calendar-grid" id="calendarGrid"></div>
@@ -816,7 +928,7 @@
     ];
 
     let userKeyAtual = null;
-    let abaAtual = 'sala1'; 
+    let abaAtual = 'home'; // Inicializa sempre na tela de boas-vindas/home
     let dataAtual = new Date();
     let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, despesas: [], pacientes: [], lancamentosPacientes: {}, escalaLimpeza: {}, logoUrl: '' };
 
@@ -932,7 +1044,7 @@
           if (abaAtual === 'financeiro') renderizarFinanceiro();
           else if (abaAtual === 'pacientes') renderizarPacientes();
           else if (abaAtual === 'limpeza') renderizarEscalaLimpeza();
-          else renderizarCalendario();
+          else if (abaAtual === 'sala1' || abaAtual === 'sala2') renderizarCalendario();
         }
       } catch (err) {
         alert('Erro ao guardar alterações.');
@@ -963,14 +1075,40 @@
       }
     }
 
+    function alternarSubmenuSalas() {
+      const sub = document.getElementById('submenuSalas');
+      const seta = document.getElementById('setaSalas');
+      if (sub.style.display === 'none') {
+        sub.style.display = 'flex';
+        seta.innerText = '▲';
+      } else {
+        sub.style.display = 'none';
+        seta.innerText = '▼';
+      }
+    }
+
     function mudarAba(idAba) {
       abaAtual = idAba;
-      document.getElementById('tabSala1').classList.toggle('active', idAba === 'sala1');
-      document.getElementById('tabSala2').classList.toggle('active', idAba === 'sala2');
-      document.getElementById('tabPacientes').classList.toggle('active', idAba === 'pacientes');
-      document.getElementById('tabLimpeza').classList.toggle('active', idAba === 'limpeza');
-      document.getElementById('tabFinanceiro').classList.toggle('active', idAba === 'financeiro');
+      
+      // Reseta botões ativos na Sidebar
+      document.querySelectorAll('.sidebar-btn, .submenu-btn').forEach(b => b.classList.remove('active'));
 
+      if (idAba === 'home') document.getElementById('tabHome').classList.add('active');
+      if (idAba === 'sala1') document.getElementById('tabSala1').classList.add('active');
+      if (idAba === 'sala2') document.getElementById('tabSala2').classList.add('active');
+      if (idAba === 'pacientes') document.getElementById('tabPacientes').classList.add('active');
+      if (idAba === 'limpeza') document.getElementById('tabLimpeza').classList.add('active');
+      if (idAba === 'financeiro') document.getElementById('tabFinanceiro').classList.add('active');
+
+      // Abre submenu de salas se for sala1 ou sala2
+      if (idAba === 'sala1' || idAba === 'sala2') {
+        document.getElementById('submenuSalas').style.display = 'flex';
+        document.getElementById('setaSalas').innerText = '▲';
+      }
+
+      // Alterna exibição dos painéis
+      document.getElementById('topBarAgenda').style.display = (idAba === 'sala1' || idAba === 'sala2') ? 'flex' : 'none';
+      document.getElementById('containerHome').style.display = (idAba === 'home') ? 'flex' : 'none';
       document.getElementById('containerCalendario').style.display = (idAba === 'sala1' || idAba === 'sala2') ? 'block' : 'none';
       document.getElementById('containerPacientes').style.display = (idAba === 'pacientes') ? 'block' : 'none';
       document.getElementById('containerLimpeza').style.display = (idAba === 'limpeza') ? 'block' : 'none';
@@ -979,7 +1117,7 @@
       if (idAba === 'financeiro') renderizarFinanceiro();
       else if (idAba === 'pacientes') renderizarPacientes();
       else if (idAba === 'limpeza') renderizarEscalaLimpeza();
-      else renderizarCalendario();
+      else if (idAba === 'sala1' || idAba === 'sala2') renderizarCalendario();
     }
 
     function realizarLogin(event) {
@@ -1033,12 +1171,13 @@
         document.getElementById('tabFinanceiro').style.display = 'flex';
       } else {
         document.getElementById('tabFinanceiro').style.display = 'none';
-        if (abaAtual === 'financeiro') abaAtual = 'sala1';
       }
 
-      renderizarCalendario();
+      // Abre sempre na tela inicial Home por padrão
+      mudarAba('home');
     }
 
+    /* --- LÓGICA DA ESCALA DE LIMPEZA --- */
     function renderizarEscalaLimpeza() {
       const mesAnoSelected = document.getElementById('selectMesLimpeza').value; 
       if (!mesAnoSelected) return;
@@ -1103,7 +1242,7 @@
         tr.innerHTML = `
           <td><strong>Semana ${semanaIndex}</strong> (${dtIniFmt} [Sáb] até ${dtFimFmt} [Sex])</td>
           <td>
-            <select style="padding: 6px; border-radius:4px; font-weight:600;" onchange="atualizarEscalaLimpeza('${chaveSemana}', 'responsavel', this.value)">
+            <select style="padding: 6px; border-radius:6px; font-weight:600;" onchange="atualizarEscalaLimpeza('${chaveSemana}', 'responsavel', this.value)">
               ${opcoesSelect}
             </select>
           </td>
@@ -1129,6 +1268,7 @@
       await guardarDados();
     }
 
+    /* --- LÓGICA DE PACIENTES --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -1350,6 +1490,7 @@
       reader.readAsText(file, 'UTF-8');
     }
 
+    /* --- LÓGICA DO BALANÇO FINANCEIRO DA CLÍNICA --- */
     function renderizarFinanceiro() {
       const mesAnoSelected = document.getElementById('selectMesFinanceiro').value; 
       if (!mesAnoSelected) return;
@@ -1637,7 +1778,7 @@
         
         const nomeDia = dia.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase();
         const numDia = dia.getDate();
-        divHeader.innerHTML = `${nomeDia}<br><span style="font-size: 1.1rem; font-weight: 700;">${numDia}</span>`;
+        divHeader.innerHTML = `${nomeDia}<br><span style="font-size: 1.1rem; font-weight: 800;">${numDia}</span>`;
         grid.appendChild(divHeader);
       });
 
@@ -1699,7 +1840,7 @@
       document.getElementById('inputTurno').value = turno.id;
       
       const dataFmt = new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR');
-      const nomeSala = abaAtual === 'sala1' ? 'Sala 01 - Maior' : 'Sala 02 - Compartilhada';
+      const nomeSala = abaAtual === 'sala1' ? 'Sala 01 (Estante)' : 'Sala 02 (Divã)';
       document.getElementById('inputInfoDataHorario').value = `${nomeSala} | ${dataFmt} (${turno.nome})`;
 
       const usuarioLogado = dadosJsonBin.usuarios[userKeyAtual];
