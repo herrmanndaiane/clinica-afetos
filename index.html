@@ -3,270 +3,433 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel da Clínica & Gestão de Pacientes</title>
+  <title>Painel de Gestão — Clínica de Psicologia</title>
+  
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <!-- Biblioteca CryptoJS para Criptografia AES-256 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
   <style>
     :root {
-      --primary-color: #6b1d2f;        /* Bordô Principal */
-      --primary-hover: #501422;        
-      --primary-light: #fdf2f4;
-      --bg-color: #f8f9fa;             /* Fundo neutro moderno */
-      --card-bg: #ffffff;
-      --border-color: #e2e8f0;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
+      /* Paleta Oficial */
+      --bordo-primary: #6B1D2F;
+      --bordo-hover: #4A1220;
+      --bordo-light: #F8EFEF;
       
-      --free-bg: #f0fdf4;              /* Turno Livre */
-      --free-border: #bbf7d0;      
-      --free-text: #166534;        
+      --verde-floresta: #1E4D2B;
+      --verde-hover: #14361E;
+      --verde-light: #EDF4EE;
+
+      --off-white-bg: #F9F8F6;
+      --off-white-card: #FFFFFF;
+      --off-white-sidebar: #F3F0EC;
+      
+      --border-color: #E5E0DA;
+      --text-main: #2C2A29;
+      --text-muted: #736E6B;
       
       --radius-sm: 6px;
       --radius-md: 10px;
-      --radius-lg: 14px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 12px rgba(107, 29, 47, 0.08);
-      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+      --radius-lg: 16px;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(107, 29, 47, 0.06);
+      --shadow-lg: 0 12px 28px rgba(0,0,0,0.08);
     }
 
-    /* Cores das Profissionais */
-    .slot-card.pro-karine { background-color: #fce4ec !important; border: 1px solid #f8bbd0 !important; color: #880e4f !important; }
-    .slot-card.pro-natalia { background-color: #e3f2fd !important; border: 1px solid #bbdefb !important; color: #0d47a1 !important; }
-    .slot-card.pro-marilia { background-color: #f3e5f5 !important; border: 1px solid #e1bee7 !important; color: #4a148c !important; }
-    .slot-card.pro-recepcao { background-color: #fffde7 !important; border: 1px solid #fff9c4 !important; color: #f57f17 !important; }
-    .slot-card.pro-outros { background-color: var(--primary-light) !important; border: 1px solid #e5b0b9 !important; color: var(--primary-color) !important; }
+    /* Cores das Profissionais na Agenda */
+    .slot-card.pro-karine { background-color: #FCE4EC !important; border: 1px solid #F8BBD0 !important; color: #880E4F !important; }
+    .slot-card.pro-natalia { background-color: #E3F2FD !important; border: 1px solid #BBDEFB !important; color: #0D47A1 !important; }
+    .slot-card.pro-marilia { background-color: #F3E5F5 !important; border: 1px solid #E1BEE7 !important; color: #4A148C !important; }
+    .slot-card.pro-recepcao { background-color: #FFFDE7 !important; border: 1px solid #FFF9C4 !important; color: #F57F17 !important; }
+    .slot-card.pro-outros { background-color: var(--bordo-light) !important; border: 1px solid #E5B0B9 !important; color: var(--bordo-primary) !important; }
 
     * { box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       margin: 0;
-      padding: 24px;
-      background-color: var(--bg-color);
+      padding: 0;
+      background-color: var(--off-white-bg);
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Tela de Login */
-    .login-container { display: flex; justify-content: center; align-items: center; min-height: 85vh; }
-    .login-card { 
-      background: var(--card-bg); 
-      padding: 40px; 
-      border-radius: var(--radius-lg); 
-      box-shadow: var(--shadow-lg); 
-      border: 1px solid var(--border-color); 
-      width: 100%; 
-      max-width: 380px; 
+    /* Layout da Aplicação (Sidebar + Main Content) */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
     }
-    .login-card h2 { 
-      margin-top: 0; 
-      margin-bottom: 24px; 
-      text-align: center; 
-      color: var(--primary-color); 
+
+    /* Sidebar Esquerda */
+    .sidebar {
+      width: 280px;
+      background-color: var(--off-white-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 16px;
+      position: fixed;
+      height: 100vh;
+      z-index: 10;
+    }
+
+    .brand-header {
+      padding: 0 12px 20px 12px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
       font-weight: 700;
-      font-size: 1.5rem;
+      color: var(--bordo-primary);
+      margin: 0;
+      letter-spacing: -0.02em;
     }
 
-    /* Cabeçalho */
-    .header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 20px; 
-      background: var(--card-bg); 
-      padding: 16px 24px; 
-      border-radius: var(--radius-md); 
-      border: 1px solid var(--border-color); 
-      box-shadow: var(--shadow-sm); 
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .logo-container { display: flex; align-items: center; }
-    .logo-img { max-height: 42px; max-width: 160px; object-fit: contain; }
-    .nav-controls { display: flex; align-items: center; gap: 12px; }
 
-    /* Botões */
-    .btn { 
-      padding: 9px 16px; 
-      border: 1px solid var(--border-color); 
-      border-radius: var(--radius-sm); 
-      background: #ffffff; 
-      cursor: pointer; 
-      font-weight: 500; 
+    .sidebar-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .sidebar-btn:hover {
+      background-color: rgba(107, 29, 47, 0.05);
+      color: var(--bordo-primary);
+    }
+
+    .sidebar-btn.active {
+      background-color: var(--bordo-primary);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-user {
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--off-white-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .user-name {
+      font-weight: 600;
       font-size: 0.875rem;
-      transition: all 0.2s ease; 
+      color: var(--bordo-primary);
+    }
+
+    /* Conteúdo Principal à Direita */
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      padding: 32px 40px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      background: var(--off-white-card);
+      padding: 16px 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .month-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--bordo-primary);
+      letter-spacing: -0.02em;
+    }
+
+    /* Botões Padrão */
+    .btn {
+      padding: 10px 18px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--off-white-card);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
       color: var(--text-main);
     }
-    .btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
-    .btn-primary { background: var(--primary-color); color: white; border: none; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-success { background: #166534; color: white; border: none; }
-    .btn-success:hover { background: #14532d; }
-    .btn-danger { background: #991b1b; color: white; border: none; }
-    .btn-danger:hover { background: #7f1d1d; }
 
-    .month-title { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); letter-spacing: -0.02em; }
-
-    /* Navegação por Abas */
-    .tabs-container { display: flex; gap: 6px; margin-bottom: -1px; flex-wrap: wrap; }
-    .tab-btn { 
-      padding: 12px 20px; 
-      background: #f1f5f9; 
-      border: 1px solid var(--border-color); 
-      border-bottom: none; 
-      border-radius: var(--radius-md) var(--radius-md) 0 0; 
-      cursor: pointer; 
-      font-weight: 600; 
-      font-size: 0.875rem;
-      color: var(--text-muted); 
-      transition: all 0.2s ease;
+    .btn:hover { background: var(--off-white-bg); border-color: #CBD5E1; }
+    
+    .btn-bordo {
+      background-color: var(--bordo-primary);
+      color: #ffffff;
+      border: none;
     }
-    .tab-btn:hover { background: #e2e8f0; color: var(--text-main); }
-    .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-    
-    .tab-btn-pacientes { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
-    .tab-btn-pacientes.active { background: #0284c7; color: white; border-color: #0284c7; }
-    
-    .tab-btn-limpeza { background: #fff7ed; color: #c2410c; border-color: #ffedd5; }
-    .tab-btn-limpeza.active { background: #ea580c; color: white; border-color: #ea580c; }
-    
-    .tab-btn-financeiro { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-    .tab-btn-financeiro.active { background: #16a34a; color: white; border-color: #16a34a; }
+    .btn-bordo:hover { background-color: var(--bordo-hover); }
 
-    /* Legendas */
-    .legenda-container { 
-      display: flex; 
-      gap: 16px; 
-      margin-top: 12px;
-      margin-bottom: 16px; 
-      font-size: 0.85rem; 
-      align-items: center; 
-      flex-wrap: wrap; 
-      background: var(--card-bg); 
-      padding: 12px 18px; 
-      border-radius: var(--radius-md); 
-      border: 1px solid var(--border-color); 
+    .btn-verde {
+      background-color: var(--verde-floresta);
+      color: #ffffff;
+      border: none;
+    }
+    .btn-verde:hover { background-color: var(--verde-hover); }
+
+    .btn-danger {
+      background-color: #991B1B;
+      color: #ffffff;
+      border: none;
+    }
+    .btn-danger:hover { background-color: #7F1D1D; }
+
+    /* Legenda */
+    .legenda-container {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--off-white-card);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
     }
     .legenda-item { display: flex; align-items: center; gap: 6px; font-weight: 500; }
     .legenda-cor { width: 14px; height: 14px; border-radius: 4px; }
 
-    /* Grade do Calendário */
-    .calendar-grid { 
-      display: grid; 
-      grid-template-columns: 110px repeat(7, 1fr); 
-      background: var(--card-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); 
-      overflow: hidden; 
-      box-shadow: var(--shadow-md); 
+    /* Grade da Agenda */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 110px repeat(7, 1fr);
+      background: var(--off-white-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
     }
-    .grid-header { 
-      background: #f8fafc; 
-      padding: 14px 8px; 
-      text-align: center; 
-      font-weight: 600; 
-      font-size: 0.85rem;
-      border-bottom: 2px solid var(--border-color); 
-      border-right: 1px solid var(--border-color); 
-      color: var(--primary-color); 
-    }
-    .grid-header.today { background: var(--primary-light); color: var(--primary-color); }
-    .time-col { 
-      background: #f8fafc; 
-      padding: 16px 10px; 
-      font-size: 0.8rem; 
-      font-weight: 600; 
-      border-right: 1px solid var(--border-color); 
-      border-bottom: 1px solid var(--border-color); 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      color: var(--text-muted); 
-    }
-    .day-slot { padding: 8px; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); min-height: 100px; }
 
-    .slot-card { 
-      height: 100%; 
-      border-radius: var(--radius-sm); 
-      padding: 10px; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: space-between; 
-      cursor: pointer; 
-      box-sizing: border-box; 
+    .grid-header {
+      background: #F3F0EC;
+      padding: 16px 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-bottom: 2px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      color: var(--bordo-primary);
+    }
+
+    .grid-header.today {
+      background: var(--bordo-light);
+      color: var(--bordo-primary);
+    }
+
+    .time-col {
+      background: #F3F0EC;
+      padding: 16px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .day-slot {
+      padding: 8px;
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      min-height: 105px;
+    }
+
+    .slot-card {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
+
     .slot-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-    .slot-card.livre { background: var(--free-bg); border: 1px dashed var(--free-border); color: var(--free-text); }
+    .slot-card.livre { background: var(--verde-light); border: 1px dashed #A3C9A8; color: var(--verde-floresta); }
     .slot-title { font-weight: 600; font-size: 0.85rem; }
     .slot-info { font-size: 0.78rem; margin-top: 4px; }
 
-    /* Container dos Painéis */
-    .panel-content { 
-      background: var(--card-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); 
-      padding: 24px; 
-      box-shadow: var(--shadow-md); 
+    /* Painéis de Conteúdo (Tabelas) */
+    .panel-card {
+      background: var(--off-white-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
     }
 
-    /* Tabelas */
-    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 16px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-color); }
-    .data-table th, .data-table td { padding: 12px 14px; text-align: left; font-size: 0.875rem; border-bottom: 1px solid var(--border-color); }
-    .data-table th { background-color: #e2e8f0; color: var(--text-main); font-weight: 600; }
-    .data-table tfoot td { background-color: #f1f5f9; font-weight: 700; color: var(--primary-color); border-top: 2px solid var(--primary-color); }
-    .data-table tr:nth-child(even) { background-color: #f8fafc; }
-    .data-table tr:hover { background-color: #f1f5f9; }
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 18px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
 
-    /* Cards do Financeiro */
-    .card-resumo-financeiro { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-    .box-resumo { padding: 20px; border-radius: var(--radius-md); flex: 1; min-width: 200px; border: 1px solid var(--border-color); background: #ffffff; box-shadow: var(--shadow-sm); }
+    .data-table th, .data-table td {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table th {
+      background-color: var(--bordo-primary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .data-table tfoot td {
+      background-color: var(--bordo-light);
+      font-weight: 700;
+      color: var(--bordo-primary);
+      border-top: 2px solid var(--bordo-primary);
+    }
+
+    .data-table tr:nth-child(even) { background-color: #FAFA9; }
+    .data-table tr:hover { background-color: #F3F0EC; }
+
+    /* Resumos do Financeiro */
+    .card-resumo-financeiro { display: flex; gap: 18px; margin-bottom: 28px; flex-wrap: wrap; }
+    .box-resumo {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--border-color);
+      background: var(--off-white-card);
+      box-shadow: var(--shadow-sm);
+    }
+
     .box-resumo h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-    .box-resumo span { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+    .box-resumo span { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
 
-    .box-entradas { border-left: 4px solid #16a34a; }
-    .box-entradas span { color: #15803d; }
-    .box-saidas { border-left: 4px solid #dc2626; }
-    .box-saidas span { color: #b91c1c; }
-    .box-lucro { border-left: 4px solid #2563eb; }
-    .box-lucro span { color: #1d4ed8; }
-    .box-ocupacao { border-left: 4px solid #ea580c; }
-    .box-ocupacao span { color: #c2410c; }
+    .box-entradas { border-left: 5px solid var(--verde-floresta); }
+    .box-entradas span { color: var(--verde-floresta); }
+
+    .box-saidas { border-left: 5px solid #991B1B; }
+    .box-saidas span { color: #991B1B; }
+
+    .box-lucro { border-left: 5px solid #2563EB; }
+    .box-lucro span { color: #1D4ED8; }
+
+    .box-ocupacao { border-left: 5px solid #EA580C; }
+    .box-ocupacao span { color: #C2410C; }
+
+    /* Tela de Login */
+    .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--off-white-bg); }
+    .login-card {
+      background: var(--off-white-card);
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-card h2 {
+      margin-top: 0;
+      margin-bottom: 24px;
+      text-align: center;
+      color: var(--bordo-primary);
+      font-weight: 700;
+    }
 
     /* Modais */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #ffffff; padding: 28px; border-radius: var(--radius-lg); width: 400px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto; }
-    .modal-content h3 { margin-top: 0; color: var(--primary-color); font-weight: 700; font-size: 1.2rem; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      width: 420px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 { margin-top: 0; color: var(--bordo-primary); font-weight: 700; }
+
     .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500; color: var(--text-main); }
-    .form-group input, .form-group select, .form-group textarea { 
-      width: 100%; 
-      padding: 10px 12px; 
-      border: 1px solid var(--border-color); 
-      border-radius: var(--radius-sm); 
-      box-sizing: border-box; 
+    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
       font-family: inherit;
       font-size: 0.875rem;
-      transition: border-color 0.15s ease;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary-color);
-    }
-    .recorrencia-box { background: #f8fafc; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-top: 12px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
 
     @media print {
+      .sidebar { display: none !important; }
+      .main-content { margin-left: 0 !important; padding: 0 !important; }
       body * { visibility: hidden; }
       #containerPacientes, #containerPacientes * { visibility: visible; }
       #containerPacientes { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
-      input, select { border: none !important; background: transparent !important; }
     }
   </style>
 </head>
@@ -285,195 +448,217 @@
           <label for="loginSenha">Senha</label>
           <input type="password" id="loginSenha" placeholder="Digite sua senha" required>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar</button>
+        <button type="submit" class="btn btn-bordo" style="width: 100%;">Entrar no Painel</button>
       </form>
     </div>
   </div>
 
-  <!-- Painel Principal -->
-  <div id="painelCalendario" style="display: none;">
-    <div class="header">
-      <div class="nav-controls">
-        <button class="btn" onclick="mudarSemana(-1)">&lt;</button>
-        <button class="btn" onclick="semanaAtual()">Hoje</button>
-        <button class="btn" onclick="mudarSemana(1)">&gt;</button>
-        <span class="month-title" id="tituloMes">Setembro de 2026</span>
-      </div>
-
-      <div class="user-info">
-        <div class="logo-container">
+  <!-- Estrutura Principal com Sidebar à Esquerda -->
+  <div class="app-layout" id="painelCalendario" style="display: none;">
+    
+    <!-- Sidebar Lateral -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-header">
           <img id="imgLogoTopo" class="logo-img" src="" alt="Logo" style="display: none;">
+          <h1 class="brand-title">Clínica de Psicologia</h1>
         </div>
-        <span id="nomeUsuarioLogado" style="font-weight: 600; color: var(--primary-color);"></span>
-        <button class="btn" onclick="abrirModalNovaProfissional()">➕ Nova Profissional</button>
-        <button class="btn" onclick="abrirModalSenha()">🔑 Alterar Senha</button>
-        <button class="btn" onclick="realizarLogout()">Sair</button>
-      </div>
-    </div>
 
-    <!-- Abas do Sistema -->
-    <div class="tabs-container">
-      <button class="tab-btn active" id="tabSala1" onclick="mudarAba('sala1')">Sala 01 - Maior</button>
-      <button class="tab-btn" id="tabSala2" onclick="mudarAba('sala2')">Sala 02 - Compartilhada</button>
-      <button class="tab-btn tab-btn-pacientes" id="tabPacientes" onclick="mudarAba('pacientes')">📋 Levantamento de Pacientes</button>
-      <button class="tab-btn tab-btn-limpeza" id="tabLimpeza" onclick="mudarAba('limpeza')">🧹 Escala de Limpeza</button>
-      <button class="tab-btn tab-btn-financeiro" id="tabFinanceiro" onclick="mudarAba('financeiro')" style="display: none;">📊 Financeiro da Clínica</button>
-    </div>
-
-    <!-- Conteúdo 1: Grade de Agendamento -->
-    <div id="containerCalendario">
-      <div class="legenda-container">
-        <strong>Legenda:</strong>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#fce4ec; border:1px solid #f8bbd0;"></div> Karine</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#e3f2fd; border:1px solid #bbdefb;"></div> Natália</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#f3e5f5; border:1px solid #e1bee7;"></div> Marília</div>
-        <div class="legenda-item"><div class="legenda-cor" style="background:#fffde7; border:1px solid #fff9c4;"></div> Recepção</div>
+        <nav class="sidebar-menu">
+          <button class="sidebar-btn active" id="tabSala1" onclick="mudarAba('sala1')">
+            🚪 Sala 01 - Maior
+          </button>
+          <button class="sidebar-btn" id="tabSala2" onclick="mudarAba('sala2')">
+            🛋️ Sala 02 - Compartilhada
+          </button>
+          <button class="sidebar-btn" id="tabPacientes" onclick="mudarAba('pacientes')">
+            📋 Levantamento Pacientes
+          </button>
+          <button class="sidebar-btn" id="tabLimpeza" onclick="mudarAba('limpeza')">
+            🧹 Escala de Limpeza
+          </button>
+          <button class="sidebar-btn" id="tabFinanceiro" onclick="mudarAba('financeiro')" style="display: none;">
+            📊 Financeiro Clínica
+          </button>
+        </nav>
       </div>
 
-      <div class="calendar-grid" id="calendarGrid"></div>
-    </div>
+      <div class="sidebar-user">
+        <div class="user-profile">
+          <span id="nomeUsuarioLogado" class="user-name"></span>
+        </div>
+        <button class="btn" onclick="abrirModalNovaProfissional()" style="width:100%;">➕ Nova Profissional</button>
+        <button class="btn" onclick="abrirModalSenha()" style="width:100%;">🔑 Alterar Senha</button>
+        <button class="btn btn-danger" onclick="realizarLogout()" style="width:100%;">Sair do Sistema</button>
+      </div>
+    </aside>
 
-    <!-- Conteúdo 2: Levantamento Financeiro Mensal de Pacientes -->
-    <div id="containerPacientes" class="panel-content" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;" class="no-print">
-        <h3 style="margin:0; color: var(--primary-color);">Levantamento Financeiro Mensal de Pacientes</h3>
-        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <label for="selectMesPacientes"><strong>Mês/Ano: </strong></label>
-          <select id="selectMesPacientes" onchange="renderizarPacientes()"></select>
-          <button class="btn btn-primary" onclick="abrirModalNovoPaciente()">👤 Cadastrar Paciente</button>
-          
-          <button class="btn" onclick="document.getElementById('inputImportarCSV').click()" style="background:#f59e0b; color:white; border:none;">📤 Importar CSV</button>
-          <input type="file" id="inputImportarCSV" accept=".csv" style="display:none;" onchange="importarCSVPacientes(event)">
-
-          <button class="btn btn-success" onclick="exportarCSVPacientes()">📥 Exportar Excel (CSV)</button>
-          <button class="btn btn-primary" onclick="window.print()">🖨️️ Gerar PDF / Imprimir</button>
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      
+      <!-- Top Bar da Agenda -->
+      <div class="top-bar no-print">
+        <div class="nav-controls">
+          <button class="btn" onclick="mudarSemana(-1)">&lt;</button>
+          <button class="btn" onclick="semanaAtual()">Hoje</button>
+          <button class="btn" onclick="mudarSemana(1)">&gt;</button>
+          <span class="month-title" id="tituloMes">Setembro de 2026</span>
         </div>
       </div>
 
-      <h4 id="tituloLevantamentoMes" style="margin: 5px 0 15px 0; color: var(--primary-color); text-align: center;">Levantamento Financeiro Mensal</h4>
-
-      <table class="data-table" id="tabelaPacientesDOM">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>CPF</th>
-            <th style="width: 120px;">Valor (R$)</th>
-            <th>CEP</th>
-            <th>E_mail</th>
-            <th style="width: 180px;">Nota fiscal ou carnê leão</th>
-            <th style="width: 80px; text-align: center;">Emitido</th>
-            <th style="width: 60px; text-align: center;" class="no-print">Ação</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyPacientes"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="2"><strong>TOTAL RECEBIDO NO MÊS</strong></td>
-            <td id="tfootTotalRecebidoPacientes"><strong>R$ 0,00</strong></td>
-            <td colspan="3"></td>
-            <td id="tfootTotalEmitidos" style="text-align: center;"><strong>0/0</strong></td>
-            <td class="no-print"></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-
-    <!-- Conteúdo 3: Escala de Limpeza -->
-    <div id="containerLimpeza" class="panel-content" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin:0; color: #ea580c;">🧹 Escala Semanal de Limpeza (Sábado a Sexta-feira)</h3>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <label for="selectMesLimpeza"><strong>Mês/Ano: </strong></label>
-          <select id="selectMesLimpeza" onchange="renderizarEscalaLimpeza()"></select>
+      <!-- Conteúdo 1: Grade de Agendamento -->
+      <div id="containerCalendario">
+        <div class="legenda-container">
+          <strong>Legenda:</strong>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#FCE4EC; border:1px solid #F8BBD0;"></div> Karine</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#E3F2FD; border:1px solid #BBDEFB;"></div> Natália</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#F3E5F5; border:1px solid #E1BEE7;"></div> Marília</div>
+          <div class="legenda-item"><div class="legenda-cor" style="background:#FFFDE7; border:1px solid #FFF9C4;"></div> Recepção</div>
         </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
       </div>
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="background-color: #ea580c; color: white;">Semana / Período (Sáb - Sex)</th>
-            <th style="background-color: #ea580c; color: white;">Psicóloga Responsável</th>
-            <th style="width: 120px; text-align: center; background-color: #ea580c; color: white;">Concluído?</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyEscalaLimpeza"></tbody>
-      </table>
-    </div>
-
-    <!-- Conteúdo 4: Painel Financeiro da Clínica -->
-    <div id="containerFinanceiro" class="panel-content" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin:0; color: var(--primary-color);">Balanço Financeiro da Clínica</h3>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <label for="selectMesFinanceiro"><strong>Mês de Referência: </strong></label>
-          <select id="selectMesFinanceiro" onchange="renderizarFinanceiro()"></select>
-          <button class="btn btn-primary" onclick="abrirModalDespesa()">➕ Adicionar Despesa</button>
-          <button class="btn btn-success" onclick="exportarExcelFinanceiro()">📥 Exportar Excel/CSV</button>
+      <!-- Conteúdo 2: Levantamento Financeiro de Pacientes -->
+      <div id="containerPacientes" class="panel-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;" class="no-print">
+          <h3 style="margin:0; color: var(--bordo-primary);">Levantamento Financeiro de Pacientes</h3>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <label for="selectMesPacientes"><strong>Mês/Ano: </strong></label>
+            <select id="selectMesPacientes" onchange="renderizarPacientes()"></select>
+            <button class="btn btn-bordo" onclick="abrirModalNovoPaciente()">👤 Cadastrar Paciente</button>
+            <button class="btn" onclick="document.getElementById('inputImportarCSV').click()" style="background:#F59E0B; color:white; border:none;">📤 Importar CSV</button>
+            <input type="file" id="inputImportarCSV" accept=".csv" style="display:none;" onchange="importarCSVPacientes(event)">
+            <button class="btn btn-verde" onclick="exportarCSVPacientes()">📥 Exportar CSV</button>
+            <button class="btn btn-bordo" onclick="window.print()">🖨 Imprimir PDF</button>
+          </div>
         </div>
+
+        <h4 id="tituloLevantamentoMes" style="margin: 5px 0 15px 0; color: var(--bordo-primary); text-align: center;">Levantamento Financeiro Mensal</h4>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th style="width: 120px;">Valor (R$)</th>
+              <th>CEP</th>
+              <th>E_mail</th>
+              <th style="width: 180px;">Nota fiscal ou carnê leão</th>
+              <th style="width: 80px; text-align: center;">Emitido</th>
+              <th style="width: 60px; text-align: center;" class="no-print">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPacientes"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"><strong>TOTAL RECEBIDO NO MÊS</strong></td>
+              <td id="tfootTotalRecebidoPacientes"><strong>R$ 0,00</strong></td>
+              <td colspan="3"></td>
+              <td id="tfootTotalEmitidos" style="text-align: center;"><strong>0/0</strong></td>
+              <td class="no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
 
-      <div class="card-resumo-financeiro">
-        <div class="box-resumo box-entradas">
-          <h4>Total de Entradas (Locação + Pacientes)</h4>
-          <span id="txtTotalEntrada">R$ 0,00</span>
+      <!-- Conteúdo 3: Escala de Limpeza -->
+      <div id="containerLimpeza" class="panel-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="margin:0; color: #EA580C;">🧹 Escala Semanal de Limpeza (Sábado a Sexta-feira)</h3>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label for="selectMesLimpeza"><strong>Mês/Ano: </strong></label>
+            <select id="selectMesLimpeza" onchange="renderizarEscalaLimpeza()"></select>
+          </div>
         </div>
-        <div class="box-resumo box-saidas">
-          <h4>Total de Saídas (Custos)</h4>
-          <span id="txtTotalSaida">R$ 0,00</span>
-        </div>
-        <div class="box-resumo box-lucro">
-          <h4>Lucro Líquido do Mês</h4>
-          <span id="txtLucroLiquido">R$ 0,00</span>
-        </div>
-        <div class="box-resumo box-ocupacao">
-          <h4>Taxa de Ocupação Geral</h4>
-          <span id="txtTaxaOcupacao">0%</span>
-        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="background-color: #EA580C; color: white;">Semana / Período (Sáb - Sex)</th>
+              <th style="background-color: #EA580C; color: white;">Psicóloga Responsável</th>
+              <th style="width: 120px; text-align: center; background-color: #EA580C; color: white;">Concluído?</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEscalaLimpeza"></tbody>
+        </table>
       </div>
 
-      <h4 style="color: var(--primary-color); margin-top: 24px;">Entradas por Locação de Salas (R$ 350,00 por turno fixo mensal - Isento para Karine)</h4>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Profissional</th>
-            <th>Turnos Fixos (Sala 01)</th>
-            <th>Turnos Fixos (Sala 02)</th>
-            <th>Total de Turnos Fixos</th>
-            <th>Valor Mensal Devido</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyEntradas"></tbody>
-      </table>
+      <!-- Conteúdo 4: Financeiro da Clínica -->
+      <div id="containerFinanceiro" class="panel-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="margin:0; color: var(--bordo-primary);">Balanço Financeiro da Clínica</h3>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label for="selectMesFinanceiro"><strong>Mês de Referência: </strong></label>
+            <select id="selectMesFinanceiro" onchange="renderizarFinanceiro()"></select>
+            <button class="btn btn-bordo" onclick="abrirModalDespesa()">➕ Adicionar Despesa</button>
+            <button class="btn btn-verde" onclick="exportarExcelFinanceiro()">📥 Exportar Excel/CSV</button>
+          </div>
+        </div>
 
-      <h4 style="margin-top: 30px; color: #166534;">Entradas de Atendimentos Clínicos / Pacientes (Karine)</h4>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="background-color: #166534; color: white;">Origem / Profissional</th>
-            <th style="background-color: #166534; color: white;">Qtd. de Pacientes no Mês</th>
-            <th style="background-color: #166534; color: white;">Total Bruto Recebido</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyEntradasPacientesKarine"></tbody>
-      </table>
+        <div class="card-resumo-financeiro">
+          <div class="box-resumo box-entradas">
+            <h4>Total Entradas (Locação + Pacientes)</h4>
+            <span id="txtTotalEntrada">R$ 0,00</span>
+          </div>
+          <div class="box-resumo box-saidas">
+            <h4>Total Saídas (Custos)</h4>
+            <span id="txtTotalSaida">R$ 0,00</span>
+          </div>
+          <div class="box-resumo box-lucro">
+            <h4>Lucro Líquido do Mês</h4>
+            <span id="txtLucroLiquido">R$ 0,00</span>
+          </div>
+          <div class="box-resumo box-ocupacao">
+            <h4>Taxa de Ocupação</h4>
+            <span id="txtTaxaOcupacao">0%</span>
+          </div>
+        </div>
 
-      <h4 style="margin-top: 30px; color: #991b1b;">Despesas e Custos do Mês</h4>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="background-color: #991b1b; color: white;">Descrição da Despesa</th>
-            <th style="background-color: #991b1b; color: white;">Categoria</th>
-            <th style="background-color: #991b1b; color: white;">Valor (R$)</th>
-            <th style="width: 80px; text-align: center; background-color: #991b1b; color: white;">Ação</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyDespesas"></tbody>
-      </table>
-    </div>
+        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas (R$ 350,00 por turno fixo mensais)</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Profissional</th>
+              <th>Turnos Fixos (Sala 01)</th>
+              <th>Turnos Fixos (Sala 02)</th>
+              <th>Total de Turnos Fixos</th>
+              <th>Valor Mensal Devido</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEntradas"></tbody>
+        </table>
 
+        <h4 style="margin-top: 30px; color: var(--verde-floresta);">Entradas de Consultas / Pacientes (Karine)</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="background-color: var(--verde-floresta); color: white;">Origem / Profissional</th>
+              <th style="background-color: var(--verde-floresta); color: white;">Qtd. Pacientes</th>
+              <th style="background-color: var(--verde-floresta); color: white;">Total Bruto Recebido</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEntradasPacientesKarine"></tbody>
+        </table>
+
+        <h4 style="margin-top: 30px; color: #991B1B;">Despesas e Custos do Mês</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="background-color: #991B1B; color: white;">Descrição da Despesa</th>
+              <th style="background-color: #991B1B; color: white;">Categoria</th>
+              <th style="background-color: #991B1B; color: white;">Valor (R$)</th>
+              <th style="width: 80px; text-align: center; background-color: #991B1B; color: white;">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDespesas"></tbody>
+        </table>
+      </div>
+
+    </main>
   </div>
 
-  <!-- Modal Inclusão/Edição de Reserva -->
+  <!-- Modais do Sistema -->
   <div class="modal" id="modalReserva">
     <div class="modal-content">
       <h3 id="modalTitulo">Agendar Turno</h3>
@@ -482,7 +667,7 @@
       
       <div class="form-group">
         <label>Data e Horário</label>
-        <input type="text" id="inputInfoDataHorario" readonly style="background: #f8fafc;">
+        <input type="text" id="inputInfoDataHorario" readonly style="background: #F8FAFC;">
       </div>
 
       <div class="form-group">
@@ -508,12 +693,11 @@
       <div class="modal-actions">
         <button class="btn btn-danger" id="btnExcluir" onclick="excluirReserva()" style="display:none;">Excluir</button>
         <button class="btn" onclick="fecharModal('modalReserva')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarReserva()">Salvar</button>
+        <button class="btn btn-bordo" onclick="salvarReserva()">Salvar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Cadastro de Paciente -->
   <div class="modal" id="modalPaciente">
     <div class="modal-content">
       <h3 id="modalPacienteTitulo">Cadastrar Novo Paciente</h3>
@@ -536,12 +720,11 @@
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="fecharModal('modalPaciente')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarPaciente()">Salvar Paciente</button>
+        <button class="btn btn-bordo" onclick="salvarPaciente()">Salvar Paciente</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Adicionar Despesa -->
   <div class="modal" id="modalDespesa">
     <div class="modal-content">
       <h3>Adicionar Custo / Despesa</h3>
@@ -564,12 +747,11 @@
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="fecharModal('modalDespesa')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarDespesa()">Adicionar Custo</button>
+        <button class="btn btn-bordo" onclick="salvarDespesa()">Adicionar Custo</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Alteração de Senha -->
   <div class="modal" id="modalSenha">
     <div class="modal-content">
       <h3>Alterar Minha Senha</h3>
@@ -587,12 +769,11 @@
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="fecharModal('modalSenha')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarNovaSenha()">Atualizar Senha</button>
+        <button class="btn btn-bordo" onclick="salvarNovaSenha()">Atualizar Senha</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Cadastrar Nova Profissional -->
   <div class="modal" id="modalNovaProfissional">
     <div class="modal-content">
       <h3>Cadastrar Nova Profissional</h3>
@@ -606,7 +787,7 @@
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="fecharModal('modalNovaProfissional')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarNovaProfissional()">Cadastrar</button>
+        <button class="btn btn-bordo" onclick="salvarNovaProfissional()">Cadastrar</button>
       </div>
     </div>
   </div>
@@ -639,7 +820,6 @@
     let dataAtual = new Date();
     let dadosJsonBin = { reservas: [], usuarios: USUARIOS_PADRAO, despesas: [], pacientes: [], lancamentosPacientes: {}, escalaLimpeza: {}, logoUrl: '' };
 
-    /* --- FUNÇÕES AUXILIARES DE CRIPTOGRAFIA (AES-256) --- */
     function encriptarTexto(texto) {
       if (!texto) return '';
       return CryptoJS.AES.encrypt(texto, CHAVE_CRIPTOGRAFIA).toString();
@@ -845,12 +1025,12 @@
       const usuarioLogado = usuarios[userKeyAtual];
 
       document.getElementById('telaLogin').style.display = 'none';
-      document.getElementById('painelCalendario').style.display = 'block';
-      document.getElementById('nomeUsuarioLogado').innerText = `👤 ${usuarioLogado.nome}`;
+      document.getElementById('painelCalendario').style.display = 'flex';
+      document.getElementById('nomeUsuarioLogado').innerText = usuarioLogado.nome;
 
       const nomeLower = usuarioLogado.nome.toLowerCase();
       if (nomeLower.includes('karine') || nomeLower.includes('recepção') || nomeLower.includes('recepcao')) {
-        document.getElementById('tabFinanceiro').style.display = 'inline-block';
+        document.getElementById('tabFinanceiro').style.display = 'flex';
       } else {
         document.getElementById('tabFinanceiro').style.display = 'none';
         if (abaAtual === 'financeiro') abaAtual = 'sala1';
@@ -859,7 +1039,6 @@
       renderizarCalendario();
     }
 
-    /* --- LÓGICA DA ESCALA DE LIMPEZA --- */
     function renderizarEscalaLimpeza() {
       const mesAnoSelected = document.getElementById('selectMesLimpeza').value; 
       if (!mesAnoSelected) return;
@@ -924,7 +1103,7 @@
         tr.innerHTML = `
           <td><strong>Semana ${semanaIndex}</strong> (${dtIniFmt} [Sáb] até ${dtFimFmt} [Sex])</td>
           <td>
-            <select style="padding: 4px; border-radius:4px; font-weight:bold;" onchange="atualizarEscalaLimpeza('${chaveSemana}', 'responsavel', this.value)">
+            <select style="padding: 6px; border-radius:4px; font-weight:600;" onchange="atualizarEscalaLimpeza('${chaveSemana}', 'responsavel', this.value)">
               ${opcoesSelect}
             </select>
           </td>
@@ -950,7 +1129,6 @@
       await guardarDados();
     }
 
-    /* --- LÓGICA DE PACIENTES --- */
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -1052,13 +1230,13 @@
           <td><strong>${nomeDec}</strong></td>
           <td>${cpfDec || '-'}</td>
           <td>
-            <input type="text" style="width: 100px; padding: 4px;" value="${lanc.valor || ''}" placeholder="R$ 0,00"
+            <input type="text" style="width: 100px; padding: 6px;" value="${lanc.valor || ''}" placeholder="R$ 0,00"
               onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'valor', this.value)">
           </td>
           <td>${cepDec || '-'}</td>
           <td>${emailDec || '-'}</td>
           <td>
-            <select style="width: 100%; padding: 4px;" onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'tipo', this.value)">
+            <select style="width: 100%; padding: 6px;" onchange="atualizarLancamentoPaciente('${chaveLancamento}', 'tipo', this.value)">
               <option value="Nota fiscal" ${lanc.tipo === 'Nota fiscal' ? 'selected' : ''}>Nota fiscal</option>
               <option value="Carnê leão" ${lanc.tipo === 'Carnê leão' ? 'selected' : ''}>Carnê leão</option>
               <option value="não precisa nota" ${lanc.tipo === 'não precisa nota' ? 'selected' : ''}>não precisa nota</option>
@@ -1132,7 +1310,6 @@
       link.click();
     }
 
-    /* Importação Massiva de Pacientes via CSV */
     async function importarCSVPacientes(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1173,7 +1350,6 @@
       reader.readAsText(file, 'UTF-8');
     }
 
-    /* --- LÓGICA DO BALANÇO FINANCEIRO DA CLÍNICA --- */
     function renderizarFinanceiro() {
       const mesAnoSelected = document.getElementById('selectMesFinanceiro').value; 
       if (!mesAnoSelected) return;
@@ -1186,7 +1362,6 @@
       tbodyDespesas.innerHTML = '';
       tbodyKarine.innerHTML = '';
 
-      /* 1. Cálculo de Locação de Salas (ISENTO PARA KARINE) */
       const turnosFixosPorProfissional = {};
       let totalTurnosOcupadosGeral = 0;
 
@@ -1226,7 +1401,7 @@
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><strong>${pro} ${eKarine ? '<small style="color:#166534;">(Isenta)</small>' : ''}</strong></td>
+            <td><strong>${pro} ${eKarine ? '<small style="color:var(--verde-floresta);">(Isenta)</small>' : ''}</strong></td>
             <td>${s1Count} turno(s) fixo(s)</td>
             <td>${s2Count} turno(s) fixo(s)</td>
             <td><strong>${totalTurnosFixos} turno(s)</strong></td>
@@ -1236,7 +1411,6 @@
         });
       }
 
-      /* 2. Cálculo de Entradas dos Pacientes da Karine */
       let totalEntradasKarineValor = 0;
       let qtdPacientesKarine = 0;
 
@@ -1266,7 +1440,6 @@
       `;
       tbodyKarine.appendChild(trK);
 
-      /* 3. Cálculo das Despesas */
       let totalSaidasValor = 0;
       const despesasDoMes = (dadosJsonBin.despesas || []).filter(d => d.mesAno === mesAnoSelected);
 
@@ -1287,7 +1460,6 @@
         });
       }
 
-      /* 4. Totais Finais e Taxa de Ocupação */
       const totalEntradasGeral = totalEntradasSalasValor + totalEntradasKarineValor;
       const capacidadeTotalMes = 180;
       const pctOcupacao = Math.min(100, Math.round((totalTurnosOcupadosGeral / capacidadeTotalMes) * 100));
@@ -1323,7 +1495,6 @@
       link.click();
     }
 
-    /* Modais Gerais */
     function abrirModalDespesa() {
       document.getElementById('despesaDescricao').value = '';
       document.getElementById('despesaValor').value = '';
@@ -1497,7 +1668,7 @@
             card.className = 'slot-card livre';
             card.innerHTML = `
               <div class="slot-title">Disponível</div>
-              <div class="slot-info">+ Clique p/ agendar</div>
+              <div class="slot-info">+ Agendar</div>
             `;
             card.onclick = () => abrirModalReserva(dataIso, turno, null);
           }
@@ -1551,7 +1722,7 @@
           campoPsicologa.style.background = '#ffffff';
         } else {
           campoPsicologa.readOnly = true;
-          campoPsicologa.style.background = '#f8fafc';
+          campoPsicologa.style.background = '#F8FAFC';
         }
 
         document.getElementById('inputObs').value = reserva.observacao || '';
@@ -1567,7 +1738,7 @@
         } else {
           campoPsicologa.value = usuarioLogado.nome;
           campoPsicologa.readOnly = true;
-          campoPsicologa.style.background = '#f8fafc';
+          campoPsicologa.style.background = '#F8FAFC';
         }
 
         document.getElementById('inputObs').value = '';
