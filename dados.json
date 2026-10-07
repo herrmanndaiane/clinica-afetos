@@ -1,0 +1,1763 @@
+{
+  "reservas": [
+    {
+      "id": "res_1791296256384_z6id",
+      "data": "2026-10-06",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.384Z"
+    },
+    {
+      "id": "res_1791296256384_andd",
+      "data": "2026-10-13",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.384Z"
+    },
+    {
+      "id": "res_1791296256384_ft82",
+      "data": "2026-10-20",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.384Z"
+    },
+    {
+      "id": "res_1791296256385_gdp7",
+      "data": "2026-10-27",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_4z1w",
+      "data": "2026-11-03",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_rnqz",
+      "data": "2026-11-10",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_mmbz",
+      "data": "2026-11-17",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_h1g9",
+      "data": "2026-11-24",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_rrt6",
+      "data": "2026-12-01",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_gsst",
+      "data": "2026-12-08",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_cxle",
+      "data": "2026-12-15",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_2u8f",
+      "data": "2026-12-22",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_j2co",
+      "data": "2026-12-29",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296256385_z3f3",
+      "data": "2027-01-05",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:36.385Z"
+    },
+    {
+      "id": "res_1791296265209_v1ae",
+      "data": "2026-10-06",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_ikr3",
+      "data": "2026-10-13",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_y0ec",
+      "data": "2026-10-20",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_l6o3",
+      "data": "2026-10-27",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_q0t0",
+      "data": "2026-11-03",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_c89k",
+      "data": "2026-11-10",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_6ofd",
+      "data": "2026-11-17",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_2ojt",
+      "data": "2026-11-24",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_7qjc",
+      "data": "2026-12-01",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_1vf8",
+      "data": "2026-12-08",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_7r45",
+      "data": "2026-12-15",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_igv7",
+      "data": "2026-12-22",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_z582",
+      "data": "2026-12-29",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296265209_ijnj",
+      "data": "2027-01-05",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:45.209Z"
+    },
+    {
+      "id": "res_1791296275570_t1rp",
+      "data": "2026-10-07",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_154w",
+      "data": "2026-10-14",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_h5p9",
+      "data": "2026-10-21",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_zedx",
+      "data": "2026-10-28",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_2pz6",
+      "data": "2026-11-04",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_vobe",
+      "data": "2026-11-11",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_iqxz",
+      "data": "2026-11-18",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_nle0",
+      "data": "2026-11-25",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_z9a9",
+      "data": "2026-12-02",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_jhi9",
+      "data": "2026-12-09",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_ixws",
+      "data": "2026-12-16",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_idc7",
+      "data": "2026-12-23",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_b1a9",
+      "data": "2026-12-30",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296275570_r3d3",
+      "data": "2027-01-06",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:17:55.570Z"
+    },
+    {
+      "id": "res_1791296288105_g22k",
+      "data": "2026-10-07",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_pn6s",
+      "data": "2026-10-14",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_9yer",
+      "data": "2026-10-21",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_3hx7",
+      "data": "2026-10-28",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_ruhk",
+      "data": "2026-11-04",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_9ike",
+      "data": "2026-11-11",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_jrgz",
+      "data": "2026-11-18",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_xsqr",
+      "data": "2026-11-25",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_iqwf",
+      "data": "2026-12-02",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_cix4",
+      "data": "2026-12-09",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_1oik",
+      "data": "2026-12-16",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_9a52",
+      "data": "2026-12-23",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_0so9",
+      "data": "2026-12-30",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296288105_hxt2",
+      "data": "2027-01-06",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:08.105Z"
+    },
+    {
+      "id": "res_1791296295753_yw6v",
+      "data": "2026-10-08",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_2oah",
+      "data": "2026-10-15",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_hq2u",
+      "data": "2026-10-22",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_xnok",
+      "data": "2026-10-29",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_83ax",
+      "data": "2026-11-05",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_qg1y",
+      "data": "2026-11-12",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_7grd",
+      "data": "2026-11-19",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_1inp",
+      "data": "2026-11-26",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_jb4i",
+      "data": "2026-12-03",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.753Z"
+    },
+    {
+      "id": "res_1791296295753_7nzq",
+      "data": "2026-12-10",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.754Z"
+    },
+    {
+      "id": "res_1791296295754_q7g5",
+      "data": "2026-12-17",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.754Z"
+    },
+    {
+      "id": "res_1791296295754_brdq",
+      "data": "2026-12-24",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.754Z"
+    },
+    {
+      "id": "res_1791296295754_qk0d",
+      "data": "2026-12-31",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.754Z"
+    },
+    {
+      "id": "res_1791296295754_irjg",
+      "data": "2027-01-07",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:15.754Z"
+    },
+    {
+      "id": "res_1791296304217_kdif",
+      "data": "2026-10-08",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304217_7n3a",
+      "data": "2026-10-15",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304217_amfg",
+      "data": "2026-10-22",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304217_x280",
+      "data": "2026-10-29",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304217_n63h",
+      "data": "2026-11-05",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304217_x4xe",
+      "data": "2026-11-12",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304217_sq2h",
+      "data": "2026-11-19",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.217Z"
+    },
+    {
+      "id": "res_1791296304218_ndgt",
+      "data": "2026-11-26",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296304218_rti4",
+      "data": "2026-12-03",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296304218_36lj",
+      "data": "2026-12-10",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296304218_6fsg",
+      "data": "2026-12-17",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296304218_29ld",
+      "data": "2026-12-24",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296304218_s2q0",
+      "data": "2026-12-31",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296304218_ci0i",
+      "data": "2027-01-07",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:24.218Z"
+    },
+    {
+      "id": "res_1791296314252_sqw0",
+      "data": "2026-10-08",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_0w0z",
+      "data": "2026-10-15",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_c2wd",
+      "data": "2026-10-22",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_cpn4",
+      "data": "2026-10-29",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_ckfz",
+      "data": "2026-11-05",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_umbf",
+      "data": "2026-11-12",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_ifpj",
+      "data": "2026-11-19",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_03rq",
+      "data": "2026-11-26",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_a9ms",
+      "data": "2026-12-03",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_8lkh",
+      "data": "2026-12-10",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_es41",
+      "data": "2026-12-17",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_lo39",
+      "data": "2026-12-24",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_4x31",
+      "data": "2026-12-31",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296314252_o883",
+      "data": "2027-01-07",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:34.252Z"
+    },
+    {
+      "id": "res_1791296321459_lhys",
+      "data": "2026-10-09",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_im07",
+      "data": "2026-10-16",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_h7kb",
+      "data": "2026-10-23",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_ekhi",
+      "data": "2026-10-30",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_ikre",
+      "data": "2026-11-06",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_bpqj",
+      "data": "2026-11-13",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_x4gb",
+      "data": "2026-11-20",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_jdik",
+      "data": "2026-11-27",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_wh4i",
+      "data": "2026-12-04",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_n5bm",
+      "data": "2026-12-11",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_ysyz",
+      "data": "2026-12-18",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_xs15",
+      "data": "2026-12-25",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_dqyc",
+      "data": "2027-01-01",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296321459_22r4",
+      "data": "2027-01-08",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:41.459Z"
+    },
+    {
+      "id": "res_1791296331222_1tl2",
+      "data": "2026-10-09",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_0d4v",
+      "data": "2026-10-16",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_3j9i",
+      "data": "2026-10-23",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_rc2m",
+      "data": "2026-10-30",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_to8u",
+      "data": "2026-11-06",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_t0ps",
+      "data": "2026-11-13",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_0x60",
+      "data": "2026-11-20",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_fcxc",
+      "data": "2026-11-27",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_83t6",
+      "data": "2026-12-04",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_g5pu",
+      "data": "2026-12-11",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_k5zz",
+      "data": "2026-12-18",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_1z71",
+      "data": "2026-12-25",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_flip",
+      "data": "2027-01-01",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296331222_6i7m",
+      "data": "2027-01-08",
+      "turno": "tarde",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:18:51.222Z"
+    },
+    {
+      "id": "res_1791296341594_eztk",
+      "data": "2026-10-09",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_b31g",
+      "data": "2026-10-16",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_z6y1",
+      "data": "2026-10-23",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_ryl2",
+      "data": "2026-10-30",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_8iz8",
+      "data": "2026-11-06",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_03s1",
+      "data": "2026-11-13",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_hh3v",
+      "data": "2026-11-20",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_frep",
+      "data": "2026-11-27",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_b46l",
+      "data": "2026-12-04",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_s2yr",
+      "data": "2026-12-11",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_hgjm",
+      "data": "2026-12-18",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_ooyd",
+      "data": "2026-12-25",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_yvlx",
+      "data": "2027-01-01",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296341594_teee",
+      "data": "2027-01-08",
+      "turno": "noite",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:01.594Z"
+    },
+    {
+      "id": "res_1791296349147_nqup",
+      "data": "2026-10-06",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_pah1",
+      "data": "2026-10-13",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_htan",
+      "data": "2026-10-20",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_2enc",
+      "data": "2026-10-27",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_v1m7",
+      "data": "2026-11-03",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_xnbg",
+      "data": "2026-11-10",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_66dk",
+      "data": "2026-11-17",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_as9u",
+      "data": "2026-11-24",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_twwk",
+      "data": "2026-12-01",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_rnvh",
+      "data": "2026-12-08",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_f9j2",
+      "data": "2026-12-15",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_pjjb",
+      "data": "2026-12-22",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_4hqn",
+      "data": "2026-12-29",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296349148_95gm",
+      "data": "2027-01-05",
+      "turno": "manha",
+      "sala": "sala1",
+      "psicologa": "Karine",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:09.148Z"
+    },
+    {
+      "id": "res_1791296378320_hvug",
+      "data": "2026-10-05",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_ypiq",
+      "data": "2026-10-12",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_vkem",
+      "data": "2026-10-19",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_b4ai",
+      "data": "2026-10-26",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_3311",
+      "data": "2026-11-02",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_xkrj",
+      "data": "2026-11-09",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_ymr3",
+      "data": "2026-11-16",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_vwze",
+      "data": "2026-11-23",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_2h7u",
+      "data": "2026-11-30",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_50u4",
+      "data": "2026-12-07",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_qutn",
+      "data": "2026-12-14",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_gef4",
+      "data": "2026-12-21",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_o1dq",
+      "data": "2026-12-28",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    },
+    {
+      "id": "res_1791296378320_5d7h",
+      "data": "2027-01-04",
+      "turno": "tarde",
+      "sala": "sala2",
+      "psicologa": "Marília",
+      "observacao": "Atendimento presencial",
+      "criadoPor": "Recepção",
+      "criadoEm": "2026-10-06T14:19:38.320Z"
+    }
+  ],
+  "despesas": [],
+  "pacientes": [],
+  "lancamentosPacientes": {},
+  "escalaLimpeza": {
+    "2026-10_semana1": {
+      "responsavel": "Catia",
+      "concluido": false
+    },
+    "2026-10_semana2": {
+      "responsavel": "Karine",
+      "concluido": false
+    },
+    "2026-10_semana3": {
+      "responsavel": "Marília",
+      "concluido": false
+    },
+    "2026-10_semana4": {
+      "responsavel": "Natália",
+      "concluido": false
+    },
+    "2026-11_semana1": {
+      "responsavel": "Karine",
+      "concluido": false
+    },
+    "2026-11_semana2": {
+      "responsavel": "Natália",
+      "concluido": false
+    },
+    "2026-11_semana3": {
+      "responsavel": "Marília",
+      "concluido": false
+    },
+    "2026-11_semana4": {
+      "responsavel": "Katia",
+      "concluido": false
+    },
+    "2026-11_semana5": {
+      "responsavel": "Karine",
+      "concluido": false
+    },
+    "2026-12_semana1": {
+      "responsavel": "Catia",
+      "concluido": false
+    },
+    "2026-12_semana2": {
+      "responsavel": "Karine",
+      "concluido": false
+    },
+    "2026-12_semana3": {
+      "responsavel": "Natália",
+      "concluido": false
+    },
+    "2026-12_semana4": {
+      "responsavel": "Marília",
+      "concluido": false
+    }
+  },
+  "usuarios": {
+    "karine": {
+      "nome": "Karine",
+      "senha": "K4R!n3"
+    },
+    "natalia": {
+      "nome": "Natália",
+      "senha": "N4T@li4"
+    },
+    "marilia": {
+      "nome": "Marília",
+      "senha": "M4RiLi4"
+    },
+    "recepcao": {
+      "nome": "Recepção",
+      "senha": "1Atpd@VPGC!"
+    },
+    "katia": {
+      "nome": "Catia",
+      "senha": "Mudar123"
+    }
+  }
+}
