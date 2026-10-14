@@ -414,11 +414,12 @@
     // ⬇️ COLE AQUI OS DADOS DO SEU PAINEL SUPABASE ⬇️
     // =========================================================
     const SUPABASE_CONFIG = {
-      url: 'https://pqijrhqindehawsvqxdp.supabase.co/rest/v1/', 
-      anonKey: 'sb_publishable_Qoyx-3TtLVjrcCPqRiXV2Q_tVmC7c0v' 
+      url: 'https://pqijrhqindehawsvqxdp.supabase.co', 
+      anonKey: 'sb_publishable_Qoyx-3TtLVjrcCPqRiXV2Q_tvmC7c0v' 
     };
 
-    const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    // Usamos 'dbSupabase' ou 'supabaseClient' para não conflitar com a biblioteca global
+    const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
     // Mapeamento dos usuários para os e-mails criados no Supabase Auth
     const MAPA_USUARIOS = {
@@ -463,15 +464,15 @@
     async function carregarDados() {
       try {
         // 1. Puxa os dados compartilhados da clínica (Salas, Limpeza, Despesas)
-        const { data: pubData, error: pubErr } = await supabase.from('clinica_compartilhada').select('*').eq('id', 1).single();
+        const { data: pubData, error: pubErr } = await dbSupabase.from('clinica_compartilhada').select('*').eq('id', 1).single();
         if (pubErr) throw pubErr;
 
         // 2. Puxa APENAS os pacientes da psicóloga logada (Protegido via RLS)
-        let { data: privData, error: privErr } = await supabase.from('clinica_privada').select('*').eq('user_id', authUserAtual.id).single();
+        let { data: privData, error: privErr } = await dbSupabase.from('clinica_privada').select('*').eq('user_id', authUserAtual.id).single();
         
         // Se for o primeiro acesso da psicóloga, ela não terá linha na tabela. Criamos agora:
         if (!privData && privErr && privErr.code === 'PGRST116') {
-          const { data: newPriv } = await supabase.from('clinica_privada').insert({ user_id: authUserAtual.id }).select().single();
+          const { data: newPriv } = await dbSupabase.from('clinica_privada').insert({ user_id: authUserAtual.id }).select().single();
           privData = newPriv || { pacientes: [], lancamentos: {} };
         } else if (privErr) {
           throw privErr;
@@ -496,7 +497,7 @@
 
     async function guardarDados() {
       try {
-        await supabase.from('clinica_compartilhada').update({
+        await dbSupabase.from('clinica_compartilhada').update({
           reservas: dadosJsonBin.reservas,
           despesas: dadosJsonBin.despesas,
           escala_limpeza: dadosJsonBin.escalaLimpeza
@@ -510,7 +511,7 @@
           email: encriptarTexto(p.email)
         }));
 
-        await supabase.from('clinica_privada').update({
+        await dbSupabase.from('clinica_privada').update({
           pacientes: pacientesCriptografados,
           lancamentos: dadosJsonBin.lancamentosPacientes
         }).eq('user_id', authUserAtual.id);
@@ -546,7 +547,7 @@
       if (!key) { alert("Selecione um usuário."); return; }
       
       const emailFormatado = MAPA_USUARIOS[key].email;
-      const { data, error } = await supabase.auth.signInWithPassword({ email: emailFormatado, password: senhaDigitada });
+      const { data, error } = await dbSupabase.auth.signInWithPassword({ email: emailFormatado, password: senhaDigitada });
 
       if (error) { alert('Senha incorreta ou usuário não cadastrado no Supabase!'); return; }
 
@@ -561,7 +562,7 @@
     async function verificarSessao() {
       atualizarSelectUsuariosLogin();
       const keySalva = localStorage.getItem('usuarioLogadoKey');
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await dbSupabase.auth.getSession();
 
       if (keySalva && session) {
         userKeyAtual = keySalva;
@@ -575,7 +576,7 @@
     }
 
     async function realizarLogout() {
-      await supabase.auth.signOut();
+      await dbSupabase.auth.signOut();
       localStorage.removeItem('usuarioLogadoKey');
       userKeyAtual = null; authUserAtual = null;
       document.getElementById('telaLogin').style.display = 'flex';
@@ -894,7 +895,7 @@
       if (nova.length < 6) return alert('A senha deve ter no mínimo 6 caracteres.');
       if (nova !== conf) return alert('As senhas não coincidem.');
       
-      const { error } = await supabase.auth.updateUser({ password: nova });
+      const { error } = await dbSupabase.auth.updateUser({ password: nova });
       if(error) alert('Erro ao atualizar senha no servidor.');
       else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
     }
