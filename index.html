@@ -43,7 +43,7 @@
     .slot-card.pro-karine { background-color: #501422 !important; border: 1px solid #3A0F19 !important; color: #FFFFFF !important; }
     .slot-card.pro-natalia { background-color: #14361E !important; border: 1px solid #0D2413 !important; color: #FFFFFF !important; }
     .slot-card.pro-marilia { background-color: #80263B !important; border: 1px solid #5C1A29 !important; color: #FFFFFF !important; }
-    .slot-card.pro-katia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
+    .slot-card.pro-catia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
     .slot-card.pro-recepcao { background-color: #6B1D2F !important; border: 1px solid #4A1220 !important; color: #FFFFFF !important; }
     .slot-card.pro-outros { background-color: #4A4A4A !important; border: 1px solid #333333 !important; color: #FFFFFF !important; }
 
@@ -426,7 +426,7 @@
       'karine':   { nome: 'Karine', email: 'karine@clinica.local' },
       'natalia':  { nome: 'Natália', email: 'natalia@clinica.local' },
       'marilia':  { nome: 'Marília', email: 'marilia@clinica.local' },
-      'katia':    { nome: 'Katia', email: 'katia@clinica.local' },
+      'catia':    { nome: 'catia', email: 'catia@clinica.local' },
       'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
     };
 
@@ -661,7 +661,7 @@
         if (n.includes('karine')) corBg = '#501422';
         else if (n.includes('natalia') || n.includes('natália')) corBg = '#14361E';
         else if (n.includes('marilia') || n.includes('marília')) corBg = '#80263B';
-        else if (n.includes('katia')) corBg = '#2D5A38';
+        else if (n.includes('catia')) corBg = '#2D5A38';
         item.innerHTML = `<div class="legenda-cor" style="background:${corBg};"></div> ${u.nome}`;
         container.appendChild(item);
       });
@@ -674,7 +674,7 @@
       if (n.includes('karine')) return 'pro-karine';
       if (n.includes('natália') || n.includes('natalia')) return 'pro-natalia';
       if (n.includes('marília') || n.includes('marilia')) return 'pro-marilia';
-      if (n.includes('katia')) return 'pro-katia';
+      if (n.includes('catia')) return 'pro-catia';
       return 'pro-outros';
     }
 
