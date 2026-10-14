@@ -898,7 +898,10 @@
       if(error) alert('Erro ao atualizar senha no servidor.');
       else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
     }
-    verificarSessao();
+    document.addEventListener('DOMContentLoaded', () => {
+  atualizarSelectUsuariosLogin();
+  verificarSessao();
+});
   </script>
 </body>
 </html>
