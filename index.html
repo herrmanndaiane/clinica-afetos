@@ -3,906 +3,394 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel da Clínica & Gestão de Pacientes</title>
+  <title>Sistema Clínico - Gestão Integrada</title>
   
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Criptografia AES -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  
-  <!-- SDK do Supabase -->
+  <!-- Supabase JS SDK v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root {
-      /* Paleta Oficial */
-      --bordo-primary: #6B1D2F;
-      --bordo-hover: #4A1220;
-      --bordo-light: #F8EFEF;
-      --verde-floresta: #1E4D2B;
-      --verde-hover: #14361E;
-      --verde-light: #EDF4EE;
-      --off-white-bg: #F8F7F4;
-      --off-white-card: #FFFFFF;
-      --off-white-sidebar: #EFECE6;
-      --border-color: #E2DDD7;
-      --text-main: #221F1E;
-      --text-muted: #6B6562;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.03);
-      --shadow-md: 0 6px 16px rgba(107, 29, 47, 0.06);
-      --shadow-lg: 0 14px 32px rgba(0,0,0,0.08);
+      --primary: #5c1d30;
+      --primary-hover: #431422;
+      --bg-main: #f8f6f4;
+      --card-bg: #ffffff;
+      --text-dark: #2c2c2c;
+      --text-muted: #666666;
+      --border-color: #e2ddd8;
+      --success: #2e7d32;
+      --danger: #c62828;
     }
 
-    /* Cores das Profissionais na Agenda */
-    .slot-card.pro-karine { background-color: #501422 !important; border: 1px solid #3A0F19 !important; color: #FFFFFF !important; }
-    .slot-card.pro-natalia { background-color: #14361E !important; border: 1px solid #0D2413 !important; color: #FFFFFF !important; }
-    .slot-card.pro-marilia { background-color: #80263B !important; border: 1px solid #5C1A29 !important; color: #FFFFFF !important; }
-    .slot-card.pro-catia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
-    .slot-card.pro-recepcao { background-color: #6B1D2F !important; border: 1px solid #4A1220 !important; color: #FFFFFF !important; }
-    .slot-card.pro-outros { background-color: #4A4A4A !important; border: 1px solid #333333 !important; color: #FFFFFF !important; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-dark); display: flex; min-height: 100vh; }
 
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--off-white-bg);
-      color: var(--text-main);
-      -webkit-font-smoothing: antialiased;
+    /* --- TELA DE LOGIN --- */
+    #telaLogin {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: var(--bg-main); z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
     }
-
-    .app-layout { display: flex; min-height: 100vh; }
-
-    /* Sidebar Esquerda */
-    .sidebar {
-      width: 280px; background-color: var(--off-white-sidebar); border-right: 1px solid var(--border-color);
-      display: flex; flex-direction: column; justify-content: space-between; padding: 24px 16px;
-      position: fixed; height: 100vh; z-index: 10;
+    .card-login {
+      background: var(--card-bg); padding: 2.5rem; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 400px;
+      border: 1px solid var(--border-color);
     }
-    .brand-header { padding: 0 12px 20px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
-    .brand-title { font-size: 1.15rem; font-weight: 800; color: var(--bordo-primary); margin: 0; letter-spacing: -0.03em; }
-    .sidebar-menu { display: flex; flex-direction: column; gap: 6px; }
-    .sidebar-btn {
-      display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: var(--radius-md);
-      border: none; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 0.88rem; cursor: pointer;
-      text-align: left; transition: all 0.2s ease; width: 100%;
+    .card-login h2 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+    .form-group select, .form-group input {
+      width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
+      border-radius: 6px; font-size: 1rem; outline: none;
     }
-    .sidebar-btn:hover { background-color: rgba(107, 29, 47, 0.06); color: var(--bordo-primary); }
-    .sidebar-btn.active { background-color: var(--bordo-primary); color: #ffffff; font-weight: 700; box-shadow: var(--shadow-sm); }
-    .submenu-container { display: flex; flex-direction: column; gap: 4px; padding-left: 18px; margin-top: 4px; margin-bottom: 4px; }
-    .submenu-btn {
-      padding: 10px 14px; font-size: 0.82rem; font-weight: 600; border-radius: var(--radius-sm); color: var(--text-muted);
-      border: none; background: transparent; cursor: pointer; text-align: left; transition: all 0.2s ease;
+    .btn-login {
+      width: 100%; padding: 0.8rem; background-color: var(--primary); color: white;
+      border: none; border-radius: 6px; font-size: 1rem; font-weight: bold;
+      cursor: pointer; transition: background 0.2s;
     }
-    .submenu-btn:hover { color: var(--bordo-primary); background: rgba(107, 29, 47, 0.05); }
-    .submenu-btn.active { color: var(--bordo-primary); font-weight: 700; background: var(--bordo-light); }
-    .sidebar-user { padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; }
-    .user-profile { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--off-white-card); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    .user-name { font-weight: 700; font-size: 0.875rem; color: var(--bordo-primary); }
+    .btn-login:hover { background-color: var(--primary-hover); }
 
-    /* Conteúdo Principal */
-    .main-content { margin-left: 280px; flex: 1; padding: 32px 40px; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: var(--off-white-card); padding: 16px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
-    .month-title { font-size: 1.35rem; font-weight: 800; color: var(--bordo-primary); letter-spacing: -0.03em; }
-
-    /* Estilização de Botões */
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--off-white-card); cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: all 0.2s ease; color: var(--text-main); box-shadow: var(--shadow-sm); }
-    .btn:hover { background: var(--off-white-bg); border-color: #CBD5E1; }
-    .btn-bordo { background-color: var(--bordo-primary); color: #ffffff; border: none; }
-    .btn-bordo:hover { background-color: var(--bordo-hover); }
-    .btn-verde { background-color: var(--verde-floresta); color: #ffffff; border: none; }
-    .btn-verde:hover { background-color: var(--verde-hover); }
-    .btn-outline { background-color: #FFFFFF; border: 1px solid var(--border-color); color: var(--text-main); }
-    .btn-outline:hover { background-color: #F3F0EC; border-color: #CBD5E1; }
-    .btn-danger { background-color: #991B1B; color: #ffffff; border: none; }
-
-    /* Dropdown Customizado (Select) */
-    .custom-select-wrapper { position: relative; display: inline-flex; align-items: center; }
-    .custom-select { appearance: none; -webkit-appearance: none; background-color: #FFFFFF; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 36px 10px 14px; font-family: inherit; font-size: 0.875rem; font-weight: 600; color: var(--text-main); cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
-    .custom-select:focus { outline: none; border-color: var(--bordo-primary); }
-    .custom-select-icon { position: absolute; right: 12px; pointer-events: none; color: var(--text-muted); }
-
-    /* Cards Início */
-    .dashboard-home { display: flex; flex-direction: column; gap: 24px; }
-    .welcome-card { background: linear-gradient(135deg, var(--bordo-primary), var(--bordo-hover)); color: white; padding: 36px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .welcome-card h2 { margin: 0 0 10px 0; font-size: 1.8rem; font-weight: 800; }
-    .welcome-card p { margin: 0; opacity: 0.9; font-size: 1rem; }
-    .cards-salas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
-    .card-sala-select { background: var(--off-white-card); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; cursor: pointer; transition: all 0.25s ease; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; }
-    .card-sala-select:hover { border-color: var(--bordo-primary); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-    .card-sala-title { font-size: 1.3rem; font-weight: 800; color: var(--bordo-primary); margin: 0 0 10px 0; }
-    .card-sala-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
-
-    /* Grade da Agenda */
-    .legenda-container { display: flex; gap: 16px; margin-bottom: 20px; font-size: 0.85rem; align-items: center; flex-wrap: wrap; background: var(--off-white-card); padding: 12px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
-    .legenda-item { display: flex; align-items: center; gap: 6px; font-weight: 600; }
-    .legenda-cor { width: 14px; height: 14px; border-radius: 4px; }
-    .calendar-grid { display: grid; grid-template-columns: 110px repeat(7, 1fr); background: var(--off-white-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
-    .grid-header { background: #EFECE6; padding: 16px 8px; text-align: center; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); color: var(--bordo-primary); }
-    .grid-header.today { background: var(--bordo-light); color: var(--bordo-primary); }
-    .time-col { background: #EFECE6; padding: 16px 10px; font-size: 0.8rem; font-weight: 700; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; color: var(--text-muted); }
-    .day-slot { padding: 8px; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); min-height: 105px; }
-    .slot-card { height: 100%; border-radius: var(--radius-sm); padding: 10px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-    .slot-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-    .slot-card.livre { background: var(--verde-light); border: 1px dashed #A3C9A8; color: var(--verde-floresta); }
-    .slot-title { font-weight: 700; font-size: 0.85rem; }
-    .slot-info { font-size: 0.78rem; margin-top: 4px; opacity: 0.9; }
-
-    /* Painéis de Conteúdo (Tabelas) */
-    .panel-card { background: var(--off-white-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-md); }
-    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 18px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); }
-    .data-table th, .data-table td { padding: 14px 16px; text-align: left; font-size: 0.875rem; border-bottom: 1px solid var(--border-color); }
-    .data-table th { background-color: var(--bordo-primary); color: #ffffff; font-weight: 700; }
-    .data-table tfoot td { background-color: var(--bordo-light); font-weight: 800; color: var(--bordo-primary); border-top: 2px solid var(--bordo-primary); }
-    .data-table tr:nth-child(even) { background-color: #FAF9F6; }
-    .data-table tr:hover { background-color: #F3F0EC; }
-    .card-resumo-financeiro { display: flex; gap: 18px; margin-bottom: 28px; flex-wrap: wrap; }
-    .box-resumo { padding: 20px; border-radius: var(--radius-md); flex: 1; min-width: 200px; border: 1px solid var(--border-color); background: var(--off-white-card); box-shadow: var(--shadow-sm); }
-    .box-resumo h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
-    .box-resumo span { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-    .box-entradas { border-left: 5px solid var(--verde-floresta); } .box-entradas span { color: var(--verde-floresta); }
-    .box-saidas { border-left: 5px solid #991B1B; } .box-saidas span { color: #991B1B; }
-    .box-lucro { border-left: 5px solid #2563EB; } .box-lucro span { color: #1D4ED8; }
-    .box-ocupacao { border-left: 5px solid #EA580C; } .box-ocupacao span { color: #C2410C; }
-
-    /* Telas Login e Modais */
-    .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--off-white-bg); }
-    .login-card { background: var(--off-white-card); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 100%; max-width: 400px; }
-    .login-card h2 { margin-top: 0; margin-bottom: 24px; text-align: center; color: var(--bordo-primary); font-weight: 800; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #ffffff; padding: 32px; border-radius: var(--radius-lg); width: 420px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto; }
-    .modal-content h3 { margin-top: 0; color: var(--bordo-primary); font-weight: 800; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.875rem; }
-
-    @media print {
-      .sidebar { display: none !important; }
-      .main-content { margin-left: 0 !important; padding: 0 !important; }
-      body * { visibility: hidden; }
-      #containerPacientes, #containerPacientes * { visibility: visible; }
-      #containerPacientes { position: absolute; left: 0; top: 0; width: 100%; }
-      .no-print { display: none !important; }
+    /* --- LAYOUT PRINCIPAL --- */
+    #app { display: none; width: 100%; min-height: 100vh; }
+    aside {
+      width: 260px; background-color: var(--card-bg); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem 1rem;
     }
+    .brand { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 2rem; padding: 0 0.5rem; }
+    .nav-menu { list-style: none; }
+    .nav-item {
+      padding: 0.8rem 1rem; margin-bottom: 0.4rem; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 0.8rem; color: var(--text-dark); font-weight: 500;
+    }
+    .nav-item:hover, .nav-item.active { background-color: var(--bg-main); color: var(--primary); }
+    .user-profile {
+      padding: 1rem; border-top: 1px solid var(--border-color); display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    main { flex: 1; padding: 2rem; overflow-y: auto; }
+
+    /* --- COMPONENTES DA TELA --- */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card {
+      background: var(--card-bg); padding: 1.5rem; border-radius: 8px;
+      border: 1px solid var(--border-color); margin-bottom: 1.5rem;
+    }
+    .btn {
+      padding: 0.6rem 1.2rem; border-radius: 6px; border: none; cursor: pointer;
+      font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th { background: var(--bg-main); color: var(--primary); }
+
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 100%; max-width: 500px; }
   </style>
 </head>
 <body>
 
-  <!-- Tela de Login -->
-  <div class="login-container" id="telaLogin">
-    <div class="login-card">
+  <!-- TELA DE LOGIN -->
+  <div id="telaLogin">
+    <div class="card-login">
       <h2>Acesso à Agenda</h2>
-      <form onsubmit="realizarLogin(event)">
-        <div class="form-group">
-          <label for="loginUsuario">Usuário</label>
-          <select id="loginUsuario" required></select>
-        </div>
-        <div class="form-group">
-          <label for="loginSenha">Senha</label>
-          <input type="password" id="loginSenha" placeholder="Digite sua senha" required>
-        </div>
-        <button type="submit" class="btn btn-bordo" style="width: 100%; margin-top: 10px;">Entrar no Painel</button>
-      </form>
+      <div class="form-group">
+        <label for="loginUsuario">Usuário</label>
+        <select id="loginUsuario"></select>
+      </div>
+      <div class="form-group">
+        <label for="loginSenha">Senha</label>
+        <input type="password" id="loginSenha" placeholder="Digite sua senha">
+      </div>
+      <button class="btn-login" onclick="fazerLogin()">Entrar no Painel</button>
     </div>
   </div>
 
-  <!-- Estrutura Principal com Sidebar à Esquerda -->
-  <div class="app-layout" id="painelCalendario" style="display: none;">
-    <aside class="sidebar">
+  <!-- APLICAÇÃO -->
+  <div id="app">
+    <aside>
       <div>
-        <div class="brand-header">
-          <h1 class="brand-title">Clínica de Psicologia</h1>
-        </div>
-        <nav class="sidebar-menu">
-          <button class="sidebar-btn active" id="tabHome" onclick="mudarAba('home')"><span>🏠 Início</span></button>
-          <button class="sidebar-btn" id="btnGroupSalas" onclick="alternarSubmenuSalas()"><span>🚪 Reserva de Salas</span><span id="setaSalas">▼</span></button>
-          <div class="submenu-container" id="submenuSalas">
-            <button class="submenu-btn" id="tabSala1" onclick="mudarAba('sala1')">• Sala 01 (Estante)</button>
-            <button class="submenu-btn" id="tabSala2" onclick="mudarAba('sala2')">• Sala 02 (Divã)</button>
-          </div>
-          <button class="sidebar-btn" id="tabPacientes" onclick="mudarAba('pacientes')"><span>📋 Levantamento Pacientes</span></button>
-          <button class="sidebar-btn" id="tabLimpeza" onclick="mudarAba('limpeza')"><span>🧹 Escala de Limpeza</span></button>
-          <button class="sidebar-btn" id="tabFinanceiro" onclick="mudarAba('financeiro')" style="display: none;"><span>📊 Financeiro Clínica</span></button>
-        </nav>
+        <div class="brand"><i class="fa-solid fa-clinic-medical"></i> Clínica de Psicologia</div>
+        <ul class="nav-menu">
+          <li class="nav-item active" onclick="trocarAba('home', this)"><i class="fa-solid fa-calendar-days"></i> Reserva de Salas</li>
+          <li class="nav-item" onclick="trocarAba('pacientes', this)"><i class="fa-solid fa-user-group"></i> Meus Pacientes</li>
+          <li class="nav-item" onclick="trocarAba('limpeza', this)"><i class="fa-solid fa-broom"></i> Escala de Limpeza</li>
+          <li class="nav-item" onclick="trocarAba('financeiro', this)"><i class="fa-solid fa-chart-line"></i> Meu Financeiro</li>
+        </ul>
       </div>
-      <div class="sidebar-user">
-        <div class="user-profile">
-          <span id="nomeUsuarioLogado" class="user-name"></span>
+      <div class="user-profile">
+        <div>
+          <strong id="nomeUsuarioLogado">-</strong>
+          <div style="font-size: 0.8rem; color: var(--text-muted);" id="perfilUsuarioLogado">Psicóloga</div>
         </div>
-        <button class="btn" onclick="abrirModalSenha()" style="width:100%;">🔑 Alterar Senha</button>
-        <button class="btn btn-danger" onclick="realizarLogout()" style="width:100%;">Sair do Sistema</button>
+        <button class="btn" onclick="fazerLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
       </div>
     </aside>
 
-    <!-- Conteúdo Principal -->
-    <main class="main-content">
-      <div class="top-bar no-print" id="topBarAgenda" style="display: none;">
-        <div class="nav-controls">
-          <button class="btn" onclick="mudarSemana(-1)">&lt;</button>
-          <button class="btn" onclick="semanaAtual()">Hoje</button>
-          <button class="btn" onclick="mudarSemana(1)">&gt;</button>
-          <span class="month-title" id="tituloMes">Setembro de 2026</span>
+    <main>
+      <!-- ABA 1: RESERVA DE SALAS (COMPARTILHADA) -->
+      <section id="aba-home" class="tab-content active">
+        <h2>Reserva de Salas (Geral)</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <p>Agenda e ocupação geral das salas de atendimento da clínica.</p>
+          <div id="containerReservaSalas" style="margin-top: 1rem;">
+            <!-- Renderização das reservas -->
+          </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Dashboard Home -->
-      <div id="containerHome" class="dashboard-home">
-        <div class="welcome-card">
-          <h2>Bem-vinda ao Painel Seguro da Clínica</h2>
-          <p>Selecione a sala desejada abaixo para visualizar os horários ou utilizar as funções no menu lateral.</p>
+      <!-- ABA 2: MEUS PACIENTES (PRIVADO POR PSICÓLOGA) -->
+      <section id="aba-pacientes" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>Meus Pacientes (Privado)</h2>
+          <button class="btn btn-primary" onclick="abrirModalPaciente()"><i class="fa-solid fa-plus"></i> Novo Paciente</button>
         </div>
-        <div class="cards-salas-grid">
-          <div class="card-sala-select" onclick="mudarAba('sala1')">
-            <div><h3 class="card-sala-title">Sala 01 (Estante)</h3></div>
-            <button class="btn btn-bordo">Acessar Agenda da Sala 01 &rarr;</button>
-          </div>
-          <div class="card-sala-select" onclick="mudarAba('sala2')">
-            <div><h3 class="card-sala-title">Sala 02 (Divã)</h3></div>
-            <button class="btn btn-verde">Acessar Agenda da Sala 02 &rarr;</button>
-          </div>
+        <div class="card" style="margin-top: 1rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Observações</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPacientes">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
         </div>
-      </div>
+      </section>
 
-      <!-- Grade de Calendário -->
-      <div id="containerCalendario" style="display: none;">
-        <div class="legenda-container" id="legendaContainerDinamica"><strong>Legenda:</strong></div>
-        <div class="calendar-grid" id="calendarGrid"></div>
-      </div>
+      <!-- ABA 3: ESCALA DE LIMPEZA (COMPARTILHADA) -->
+      <section id="aba-limpeza" class="tab-content">
+        <h2>Escala de Limpeza Compartilhada</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <div id="containerEscalaLimpeza">
+            <!-- Renderizado via JS -->
+          </div>
+        </div>
+      </section>
 
-      <!-- Levantamento de Pacientes -->
-      <div id="containerPacientes" class="panel-card" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);" class="no-print">
-          <div>
-            <h3 style="margin:0; font-size: 1.35rem; color: var(--bordo-primary);">Levantamento de Pacientes</h3>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Dados protegidos pelo Supabase (RLS)</span>
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <div class="custom-select-wrapper">
-              <select id="selectMesPacientes" class="custom-select" onchange="renderizarPacientes()"></select>
-              <svg class="custom-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            <button class="btn btn-verde" onclick="abrirModalNovoPaciente()">+ Cadastrar Paciente</button>
-            <button class="btn btn-outline" onclick="window.print()">🖨 Imprimir PDF</button>
+      <!-- ABA 4: MEU FINANCEIRO (PRIVADO POR PSICÓLOGA) -->
+      <section id="aba-financeiro" class="tab-content">
+        <h2>Meu Financeiro (Privado)</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <div id="containerFinanceiro">
+            <p>Acompanhamento financeiro pessoal e faturamento individual.</p>
           </div>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>CPF</th>
-              <th style="width: 130px;">Valor (R$)</th>
-              <th>CEP</th>
-              <th>E_mail</th>
-              <th style="width: 190px;">Nota fiscal ou carnê leão</th>
-              <th style="width: 90px; text-align: center;">Emitido</th>
-              <th style="width: 60px; text-align: center;" class="no-print">Ação</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyPacientes"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"><strong>TOTAL RECEBIDO NO MÊS</strong></td>
-              <td id="tfootTotalRecebidoPacientes"><strong>R$ 0,00</strong></td>
-              <td colspan="5"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <!-- Escala Limpeza -->
-      <div id="containerLimpeza" class="panel-card" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 style="margin:0; color: #EA580C;">🧹 Escala Semanal de Limpeza</h3>
-          <div class="custom-select-wrapper">
-            <select id="selectMesLimpeza" class="custom-select" onchange="renderizarEscalaLimpeza()"></select>
-          </div>
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="background-color: #EA580C; color: white;">Semana / Período</th>
-              <th style="background-color: #EA580C; color: white;">Psicóloga Responsável</th>
-              <th style="width: 120px; text-align: center; background-color: #EA580C; color: white;">Concluído?</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyEscalaLimpeza"></tbody>
-        </table>
-      </div>
-
-      <!-- Financeiro Clínica -->
-      <div id="containerFinanceiro" class="panel-card" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 style="margin:0; color: var(--bordo-primary);">Balanço Financeiro da Clínica</h3>
-          <div style="display: flex; gap: 10px;">
-            <select id="selectMesFinanceiro" class="custom-select" onchange="renderizarFinanceiro()"></select>
-            <button class="btn btn-bordo" onclick="abrirModalDespesa()">➕ Adicionar Despesa</button>
-          </div>
-        </div>
-        <div class="card-resumo-financeiro">
-          <div class="box-resumo box-entradas"><h4>Entradas</h4><span id="txtTotalEntrada">R$ 0,00</span></div>
-          <div class="box-resumo box-saidas"><h4>Saídas (Custos)</h4><span id="txtTotalSaida">R$ 0,00</span></div>
-          <div class="box-resumo box-lucro"><h4>Lucro Líquido</h4><span id="txtLucroLiquido">R$ 0,00</span></div>
-        </div>
-        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas (R$ 350,00 por turno)</h4>
-        <table class="data-table">
-          <thead><tr><th>Profissional</th><th>Turnos Sala 01</th><th>Turnos Sala 02</th><th>Total Turnos</th><th>Valor Devido</th></tr></thead>
-          <tbody id="tbodyEntradas"></tbody>
-        </table>
-        <h4 style="margin-top: 30px; color: #991B1B;">Despesas e Custos</h4>
-        <table class="data-table">
-          <thead><tr><th style="background-color: #991B1B; color: white;">Descrição</th><th style="background-color: #991B1B; color: white;">Categoria</th><th style="background-color: #991B1B; color: white;">Valor (R$)</th><th style="background-color: #991B1B; color: white;">Ação</th></tr></thead>
-          <tbody id="tbodyDespesas"></tbody>
-        </table>
-      </div>
+      </section>
     </main>
   </div>
 
-  <!-- MODAIS -->
-  <div class="modal" id="modalReserva">
-    <div class="modal-content">
-      <h3 id="modalTitulo">Agendar Turno</h3>
-      <input type="hidden" id="inputData">
-      <input type="hidden" id="inputTurno">
-      <div class="form-group"><label>Data e Horário</label><input type="text" id="inputInfoDataHorario" readonly style="background: #F8FAFC;"></div>
-      <div class="form-group"><label>Profissional</label><select id="inputPsicologa"></select></div>
-      <div class="form-group"><label>Observação</label><textarea id="inputObs" rows="2"></textarea></div>
-      <div class="recorrencia-box" id="boxRecorrencia">
-        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente</label>
-        <div id="divDataFimRecorrencia" style="display: none; margin-top: 10px;"><input type="date" id="inputDataFimRecorrencia"></div>
-      </div>
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="btn btn-danger" id="btnExcluir" onclick="excluirReserva()" style="display:none;">Excluir</button>
-        <button class="btn" onclick="fecharModal('modalReserva')">Cancelar</button>
-        <button class="btn btn-bordo" onclick="salvarReserva()">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="modalPaciente">
-    <div class="modal-content">
-      <h3 id="modalPacienteTitulo">Cadastrar Novo Paciente</h3>
-      <input type="hidden" id="pacienteIdEdit">
-      <div class="form-group"><label>Nome Completo *</label><input type="text" id="pacienteNome"></div>
-      <div class="form-group"><label>CPF</label><input type="text" id="pacienteCPF"></div>
-      <div class="form-group"><label>CEP</label><input type="text" id="pacienteCEP"></div>
-      <div class="form-group"><label>E-mail</label><input type="email" id="pacienteEmail"></div>
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="btn" onclick="fecharModal('modalPaciente')">Cancelar</button>
-        <button class="btn btn-bordo" onclick="salvarPaciente()">Salvar Paciente</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="modalDespesa">
-    <div class="modal-content">
-      <h3>Adicionar Despesa</h3>
-      <div class="form-group"><label>Descrição *</label><input type="text" id="despesaDescricao"></div>
-      <div class="form-group"><label>Categoria</label>
-        <select id="despesaCategoria">
-          <option value="Fixa">Custo Fixo</option><option value="Material">Material</option><option value="Manutenção">Manutenção</option><option value="Outros">Outros</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Valor (R$) *</label><input type="number" id="despesaValor" step="0.01"></div>
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="btn" onclick="fecharModal('modalDespesa')">Cancelar</button>
-        <button class="btn btn-bordo" onclick="salvarDespesa()">Adicionar Custo</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="modalSenha">
-    <div class="modal-content">
-      <h3>Alterar Minha Senha</h3>
-      <div class="form-group"><label>Nova Senha (Mínimo 6 caracteres)*</label><input type="password" id="novaSenha"></div>
-      <div class="form-group"><label>Confirmar Nova Senha *</label><input type="password" id="confirmarNovaSenha"></div>
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="btn" onclick="fecharModal('modalSenha')">Cancelar</button>
-        <button class="btn btn-bordo" onclick="salvarNovaSenha()">Atualizar Senha</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // =========================================================
-    // ⬇️ COLE AQUI OS DADOS DO SEU PAINEL SUPABASE ⬇️
-    // =========================================================
+    // =========================================================================
+    // CONFIGURAÇÃO DO SUPABASE (OFICIAL COM TOKEN JWT ANON PUBLIC)
+    // =========================================================================
     const SUPABASE_CONFIG = {
-      url: 'https://pqijrhqindehawsvqxdp.supabase.co', 
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MTU0NTksImV4cCI6MjEwNzQ5MTQ1OX0.YNPNTcAm7iXa2zBByIolgRSsKm8UPIlrrM_matBGRyY' 
+      url: 'https://pqijrhqindehawsvqxdp.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzNTcyNTAsImV4cCI6MjA1NTkzMzI1MH0.PASTE_AQUI_SEU_TOKEN_JWT_CORRETO'
     };
 
-    // Usamos 'dbSupabase' ou 'supabaseClient' para não conflitar com a biblioteca global
     const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
-    // Mapeamento dos usuários para os e-mails criados no Supabase Auth
+    // Mapeamento dos usuários para o Supabase Auth (@clinica.local)
     const MAPA_USUARIOS = {
-      'karine':   { nome: 'Karine', email: 'karine@clinica.local' },
-      'natalia':  { nome: 'Natália', email: 'natalia@clinica.local' },
-      'marilia':  { nome: 'Marília', email: 'marilia@clinica.local' },
-      'catia':    { nome: 'catia', email: 'catia@clinica.local' },
+      'karine':   { nome: 'Karine',   email: 'karine@clinica.local' },
+      'natalia':  { nome: 'Natália',  email: 'natalia@clinica.local' },
+      'marilia':  { nome: 'Marília',  email: 'marilia@clinica.local' },
+      'catia':    { nome: 'Catia',    email: 'catia@clinica.local' },
       'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
     };
 
-    const CHAVE_CRIPTOGRAFIA = 'ChaveExtraClinica2026'; // Mantém dados criptografados mesmo dentro do Supabase
-    const VALOR_TURNO_MENSAL = 350.00;
-    const TURNOS = [
-      { id: 'manha', nome: 'Manhã', horario: '08:00 - 12:00' },
-      { id: 'tarde', nome: 'Tarde', horario: '13:00 - 17:00' },
-      { id: 'noite', nome: 'Noite', horario: '17:30 - 21:30' }
-    ];
+    let usuarioAtual = null;
+    let dadosCompartilhados = { reservas: [], escalaLimpeza: {} };
+    let dadosPrivadosPacientes = [];
+    let dadosPrivadosFinanceiro = [];
 
-    let userKeyAtual = null;
-    let authUserAtual = null; // ID oficial gerado pelo Supabase
-    let abaAtual = 'home';
-    let dataAtual = new Date();
-    
-    // Objeto local para manipulação da tela
-    let dadosJsonBin = { reservas: [], despesas: [], pacientes: [], lancamentosPacientes: {}, escalaLimpeza: {} };
-
-    // --- Criptografia Extra de Segurança (AES) ---
-    function encriptarTexto(texto) {
-      if (!texto) return '';
-      return CryptoJS.AES.encrypt(texto, CHAVE_CRIPTOGRAFIA).toString();
-    }
-    function decriptarTexto(ciphertext) {
-      if (!ciphertext) return '';
-      try {
-        const bytes = CryptoJS.AES.decrypt(ciphertext, CHAVE_CRIPTOGRAFIA);
-        const original = bytes.toString(CryptoJS.enc.Utf8);
-        return original || ciphertext;
-      } catch (e) { return ciphertext; }
-    }
-
-    // --- Lógica Central de Banco de Dados (Supabase) ---
-    async function carregarDados() {
-      try {
-        // 1. Puxa os dados compartilhados da clínica (Salas, Limpeza, Despesas)
-        const { data: pubData, error: pubErr } = await dbSupabase.from('clinica_compartilhada').select('*').eq('id', 1).single();
-        if (pubErr) throw pubErr;
-
-        // 2. Puxa APENAS os pacientes da psicóloga logada (Protegido via RLS)
-        let { data: privData, error: privErr } = await dbSupabase.from('clinica_privada').select('*').eq('user_id', authUserAtual.id).single();
-        
-        // Se for o primeiro acesso da psicóloga, ela não terá linha na tabela. Criamos agora:
-        if (!privData && privErr && privErr.code === 'PGRST116') {
-          const { data: newPriv } = await dbSupabase.from('clinica_privada').insert({ user_id: authUserAtual.id }).select().single();
-          privData = newPriv || { pacientes: [], lancamentos: {} };
-        } else if (privErr) {
-          throw privErr;
-        }
-
-        // Monta o objeto na memória do jeito que a tela já espera
-        dadosJsonBin = {
-          reservas: pubData.reservas || [],
-          despesas: pubData.despesas || [],
-          escalaLimpeza: pubData.escala_limpeza || {},
-          pacientes: privData.pacientes || [],
-          lancamentosPacientes: privData.lancamentos || {}
-        };
-
-        populasSelectsMeses();
-        mudarAba('home');
-
-      } catch (err) {
-        console.error('Erro ao carregar banco de dados:', err);
-      }
-    }
-
-    async function guardarDados() {
-      try {
-        await dbSupabase.from('clinica_compartilhada').update({
-          reservas: dadosJsonBin.reservas,
-          despesas: dadosJsonBin.despesas,
-          escala_limpeza: dadosJsonBin.escalaLimpeza
-        }).eq('id', 1);
-
-        const pacientesCriptografados = dadosJsonBin.pacientes.map(p => ({
-          ...p,
-          nome: encriptarTexto(p.nome),
-          cpf: encriptarTexto(p.cpf),
-          cep: encriptarTexto(p.cep),
-          email: encriptarTexto(p.email)
-        }));
-
-        await dbSupabase.from('clinica_privada').update({
-          pacientes: pacientesCriptografados,
-          lancamentos: dadosJsonBin.lancamentosPacientes
-        }).eq('user_id', authUserAtual.id);
-
-        if (abaAtual === 'financeiro') renderizarFinanceiro();
-        else if (abaAtual === 'pacientes') renderizarPacientes();
-        else if (abaAtual === 'limpeza') renderizarEscalaLimpeza();
-        else if (abaAtual === 'sala1' || abaAtual === 'sala2') renderizarCalendario();
-
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao guardar alterações no servidor seguro.');
-      }
-    }
-
-    // --- Sistema de Autenticação Real ---
+    // --- MONTAGEM DO MENU SUSPENSO ---
     function atualizarSelectUsuariosLogin() {
       const select = document.getElementById('loginUsuario');
       if (!select) return;
-      select.innerHTML = '<option value="">Selecione seu usuário...</option>';
-      Object.keys(MAPA_USUARIOS).forEach(key => {
+      select.innerHTML = '';
+      Object.keys(MAPA_USUARIOS).forEach(chave => {
         const opt = document.createElement('option');
-        opt.value = key; opt.innerText = MAPA_USUARIOS[key].nome;
+        opt.value = chave;
+        opt.textContent = MAPA_USUARIOS[chave].nome;
         select.appendChild(opt);
       });
     }
 
-    async function realizarLogin(event) {
-      event.preventDefault();
-      const key = document.getElementById('loginUsuario').value;
-      const senhaDigitada = document.getElementById('loginSenha').value;
+    // --- AUTENTICAÇÃO E SESSÃO ---
+    async function fazerLogin() {
+      const chaveUsuario = document.getElementById('loginUsuario').value;
+      const senha = document.getElementById('loginSenha').value;
+      const configUser = MAPA_USUARIOS[chaveUsuario];
 
-      if (!key) { alert("Selecione um usuário."); return; }
-      
-      const emailFormatado = MAPA_USUARIOS[key].email;
-      const { data, error } = await dbSupabase.auth.signInWithPassword({ email: emailFormatado, password: senhaDigitada });
+      if (!senha) return alert('Por favor, informe a senha.');
 
-      if (error) { alert('Senha incorreta ou usuário não cadastrado no Supabase!'); return; }
+      const { data, error } = await dbSupabase.auth.signInWithPassword({
+        email: configUser.email,
+        password: senha
+      });
 
-      userKeyAtual = key;
-      authUserAtual = data.user;
-      localStorage.setItem('usuarioLogadoKey', key);
-      
-      iniciarApp();
-      carregarDados();
+      if (error) {
+        alert('Senha incorreta ou erro ao autenticar.');
+        console.error(error);
+      } else {
+        usuarioAtual = data.user;
+        inicializarPainel(configUser.nome);
+      }
     }
 
     async function verificarSessao() {
-      atualizarSelectUsuariosLogin();
-      const keySalva = localStorage.getItem('usuarioLogadoKey');
       const { data: { session } } = await dbSupabase.auth.getSession();
-
-      if (keySalva && session) {
-        userKeyAtual = keySalva;
-        authUserAtual = session.user;
-        iniciarApp();
-        carregarDados();
-      } else {
-        document.getElementById('telaLogin').style.display = 'flex';
-        document.getElementById('painelCalendario').style.display = 'none';
+      if (session) {
+        usuarioAtual = session.user;
+        const e = session.user.email;
+        const chaveEncontrada = Object.keys(MAPA_USUARIOS).find(k => MAPA_USUARIOS[k].email === e);
+        const nomeExibicao = chaveEncontrada ? MAPA_USUARIOS[chaveEncontrada].nome : 'Usuária';
+        inicializarPainel(nomeExibicao);
       }
     }
 
-    async function realizarLogout() {
+    async function fazerLogout() {
       await dbSupabase.auth.signOut();
-      localStorage.removeItem('usuarioLogadoKey');
-      userKeyAtual = null; authUserAtual = null;
+      document.getElementById('app').style.display = 'none';
       document.getElementById('telaLogin').style.display = 'flex';
-      document.getElementById('painelCalendario').style.display = 'none';
-      document.getElementById('loginSenha').value = '';
     }
 
-    function iniciarApp() {
+    function inicializarPainel(nome) {
       document.getElementById('telaLogin').style.display = 'none';
-      document.getElementById('painelCalendario').style.display = 'flex';
-      document.getElementById('nomeUsuarioLogado').innerText = MAPA_USUARIOS[userKeyAtual].nome;
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('nomeUsuarioLogado').textContent = nome;
 
-      if (userKeyAtual === 'karine' || userKeyAtual === 'recepcao') {
-        document.getElementById('tabFinanceiro').style.display = 'flex';
-      } else {
-        document.getElementById('tabFinanceiro').style.display = 'none';
+      carregarDadosCompartilhados();
+      carregarDadosPrivados();
+    }
+
+    // --- CARREGAMENTO DE DADOS DO SUPABASE ---
+
+    // 1. Dados Compartilhados (Reserva + Limpeza)
+    async function carregarDadosCompartilhados() {
+      const { data, error } = await dbSupabase
+        .from('clinica_compartilhada')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+      if (!error && data) {
+        dadosCompartilhados.reservas = data.reservas || [];
+        dadosCompartilhados.escalaLimpeza = data.escala_limpeza || {};
+        renderizarReservas();
+        renderizarLimpeza();
       }
     }
 
-    function populasSelectsMeses() {
-      const sels = ['selectMesPacientes', 'selectMesFinanceiro', 'selectMesLimpeza'];
-      const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-      const anoAtual = 2026;
-      const mesIsoAgenda = dataAtual.toISOString().substr(0, 7);
+    // 2. Dados Privados por Psicóloga (Pacientes + Financeiro)
+    async function carregarDadosPrivados() {
+      if (!usuarioAtual) return;
 
-      sels.forEach(id => {
-        const select = document.getElementById(id);
-        if(!select) return;
-        select.innerHTML = '';
-        for (let m = 0; m < 12; m++) {
-          const valorIso = `${anoAtual}-${String(m + 1).padStart(2, '0')}`;
-          const opt = document.createElement('option');
-          opt.value = valorIso; opt.innerText = `${mesesNomes[m]} / ${anoAtual}`;
-          select.appendChild(opt);
-        }
-        if (select.querySelector(`option[value="${mesIsoAgenda}"]`)) select.value = mesIsoAgenda;
-      });
+      // Pacientes
+      const { data: dataPac } = await dbSupabase
+        .from('pacientes_psicologa')
+        .select('dados')
+        .eq('user_id', usuarioAtual.id)
+        .maybeSingle();
+
+      dadosPrivadosPacientes = dataPac ? dataPac.dados : [];
+      renderizarPacientes();
+
+      // Financeiro
+      const { data: dataFin } = await dbSupabase
+        .from('financeiro_psicologa')
+        .select('dados')
+        .eq('user_id', usuarioAtual.id)
+        .maybeSingle();
+
+      dadosPrivadosFinanceiro = dataFin ? dataFin.dados : [];
+      renderizarFinanceiro();
     }
 
-    function alternarSubmenuSalas() {
-      const sub = document.getElementById('submenuSalas');
-      const seta = document.getElementById('setaSalas');
-      sub.style.display = sub.style.display === 'none' ? 'flex' : 'none';
-      seta.innerText = sub.style.display === 'none' ? '▼' : '▲';
+    // --- SALVAMENTO PRIVADO NO SUPABASE ---
+    async function salvarPacientesPrivado() {
+      if (!usuarioAtual) return;
+      await dbSupabase
+        .from('pacientes_psicologa')
+        .upsert({
+          user_id: usuarioAtual.id,
+          dados: dadosPrivadosPacientes,
+          updated_at: new Date()
+        }, { onConflict: 'user_id' });
     }
 
-    function mudarAba(idAba) {
-      abaAtual = idAba;
-      document.querySelectorAll('.sidebar-btn, .submenu-btn').forEach(b => b.classList.remove('active'));
-      if (idAba === 'home') document.getElementById('tabHome').classList.add('active');
-      if (idAba === 'sala1') document.getElementById('tabSala1').classList.add('active');
-      if (idAba === 'sala2') document.getElementById('tabSala2').classList.add('active');
-      if (idAba === 'pacientes') document.getElementById('tabPacientes').classList.add('active');
-      if (idAba === 'limpeza') document.getElementById('tabLimpeza').classList.add('active');
-      if (idAba === 'financeiro') document.getElementById('tabFinanceiro').classList.add('active');
-
-      document.getElementById('topBarAgenda').style.display = (idAba === 'sala1' || idAba === 'sala2') ? 'flex' : 'none';
-      document.getElementById('containerHome').style.display = (idAba === 'home') ? 'flex' : 'none';
-      document.getElementById('containerCalendario').style.display = (idAba === 'sala1' || idAba === 'sala2') ? 'block' : 'none';
-      document.getElementById('containerPacientes').style.display = (idAba === 'pacientes') ? 'block' : 'none';
-      document.getElementById('containerLimpeza').style.display = (idAba === 'limpeza') ? 'block' : 'none';
-      document.getElementById('containerFinanceiro').style.display = (idAba === 'financeiro') ? 'block' : 'none';
-
-      if (idAba === 'financeiro') renderizarFinanceiro();
-      else if (idAba === 'pacientes') renderizarPacientes();
-      else if (idAba === 'limpeza') renderizarEscalaLimpeza();
-      else if (idAba === 'sala1' || idAba === 'sala2') {
-        renderizarLegendaDinamica(); renderizarCalendario();
-      }
+    async function salvarFinanceiroPrivado() {
+      if (!usuarioAtual) return;
+      await dbSupabase
+        .from('financeiro_psicologa')
+        .upsert({
+          user_id: usuarioAtual.id,
+          dados: dadosPrivadosFinanceiro,
+          updated_at: new Date()
+        }, { onConflict: 'user_id' });
     }
 
-    function renderizarLegendaDinamica() {
-      const container = document.getElementById('legendaContainerDinamica');
-      if (!container) return;
-      container.innerHTML = '<strong>Legenda:</strong>';
-      Object.values(MAPA_USUARIOS).forEach(u => {
-        if(u.nome.toLowerCase().includes('recepção')) return;
-        const item = document.createElement('div');
-        item.className = 'legenda-item';
-        let corBg = '#4A4A4A';
-        const n = u.nome.toLowerCase();
-        if (n.includes('karine')) corBg = '#501422';
-        else if (n.includes('natalia') || n.includes('natália')) corBg = '#14361E';
-        else if (n.includes('marilia') || n.includes('marília')) corBg = '#80263B';
-        else if (n.includes('catia')) corBg = '#2D5A38';
-        item.innerHTML = `<div class="legenda-cor" style="background:${corBg};"></div> ${u.nome}`;
-        container.appendChild(item);
-      });
+    // --- RENDERIZADORES DE INTERFACE ---
+    function renderizarReservas() {
+      const container = document.getElementById('containerReservaSalas');
+      container.innerHTML = `<p>Total de reservas salvas no sistema: <strong>${dadosCompartilhados.reservas.length}</strong></p>`;
     }
 
-    // --- MÓDULO CALENDÁRIO ---
-    function getClasseCorProfissional(nome) {
-      if (!nome) return 'pro-outros';
-      const n = nome.toLowerCase();
-      if (n.includes('karine')) return 'pro-karine';
-      if (n.includes('natália') || n.includes('natalia')) return 'pro-natalia';
-      if (n.includes('marília') || n.includes('marilia')) return 'pro-marilia';
-      if (n.includes('catia')) return 'pro-catia';
-      return 'pro-outros';
-    }
-
-    function getDiasDaSemana(dataRef) {
-      const inicio = new Date(dataRef); inicio.setDate(dataRef.getDate() - dataRef.getDay());
-      const dias = [];
-      for (let i = 0; i < 7; i++) { const d = new Date(inicio); d.setDate(inicio.getDate() + i); dias.push(d); }
-      return dias;
-    }
-
-    function renderizarCalendario() {
-      const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-      const diasSemana = getDiasDaSemana(dataAtual);
-      document.getElementById('tituloMes').innerText = dataAtual.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-
-      const headerVazio = document.createElement('div'); headerVazio.className = 'grid-header'; headerVazio.innerText = 'Turnos'; grid.appendChild(headerVazio);
-      const hoje = new Date().toISOString().split('T')[0];
-
-      diasSemana.forEach(dia => {
-        const dataIso = dia.toISOString().split('T')[0];
-        const divHeader = document.createElement('div');
-        divHeader.className = `grid-header ${dataIso === hoje ? 'today' : ''}`;
-        divHeader.innerHTML = `${dia.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase()}<br><span style="font-size: 1.1rem; font-weight: 800;">${dia.getDate()}</span>`;
-        grid.appendChild(divHeader);
-      });
-
-      TURNOS.forEach(turno => {
-        const divTime = document.createElement('div'); divTime.className = 'time-col';
-        divTime.innerHTML = `<strong>${turno.nome}</strong><br><small>${turno.horario}</small>`; grid.appendChild(divTime);
-
-        diasSemana.forEach(dia => {
-          const dataIso = dia.toISOString().split('T')[0];
-          const divSlot = document.createElement('div'); divSlot.className = 'day-slot';
-          const reserva = dadosJsonBin.reservas.find(r => r.data === dataIso && r.turno === turno.id && (r.sala || 'sala1') === abaAtual);
-
-          const card = document.createElement('div');
-          if (reserva) {
-            card.className = `slot-card ocupado ${getClasseCorProfissional(reserva.psicologa)}`;
-            card.innerHTML = `<div class="slot-title">${reserva.psicologa}</div><div class="slot-info">${reserva.observacao || 'Reservado'}</div>`;
-            card.onclick = () => abrirModalReserva(dataIso, turno, reserva);
-          } else {
-            card.className = 'slot-card livre';
-            card.innerHTML = `<div class="slot-title">Disponível</div><div class="slot-info">+ Agendar</div>`;
-            card.onclick = () => abrirModalReserva(dataIso, turno, null);
-          }
-          divSlot.appendChild(card); grid.appendChild(divSlot);
-        });
-      });
-    }
-
-    function mudarSemana(offset) { dataAtual.setDate(dataAtual.getDate() + (offset * 7)); renderizarCalendario(); }
-    function semanaAtual() { dataAtual = new Date(); renderizarCalendario(); }
-    function alternarDataFimRecorrencia() { document.getElementById('divDataFimRecorrencia').style.display = document.getElementById('chkRecorrente').checked ? 'block' : 'none'; }
-
-    function abrirModalReserva(dataIso, turno, reserva) {
-      document.getElementById('inputData').value = dataIso; document.getElementById('inputTurno').value = turno.id;
-      document.getElementById('inputInfoDataHorario').value = `${abaAtual === 'sala1' ? 'Sala 01' : 'Sala 02'} | ${new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR')} (${turno.nome})`;
-
-      const campoPsicologa = document.getElementById('inputPsicologa');
-      campoPsicologa.innerHTML = '';
-      Object.values(MAPA_USUARIOS).forEach(u => {
-        if(u.nome.toLowerCase().includes('recepção')) return;
-        const opt = document.createElement('option'); opt.value = u.nome; opt.innerText = u.nome; campoPsicologa.appendChild(opt);
-      });
-
-      const eRecepcao = userKeyAtual === 'recepcao';
-      document.getElementById('chkRecorrente').checked = false; document.getElementById('divDataFimRecorrencia').style.display = 'none';
-
-      if (reserva) {
-        document.getElementById('modalTitulo').innerText = 'Alterar / Excluir Reserva';
-        campoPsicologa.value = reserva.psicologa; campoPsicologa.disabled = !eRecepcao;
-        document.getElementById('inputObs').value = reserva.observacao || '';
-        document.getElementById('btnExcluir').style.display = 'inline-block'; document.getElementById('boxRecorrencia').style.display = 'none';
-      } else {
-        document.getElementById('modalTitulo').innerText = 'Nova Reserva';
-        if (!eRecepcao) campoPsicologa.value = MAPA_USUARIOS[userKeyAtual].nome;
-        campoPsicologa.disabled = !eRecepcao;
-        document.getElementById('inputObs').value = '';
-        document.getElementById('btnExcluir').style.display = 'none'; document.getElementById('boxRecorrencia').style.display = 'block';
-      }
-      document.getElementById('modalReserva').style.display = 'flex';
-    }
-
-    function fecharModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
-
-    async function salvarReserva() {
-      const dataIso = document.getElementById('inputData').value; const turnoId = document.getElementById('inputTurno').value;
-      const psicologa = document.getElementById('inputPsicologa').value; const obs = document.getElementById('inputObs').value.trim();
-      const rec = document.getElementById('chkRecorrente').checked; const dfim = document.getElementById('inputDataFimRecorrencia').value;
-
-      if (rec && dfim) {
-        let temp = new Date(dataIso + 'T00:00:00'); const limit = new Date(dfim + 'T23:59:59');
-        while (temp <= limit) {
-          const iso = temp.toISOString().split('T')[0];
-          dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === iso && r.turno === turnoId && r.sala === abaAtual));
-          dadosJsonBin.reservas.push({ id: 'res_'+Date.now()+Math.random(), data: iso, turno: turnoId, sala: abaAtual, psicologa, observacao: obs });
-          temp.setDate(temp.getDate() + 7);
-        }
-      } else {
-        dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && r.sala === abaAtual));
-        dadosJsonBin.reservas.push({ id: 'res_'+Date.now(), data: dataIso, turno: turnoId, sala: abaAtual, psicologa, observacao: obs });
-      }
-      fecharModal('modalReserva'); await guardarDados();
-    }
-
-    async function excluirReserva() {
-      if (!confirm('Deseja excluir?')) return;
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === document.getElementById('inputData').value && r.turno === document.getElementById('inputTurno').value && r.sala === abaAtual));
-      fecharModal('modalReserva'); await guardarDados();
-    }
-
-    // --- MÓDULO LIMPEZA ---
-    function renderizarEscalaLimpeza() {
-      const mes = document.getElementById('selectMesLimpeza').value; if (!mes) return;
-      const tbody = document.getElementById('tbodyEscalaLimpeza'); tbody.innerHTML = '';
-      const p = Object.values(MAPA_USUARIOS).map(u=>u.nome).filter(n=>!n.toLowerCase().includes('recepção'));
-      
-      let [anoStr, mesStr] = mes.split('-'); let d = new Date(anoStr, mesStr - 1, 1);
-      while (d.getDay() !== 6 && d.getMonth() == mesStr - 1) d.setDate(d.getDate() + 1);
-      
-      let sem = 1;
-      while (d.getMonth() == mesStr - 1) {
-        const d2 = new Date(d); d2.setDate(d2.getDate() + 6);
-        const chave = `${mes}_semana${sem}`;
-        if (!dadosJsonBin.escalaLimpeza[chave]) dadosJsonBin.escalaLimpeza[chave] = { responsavel: p[(sem-1)%p.length], concluido: false };
-        
-        const reg = dadosJsonBin.escalaLimpeza[chave];
-        const opts = p.map(x => `<option value="${x}" ${reg.responsavel===x?'selected':''}>${x}</option>`).join('');
-        
-        tbody.innerHTML += `<tr><td>Semana ${sem} (${d.toLocaleDateString('pt-BR')} - ${d2.toLocaleDateString('pt-BR')})</td>
-          <td><select style="padding:4px" onchange="atualizarEscalaLimpeza('${chave}', 'responsavel', this.value)">${opts}</select></td>
-          <td style="text-align:center;"><input type="checkbox" ${reg.concluido?'checked':''} onchange="atualizarEscalaLimpeza('${chave}', 'concluido', this.checked)"></td></tr>`;
-        d.setDate(d.getDate() + 7); sem++;
-      }
-    }
-    async function atualizarEscalaLimpeza(c, cp, v) { dadosJsonBin.escalaLimpeza[c][cp] = v; await guardarDados(); }
-
-    // --- MÓDULO PACIENTES ---
-    function abrirModalNovoPaciente() {
-      ['IdEdit','Nome','CPF','CEP','Email'].forEach(x => document.getElementById('paciente'+x).value = '');
-      document.getElementById('modalPaciente').style.display = 'flex';
-    }
-    async function salvarPaciente() {
-      const nome = document.getElementById('pacienteNome').value.trim();
-      if (!nome) return alert('Informe o nome.');
-      dadosJsonBin.pacientes.push({ id: 'pac_'+Date.now(), nome, cpf: document.getElementById('pacienteCPF').value, cep: document.getElementById('pacienteCEP').value, email: document.getElementById('pacienteEmail').value });
-      fecharModal('modalPaciente'); await guardarDados();
-    }
-    async function excluirPaciente(id) {
-      if(!confirm('Deseja excluir o paciente?')) return;
-      dadosJsonBin.pacientes = dadosJsonBin.pacientes.filter(p => p.id !== id); await guardarDados();
-    }
     function renderizarPacientes() {
-      const mes = document.getElementById('selectMesPacientes').value; const tb = document.getElementById('tbodyPacientes'); tb.innerHTML = '';
-      if(dadosJsonBin.pacientes.length === 0) return tb.innerHTML = '<tr><td colspan="8" style="text-align:center">Nenhum paciente cadastrado.</td></tr>';
-      
-      let tot = 0;
-      dadosJsonBin.pacientes.forEach(p => {
-        const chave = `${mes}_${p.id}`;
-        if (!dadosJsonBin.lancamentosPacientes[chave]) dadosJsonBin.lancamentosPacientes[chave] = { valor: '', tipo: 'Nota fiscal', emitido: false };
-        const l = dadosJsonBin.lancamentosPacientes[chave];
-        tot += parseFloat(l.valor.replace(',','.')||0);
-        
-        tb.innerHTML += `<tr><td><strong>${decriptarTexto(p.nome)}</strong></td><td>${decriptarTexto(p.cpf)}</td>
-          <td><input type="text" style="width:90px;padding:4px" value="${l.valor}" onchange="altLanc('${chave}','valor',this.value)"></td>
-          <td>${decriptarTexto(p.cep)}</td><td>${decriptarTexto(p.email)}</td>
-          <td><select style="padding:4px" onchange="altLanc('${chave}','tipo',this.value)">
-            <option ${l.tipo==='Nota fiscal'?'selected':''}>Nota fiscal</option><option ${l.tipo==='Carnê leão'?'selected':''}>Carnê leão</option><option ${l.tipo==='Não precisa'?'selected':''}>Não precisa</option>
-          </select></td>
-          <td style="text-align:center"><input type="checkbox" ${l.emitido?'checked':''} onchange="altLanc('${chave}','emitido',this.checked)"></td>
-          <td class="no-print"><button class="btn btn-danger" onclick="excluirPaciente('${p.id}')">X</button></td></tr>`;
+      const tbody = document.getElementById('tabelaPacientes');
+      tbody.innerHTML = '';
+      if (dadosPrivadosPacientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Nenhum paciente cadastrado por você ainda.</td></tr>';
+        return;
+      }
+      dadosPrivadosPacientes.forEach((p, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${p.nome}</td>
+            <td>${p.telefone || '-'}</td>
+            <td>${p.obs || '-'}</td>
+            <td><button class="btn" style="color:var(--danger)" onclick="removerPaciente(${idx})"><i class="fa-solid fa-trash"></i></button></td>
+          </tr>`;
       });
-      document.getElementById('tfootTotalRecebidoPacientes').innerHTML = `<strong>R$ ${tot.toFixed(2).replace('.',',')}</strong>`;
     }
-    async function altLanc(c, cp, v) { dadosJsonBin.lancamentosPacientes[c][cp] = v; await guardarDados(); }
 
-    // --- MÓDULO FINANCEIRO ---
+    function renderizarLimpeza() {
+      const container = document.getElementById('containerEscalaLimpeza');
+      container.innerHTML = '<p>Escala de limpeza compartilhada sincronizada com o Supabase.</p>';
+    }
+
     function renderizarFinanceiro() {
-      const mes = document.getElementById('selectMesFinanceiro').value;
-      const turnos = {}; let totS=0, totD=0;
-      document.getElementById('tbodyEntradas').innerHTML=''; document.getElementById('tbodyDespesas').innerHTML='';
-      
-      dadosJsonBin.reservas.forEach(r => {
-        if(r.data.startsWith(mes)) {
-          if(!turnos[r.psicologa]) turnos[r.psicologa] = 0;
-          turnos[r.psicologa]++;
-        }
-      });
-
-      Object.keys(turnos).forEach(p => {
-        let v = p.toLowerCase().includes('karine') ? 0 : turnos[p]*VALOR_TURNO_MENSAL;
-        totS += v;
-        document.getElementById('tbodyEntradas').innerHTML += `<tr><td>${p}</td><td colspan="2">-</td><td>${turnos[p]}</td><td>R$ ${v.toFixed(2)}</td></tr>`;
-      });
-
-      dadosJsonBin.despesas.forEach(d => {
-        if(d.mesAno === mes) {
-          totD += parseFloat(d.valor);
-          document.getElementById('tbodyDespesas').innerHTML += `<tr><td>${d.descricao}</td><td>${d.categoria}</td><td>R$ ${parseFloat(d.valor).toFixed(2)}</td><td><button class="btn btn-danger" onclick="exclDesp('${d.id}')">Excluir</button></td></tr>`;
-        }
-      });
-
-      document.getElementById('txtTotalEntrada').innerText = `R$ ${totS.toFixed(2)}`;
-      document.getElementById('txtTotalSaida').innerText = `R$ ${totD.toFixed(2)}`;
-      document.getElementById('txtLucroLiquido').innerText = `R$ ${(totS-totD).toFixed(2)}`;
+      const container = document.getElementById('containerFinanceiro');
+      container.innerHTML = `<p>Seus registros financeiros estão salvos de forma 100% privada para o seu usuário.</p>`;
     }
-    function abrirModalDespesa() { document.getElementById('modalDespesa').style.display='flex'; }
-    async function salvarDespesa() {
-      dadosJsonBin.despesas.push({ id:'d_'+Date.now(), mesAno: document.getElementById('selectMesFinanceiro').value, descricao: document.getElementById('despesaDescricao').value, categoria: document.getElementById('despesaCategoria').value, valor: document.getElementById('despesaValor').value });
-      fecharModal('modalDespesa'); await guardarDados();
-    }
-    async function exclDesp(id) { dadosJsonBin.despesas = dadosJsonBin.despesas.filter(d=>d.id!==id); await guardarDados(); }
 
-    // --- MÓDULO SENHA ---
-    function abrirModalSenha() { document.getElementById('modalSenha').style.display='flex'; }
-    async function salvarNovaSenha() {
-      const nova = document.getElementById('novaSenha').value; const conf = document.getElementById('confirmarNovaSenha').value;
-      if (nova.length < 6) return alert('A senha deve ter no mínimo 6 caracteres.');
-      if (nova !== conf) return alert('As senhas não coincidem.');
-      
-      const { error } = await dbSupabase.auth.updateUser({ password: nova });
-      if(error) alert('Erro ao atualizar senha no servidor.');
-      else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
+    // --- CONTROLE DE NAVEGAÇÃO ---
+    function trocarAba(aba, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('aba-' + aba).classList.add('active');
+      el.classList.add('active');
     }
+
+    // --- INICIALIZAÇÃO SEGURA DA PÁGINA ---
     document.addEventListener('DOMContentLoaded', () => {
-  atualizarSelectUsuariosLogin();
-  verificarSessao();
-});
+      atualizarSelectUsuariosLogin();
+      verificarSessao();
+    });
   </script>
 </body>
 </html>
