@@ -41,7 +41,7 @@
     .card-login h2 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
     .form-group { margin-bottom: 1.2rem; }
     .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
-    .form-group input {
+    .form-group select, .form-group input {
       width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
       border-radius: 6px; font-size: 1rem; outline: none;
     }
@@ -87,6 +87,13 @@
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); }
     th { background: var(--bg-main); color: var(--primary); }
+
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 100%; max-width: 500px; }
   </style>
 </head>
 <body>
@@ -97,8 +104,7 @@
       <h2>Acesso à Agenda</h2>
       <div class="form-group">
         <label for="loginUsuario">Usuário</label>
-        <!-- Alterado para campo de texto para evitar a enumeração de usuários -->
-        <input type="text" id="loginUsuario" placeholder="Ex: karine">
+        <input type="text" id="loginUsuario" placeholder="Ex: karine" style="text-transform: lowercase;">
       </div>
       <div class="form-group">
         <label for="loginSenha">Senha</label>
@@ -123,7 +129,7 @@
       <div class="user-profile">
         <div>
           <strong id="nomeUsuarioLogado">-</strong>
-          <div style="font-size: 0.8rem; color: var(--text-muted);" id="perfilUsuarioLogado">Sistema Clínico</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);" id="perfilUsuarioLogado">Psicóloga</div>
         </div>
         <button class="btn" onclick="fazerLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
       </div>
@@ -188,52 +194,76 @@
 
   <script>
     // =========================================================================
-    // CONFIGURAÇÃO DO SUPABASE
+    // CONFIGURAÇÃO DO SUPABASE (OFICIAL COM TOKEN JWT ANON PUBLIC)
     // =========================================================================
     const SUPABASE_CONFIG = {
       url: 'https://pqijrhqindehawsvqxdp.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MTU0NTksImV4cCI6MjEwNzQ5MTQ1OX0.YNPNTcAm7iXa2zBByIolgRSsKm8UPIlrrM_matBGRyY'
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzNTcyNTAsImV4cCI6MjA1NTkzMzI1MH0.PASTE_AQUI_SEU_TOKEN_JWT_CORRETO'
     };
 
     const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+    // Mapeamento dos usuários para o Supabase Auth (@clinica.local)
+    const MAPA_USUARIOS = {
+      'karine':   { nome: 'Karine',   email: 'karine@clinica.local' },
+      'natalia':  { nome: 'Natália',  email: 'natalia@clinica.local' },
+      'marilia':  { nome: 'Marília',  email: 'marilia@clinica.local' },
+      'catia':    { nome: 'Catia',    email: 'catia@clinica.local' },
+      'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
+    };
 
     let usuarioAtual = null;
     let dadosCompartilhados = { reservas: [], escalaLimpeza: {} };
     let dadosPrivadosPacientes = [];
     let dadosPrivadosFinanceiro = [];
 
-    // --- AUTENTICAÇÃO E SESSÃO ---
-    async function fazerLogin() {
-      const nomeDigitado = document.getElementById('loginUsuario').value.trim().toLowerCase();
-      const senha = document.getElementById('loginSenha').value;
-
-      if (!nomeDigitado || !senha) return alert('Por favor, informe usuário e senha.');
-
-      const emailMontado = `${nomeDigitado}@clinica.local`;
-
-      const { data, error } = await dbSupabase.auth.signInWithPassword({
-        email: emailMontado,
-        password: senha
+    // --- MONTAGEM DO MENU SUSPENSO ---
+    function atualizarSelectUsuariosLogin() {
+      const select = document.getElementById('loginUsuario');
+      if (!select) return;
+      select.innerHTML = '';
+      Object.keys(MAPA_USUARIOS).forEach(chave => {
+        const opt = document.createElement('option');
+        opt.value = chave;
+        opt.textContent = MAPA_USUARIOS[chave].nome;
+        select.appendChild(opt);
       });
-
-      if (error) {
-        alert('Usuário ou senha incorretos.');
-        console.error(error);
-      } else {
-        usuarioAtual = data.user;
-        // Transforma 'karine' em 'Karine' para exibir no painel
-        const nomeExibicao = nomeDigitado.charAt(0).toUpperCase() + nomeDigitado.slice(1);
-        inicializarPainel(nomeExibicao);
-      }
     }
 
+    // --- AUTENTICAÇÃO E SESSÃO ---
+  async function fazerLogin() {
+  const nomeDigitado = document.getElementById('loginUsuario').value.trim().toLowerCase();
+  const senha = document.getElementById('loginSenha').value;
+
+  if (!nomeDigitado || !senha) return alert('Por favor, informe usuário e senha.');
+
+  const emailMontado = `${nomeDigitado}@clinica.local`;
+
+  const { data, error } = await dbSupabase.auth.signInWithPassword({
+    email: emailMontado,
+    password: senha
+  });
+
+  if (error) {
+    alert('Usuário ou senha incorretos.');
+    console.error(error);
+  } else {
+    usuarioAtual = data.user;
+    
+    // Usa o seu MAPA_USUARIOS original para exibir o nome correto na tela (ex: "Natália" em vez de "natalia")
+    const configUser = MAPA_USUARIOS[nomeDigitado];
+    const nomeExibicao = configUser ? configUser.nome : nomeDigitado;
+    
+    inicializarPainel(nomeExibicao);
+  }
+}
     async function verificarSessao() {
       const { data: { session } } = await dbSupabase.auth.getSession();
       if (session) {
         usuarioAtual = session.user;
-        const email = session.user.email;
-        const nomeParte = email.split('@')[0];
-        const nomeExibicao = nomeParte.charAt(0).toUpperCase() + nomeParte.slice(1);
+        const e = session.user.email;
+        const chaveEncontrada = Object.keys(MAPA_USUARIOS).find(k => MAPA_USUARIOS[k].email === e);
+        const nomeExibicao = chaveEncontrada ? MAPA_USUARIOS[chaveEncontrada].nome : 'Usuária';
         inicializarPainel(nomeExibicao);
       }
     }
@@ -242,8 +272,6 @@
       await dbSupabase.auth.signOut();
       document.getElementById('app').style.display = 'none';
       document.getElementById('telaLogin').style.display = 'flex';
-      document.getElementById('loginUsuario').value = '';
-      document.getElementById('loginSenha').value = '';
     }
 
     function inicializarPainel(nome) {
@@ -256,6 +284,8 @@
     }
 
     // --- CARREGAMENTO DE DADOS DO SUPABASE ---
+
+    // 1. Dados Compartilhados (Reserva + Limpeza)
     async function carregarDadosCompartilhados() {
       const { data, error } = await dbSupabase
         .from('clinica_compartilhada')
@@ -271,6 +301,7 @@
       }
     }
 
+    // 2. Dados Privados por Psicóloga (Pacientes + Financeiro)
     async function carregarDadosPrivados() {
       if (!usuarioAtual) return;
 
@@ -362,6 +393,7 @@
 
     // --- INICIALIZAÇÃO SEGURA DA PÁGINA ---
     document.addEventListener('DOMContentLoaded', () => {
+      atualizarSelectUsuariosLogin();
       verificarSessao();
     });
   </script>
