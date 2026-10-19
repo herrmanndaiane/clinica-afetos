@@ -1,15 +1,3 @@
-O menu suspenso não está aparecendo porque o JavaScript encontrou um erro fatal logo no início, o que fez com que o código parasse de rodar antes de conseguir preencher as opções de usuários.
-
-Isso aconteceu devido a alterações nas configurações do Supabase (`SUPABASE_CONFIG`):
-
-1. **URL Inválida:** Foi adicionado `/rest/v1/` ao final do link. A biblioteca `supabase-js` exige apenas a URL base (`[https://pqijrhqindehawsvqxdp.supabase.co](https://pqijrhqindehawsvqxdp.supabase.co)`), caso contrário ela trava.
-2. **Chave Incorreta:** A chave foi trocada para uma versão `sb_publishable_...`, mas o sistema de autenticação e banco de dados requer a chave `anon public` padrão (que começa com `eyJ...`).
-
-Além disso, havia um pequeno erro de digitação no CSS (`- { box-sizing: border-box; }` em vez do asterisco `*`) que pode quebrar partes do layout.
-
-Para resolver tudo isso de uma vez, copie o código completo abaixo e substitua integralmente no seu arquivo `index.html`. Eu já restaurei a sua chave correta e corrigi a inicialização do script:
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -918,4 +906,3 @@ Para resolver tudo isso de uma vez, copie o código completo abaixo e substitua 
   </script>
 </body>
 </html>
-```
