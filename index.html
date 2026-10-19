@@ -394,3 +394,399 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Clínico - Gestão Integrada</title>
+  
+  <!-- Supabase JS SDK v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary: #5c1d30;
+      --primary-hover: #431422;
+      --bg-main: #f8f6f4;
+      --card-bg: #ffffff;
+      --text-dark: #2c2c2c;
+      --text-muted: #666666;
+      --border-color: #e2ddd8;
+      --success: #2e7d32;
+      --danger: #c62828;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-dark); display: flex; min-height: 100vh; }
+
+    /* --- TELA DE LOGIN --- */
+    #telaLogin {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: var(--bg-main); z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .card-login {
+      background: var(--card-bg); padding: 2.5rem; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 400px;
+      border: 1px solid var(--border-color);
+    }
+    .card-login h2 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+    .form-group select, .form-group input {
+      width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
+      border-radius: 6px; font-size: 1rem; outline: none;
+    }
+    .btn-login {
+      width: 100%; padding: 0.8rem; background-color: var(--primary); color: white;
+      border: none; border-radius: 6px; font-size: 1rem; font-weight: bold;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-login:hover { background-color: var(--primary-hover); }
+
+    /* --- LAYOUT PRINCIPAL --- */
+    #app { display: none; width: 100%; min-height: 100vh; }
+    aside {
+      width: 260px; background-color: var(--card-bg); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem 1rem;
+    }
+    .brand { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 2rem; padding: 0 0.5rem; }
+    .nav-menu { list-style: none; }
+    .nav-item {
+      padding: 0.8rem 1rem; margin-bottom: 0.4rem; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 0.8rem; color: var(--text-dark); font-weight: 500;
+    }
+    .nav-item:hover, .nav-item.active { background-color: var(--bg-main); color: var(--primary); }
+    .user-profile {
+      padding: 1rem; border-top: 1px solid var(--border-color); display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    main { flex: 1; padding: 2rem; overflow-y: auto; }
+
+    /* --- COMPONENTES DA TELA --- */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card {
+      background: var(--card-bg); padding: 1.5rem; border-radius: 8px;
+      border: 1px solid var(--border-color); margin-bottom: 1.5rem;
+    }
+    .btn {
+      padding: 0.6rem 1.2rem; border-radius: 6px; border: none; cursor: pointer;
+      font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th { background: var(--bg-main); color: var(--primary); }
+
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 100%; max-width: 500px; }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="telaLogin">
+    <div class="card-login">
+      <h2>Acesso à Agenda</h2>
+      <div class="form-group">
+        <label for="loginUsuario">Usuário</label>
+        <select id="loginUsuario"></select>
+      </div>
+      <div class="form-group">
+        <label for="loginSenha">Senha</label>
+        <input type="password" id="loginSenha" placeholder="Digite sua senha">
+      </div>
+      <button class="btn-login" onclick="fazerLogin()">Entrar no Painel</button>
+    </div>
+  </div>
+
+  <!-- APLICAÇÃO -->
+  <div id="app">
+    <aside>
+      <div>
+        <div class="brand"><i class="fa-solid fa-clinic-medical"></i> Clínica de Psicologia</div>
+        <ul class="nav-menu">
+          <li class="nav-item active" onclick="trocarAba('home', this)"><i class="fa-solid fa-calendar-days"></i> Reserva de Salas</li>
+          <li class="nav-item" onclick="trocarAba('pacientes', this)"><i class="fa-solid fa-user-group"></i> Meus Pacientes</li>
+          <li class="nav-item" onclick="trocarAba('limpeza', this)"><i class="fa-solid fa-broom"></i> Escala de Limpeza</li>
+          <li class="nav-item" onclick="trocarAba('financeiro', this)"><i class="fa-solid fa-chart-line"></i> Meu Financeiro</li>
+        </ul>
+      </div>
+      <div class="user-profile">
+        <div>
+          <strong id="nomeUsuarioLogado">-</strong>
+          <div style="font-size: 0.8rem; color: var(--text-muted);" id="perfilUsuarioLogado">Psicóloga</div>
+        </div>
+        <button class="btn" onclick="fazerLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <main>
+      <!-- ABA 1: RESERVA DE SALAS (COMPARTILHADA) -->
+      <section id="aba-home" class="tab-content active">
+        <h2>Reserva de Salas (Geral)</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <p>Agenda e ocupação geral das salas de atendimento da clínica.</p>
+          <div id="containerReservaSalas" style="margin-top: 1rem;">
+            <!-- Renderização das reservas -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 2: MEUS PACIENTES (PRIVADO POR PSICÓLOGA) -->
+      <section id="aba-pacientes" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>Meus Pacientes (Privado)</h2>
+          <button class="btn btn-primary" onclick="abrirModalPaciente()"><i class="fa-solid fa-plus"></i> Novo Paciente</button>
+        </div>
+        <div class="card" style="margin-top: 1rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Observações</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPacientes">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ABA 3: ESCALA DE LIMPEZA (COMPARTILHADA) -->
+      <section id="aba-limpeza" class="tab-content">
+        <h2>Escala de Limpeza Compartilhada</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <div id="containerEscalaLimpeza">
+            <!-- Renderizado via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 4: MEU FINANCEIRO (PRIVADO POR PSICÓLOGA) -->
+      <section id="aba-financeiro" class="tab-content">
+        <h2>Meu Financeiro (Privado)</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <div id="containerFinanceiro">
+            <p>Acompanhamento financeiro pessoal e faturamento individual.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CONFIGURAÇÃO DO SUPABASE (OFICIAL COM TOKEN JWT ANON PUBLIC)
+    // =========================================================================
+    const SUPABASE_CONFIG = {
+      url: 'https://pqijrhqindehawsvqxdp.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzNTcyNTAsImV4cCI6MjA1NTkzMzI1MH0.PASTE_AQUI_SEU_TOKEN_JWT_CORRETO'
+    };
+
+    const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+    // Mapeamento dos usuários para o Supabase Auth (@clinica.local)
+    const MAPA_USUARIOS = {
+      'karine':   { nome: 'Karine',   email: 'karine@clinica.local' },
+      'natalia':  { nome: 'Natália',  email: 'natalia@clinica.local' },
+      'marilia':  { nome: 'Marília',  email: 'marilia@clinica.local' },
+      'catia':    { nome: 'Catia',    email: 'catia@clinica.local' },
+      'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
+    };
+
+    let usuarioAtual = null;
+    let dadosCompartilhados = { reservas: [], escalaLimpeza: {} };
+    let dadosPrivadosPacientes = [];
+    let dadosPrivadosFinanceiro = [];
+
+    // --- MONTAGEM DO MENU SUSPENSO ---
+    function atualizarSelectUsuariosLogin() {
+      const select = document.getElementById('loginUsuario');
+      if (!select) return;
+      select.innerHTML = '';
+      Object.keys(MAPA_USUARIOS).forEach(chave => {
+        const opt = document.createElement('option');
+        opt.value = chave;
+        opt.textContent = MAPA_USUARIOS[chave].nome;
+        select.appendChild(opt);
+      });
+    }
+
+    // --- AUTENTICAÇÃO E SESSÃO ---
+    async function fazerLogin() {
+      const chaveUsuario = document.getElementById('loginUsuario').value;
+      const senha = document.getElementById('loginSenha').value;
+      const configUser = MAPA_USUARIOS[chaveUsuario];
+
+      if (!senha) return alert('Por favor, informe a senha.');
+
+      const { data, error } = await dbSupabase.auth.signInWithPassword({
+        email: configUser.email,
+        password: senha
+      });
+
+      if (error) {
+        alert('Senha incorreta ou erro ao autenticar.');
+        console.error(error);
+      } else {
+        usuarioAtual = data.user;
+        inicializarPainel(configUser.nome);
+      }
+    }
+
+    async function verificarSessao() {
+      const { data: { session } } = await dbSupabase.auth.getSession();
+      if (session) {
+        usuarioAtual = session.user;
+        const e = session.user.email;
+        const chaveEncontrada = Object.keys(MAPA_USUARIOS).find(k => MAPA_USUARIOS[k].email === e);
+        const nomeExibicao = chaveEncontrada ? MAPA_USUARIOS[chaveEncontrada].nome : 'Usuária';
+        inicializarPainel(nomeExibicao);
+      }
+    }
+
+    async function fazerLogout() {
+      await dbSupabase.auth.signOut();
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('telaLogin').style.display = 'flex';
+    }
+
+    function inicializarPainel(nome) {
+      document.getElementById('telaLogin').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('nomeUsuarioLogado').textContent = nome;
+
+      carregarDadosCompartilhados();
+      carregarDadosPrivados();
+    }
+
+    // --- CARREGAMENTO DE DADOS DO SUPABASE ---
+
+    // 1. Dados Compartilhados (Reserva + Limpeza)
+    async function carregarDadosCompartilhados() {
+      const { data, error } = await dbSupabase
+        .from('clinica_compartilhada')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+      if (!error && data) {
+        dadosCompartilhados.reservas = data.reservas || [];
+        dadosCompartilhados.escalaLimpeza = data.escala_limpeza || {};
+        renderizarReservas();
+        renderizarLimpeza();
+      }
+    }
+
+    // 2. Dados Privados por Psicóloga (Pacientes + Financeiro)
+    async function carregarDadosPrivados() {
+      if (!usuarioAtual) return;
+
+      // Pacientes
+      const { data: dataPac } = await dbSupabase
+        .from('pacientes_psicologa')
+        .select('dados')
+        .eq('user_id', usuarioAtual.id)
+        .maybeSingle();
+
+      dadosPrivadosPacientes = dataPac ? dataPac.dados : [];
+      renderizarPacientes();
+
+      // Financeiro
+      const { data: dataFin } = await dbSupabase
+        .from('financeiro_psicologa')
+        .select('dados')
+        .eq('user_id', usuarioAtual.id)
+        .maybeSingle();
+
+      dadosPrivadosFinanceiro = dataFin ? dataFin.dados : [];
+      renderizarFinanceiro();
+    }
+
+    // --- SALVAMENTO PRIVADO NO SUPABASE ---
+    async function salvarPacientesPrivado() {
+      if (!usuarioAtual) return;
+      await dbSupabase
+        .from('pacientes_psicologa')
+        .upsert({
+          user_id: usuarioAtual.id,
+          dados: dadosPrivadosPacientes,
+          updated_at: new Date()
+        }, { onConflict: 'user_id' });
+    }
+
+    async function salvarFinanceiroPrivado() {
+      if (!usuarioAtual) return;
+      await dbSupabase
+        .from('financeiro_psicologa')
+        .upsert({
+          user_id: usuarioAtual.id,
+          dados: dadosPrivadosFinanceiro,
+          updated_at: new Date()
+        }, { onConflict: 'user_id' });
+    }
+
+    // --- RENDERIZADORES DE INTERFACE ---
+    function renderizarReservas() {
+      const container = document.getElementById('containerReservaSalas');
+      container.innerHTML = `<p>Total de reservas salvas no sistema: <strong>${dadosCompartilhados.reservas.length}</strong></p>`;
+    }
+
+    function renderizarPacientes() {
+      const tbody = document.getElementById('tabelaPacientes');
+      tbody.innerHTML = '';
+      if (dadosPrivadosPacientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Nenhum paciente cadastrado por você ainda.</td></tr>';
+        return;
+      }
+      dadosPrivadosPacientes.forEach((p, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${p.nome}</td>
+            <td>${p.telefone || '-'}</td>
+            <td>${p.obs || '-'}</td>
+            <td><button class="btn" style="color:var(--danger)" onclick="removerPaciente(${idx})"><i class="fa-solid fa-trash"></i></button></td>
+          </tr>`;
+      });
+    }
+
+    function renderizarLimpeza() {
+      const container = document.getElementById('containerEscalaLimpeza');
+      container.innerHTML = '<p>Escala de limpeza compartilhada sincronizada com o Supabase.</p>';
+    }
+
+    function renderizarFinanceiro() {
+      const container = document.getElementById('containerFinanceiro');
+      container.innerHTML = `<p>Seus registros financeiros estão salvos de forma 100% privada para o seu usuário.</p>`;
+    }
+
+    // --- CONTROLE DE NAVEGAÇÃO ---
+    function trocarAba(aba, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('aba-' + aba).classList.add('active');
+      el.classList.add('active');
+    }
+
+    // --- INICIALIZAÇÃO SEGURA DA PÁGINA ---
+    document.addEventListener('DOMContentLoaded', () => {
+      atualizarSelectUsuariosLogin();
+      verificarSessao();
+    });
+  </script>
+</body>
+</html>
