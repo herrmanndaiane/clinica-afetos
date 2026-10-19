@@ -104,7 +104,7 @@
       <h2>Acesso à Agenda</h2>
       <div class="form-group">
         <label for="loginUsuario">Usuário</label>
-        <input type="text" id="loginUsuario" placeholder="Ex: karine" style="text-transform: lowercase;">
+        <select id="loginUsuario"></select>
       </div>
       <div class="form-group">
         <label for="loginSenha">Senha</label>
@@ -231,32 +231,27 @@
     }
 
     // --- AUTENTICAÇÃO E SESSÃO ---
-  async function fazerLogin() {
-  const nomeDigitado = document.getElementById('loginUsuario').value.trim().toLowerCase();
-  const senha = document.getElementById('loginSenha').value;
+    async function fazerLogin() {
+      const chaveUsuario = document.getElementById('loginUsuario').value;
+      const senha = document.getElementById('loginSenha').value;
+      const configUser = MAPA_USUARIOS[chaveUsuario];
 
-  if (!nomeDigitado || !senha) return alert('Por favor, informe usuário e senha.');
+      if (!senha) return alert('Por favor, informe a senha.');
 
-  const emailMontado = `${nomeDigitado}@clinica.local`;
+      const { data, error } = await dbSupabase.auth.signInWithPassword({
+        email: configUser.email,
+        password: senha
+      });
 
-  const { data, error } = await dbSupabase.auth.signInWithPassword({
-    email: emailMontado,
-    password: senha
-  });
+      if (error) {
+        alert('Senha incorreta ou erro ao autenticar.');
+        console.error(error);
+      } else {
+        usuarioAtual = data.user;
+        inicializarPainel(configUser.nome);
+      }
+    }
 
-  if (error) {
-    alert('Usuário ou senha incorretos.');
-    console.error(error);
-  } else {
-    usuarioAtual = data.user;
-    
-    // Usa o seu MAPA_USUARIOS original para exibir o nome correto na tela (ex: "Natália" em vez de "natalia")
-    const configUser = MAPA_USUARIOS[nomeDigitado];
-    const nomeExibicao = configUser ? configUser.nome : nomeDigitado;
-    
-    inicializarPainel(nomeExibicao);
-  }
-}
     async function verificarSessao() {
       const { data: { session } } = await dbSupabase.auth.getSession();
       if (session) {
