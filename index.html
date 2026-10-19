@@ -43,7 +43,7 @@
     .slot-card.pro-karine { background-color: #501422 !important; border: 1px solid #3A0F19 !important; color: #FFFFFF !important; }
     .slot-card.pro-natalia { background-color: #14361E !important; border: 1px solid #0D2413 !important; color: #FFFFFF !important; }
     .slot-card.pro-marilia { background-color: #80263B !important; border: 1px solid #5C1A29 !important; color: #FFFFFF !important; }
-    .slot-card.pro-katia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
+    .slot-card.pro-catia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
     .slot-card.pro-recepcao { background-color: #6B1D2F !important; border: 1px solid #4A1220 !important; color: #FFFFFF !important; }
     .slot-card.pro-outros { background-color: #4A4A4A !important; border: 1px solid #333333 !important; color: #FFFFFF !important; }
 
@@ -418,14 +418,14 @@
       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MTU0NTksImV4cCI6MjEwNzQ5MTQ1OX0.YNPNTcAm7iXa2zBByIolgRSsKm8UPIlrrM_matBGRyY' 
     };
 
-    const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
     // Mapeamento dos usuários para os e-mails criados no Supabase Auth
     const MAPA_USUARIOS = {
       'karine':   { nome: 'Karine', email: 'karine@clinica.local' },
       'natalia':  { nome: 'Natália', email: 'natalia@clinica.local' },
       'marilia':  { nome: 'Marília', email: 'marilia@clinica.local' },
-      'katia':    { nome: 'Katia', email: 'katia@clinica.local' },
+      'catia':    { nome: 'Cátia', email: 'catia@clinica.local' },
       'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
     };
 
@@ -463,15 +463,15 @@
     async function carregarDados() {
       try {
         // 1. Puxa os dados compartilhados da clínica (Salas, Limpeza, Despesas)
-        const { data: pubData, error: pubErr } = await supabase.from('clinica_compartilhada').select('*').eq('id', 1).single();
+        const { data: pubData, error: pubErr } = await dbSupabase.from('clinica_compartilhada').select('*').eq('id', 1).single();
         if (pubErr) throw pubErr;
 
         // 2. Puxa APENAS os pacientes da psicóloga logada (Protegido via RLS)
-        let { data: privData, error: privErr } = await supabase.from('clinica_privada').select('*').eq('user_id', authUserAtual.id).single();
+        let { data: privData, error: privErr } = await dbSupabase.from('clinica_privada').select('*').eq('user_id', authUserAtual.id).single();
         
         // Se for o primeiro acesso da psicóloga, ela não terá linha na tabela. Criamos agora:
         if (!privData && privErr && privErr.code === 'PGRST116') {
-          const { data: newPriv } = await supabase.from('clinica_privada').insert({ user_id: authUserAtual.id }).select().single();
+          const { data: newPriv } = await dbSupabase.from('clinica_privada').insert({ user_id: authUserAtual.id }).select().single();
           privData = newPriv || { pacientes: [], lancamentos: {} };
         } else if (privErr) {
           throw privErr;
@@ -496,7 +496,7 @@
 
     async function guardarDados() {
       try {
-        await supabase.from('clinica_compartilhada').update({
+        await dbSupabase.from('clinica_compartilhada').update({
           reservas: dadosJsonBin.reservas,
           despesas: dadosJsonBin.despesas,
           escala_limpeza: dadosJsonBin.escalaLimpeza
@@ -510,7 +510,7 @@
           email: encriptarTexto(p.email)
         }));
 
-        await supabase.from('clinica_privada').update({
+        await dbSupabase.from('clinica_privada').update({
           pacientes: pacientesCriptografados,
           lancamentos: dadosJsonBin.lancamentosPacientes
         }).eq('user_id', authUserAtual.id);
@@ -546,7 +546,7 @@
       if (!key) { alert("Selecione um usuário."); return; }
       
       const emailFormatado = MAPA_USUARIOS[key].email;
-      const { data, error } = await supabase.auth.signInWithPassword({ email: emailFormatado, password: senhaDigitada });
+      const { data, error } = await dbSupabase.auth.signInWithPassword({ email: emailFormatado, password: senhaDigitada });
 
       if (error) { alert('Senha incorreta ou usuário não cadastrado no Supabase!'); return; }
 
@@ -561,7 +561,7 @@
     async function verificarSessao() {
       atualizarSelectUsuariosLogin();
       const keySalva = localStorage.getItem('usuarioLogadoKey');
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await dbSupabase.auth.getSession();
 
       if (keySalva && session) {
         userKeyAtual = keySalva;
@@ -575,7 +575,7 @@
     }
 
     async function realizarLogout() {
-      await supabase.auth.signOut();
+      await dbSupabase.auth.signOut();
       localStorage.removeItem('usuarioLogadoKey');
       userKeyAtual = null; authUserAtual = null;
       document.getElementById('telaLogin').style.display = 'flex';
@@ -660,7 +660,7 @@
         if (n.includes('karine')) corBg = '#501422';
         else if (n.includes('natalia') || n.includes('natália')) corBg = '#14361E';
         else if (n.includes('marilia') || n.includes('marília')) corBg = '#80263B';
-        else if (n.includes('katia')) corBg = '#2D5A38';
+        else if (n.includes('catia') || n.includes('cátia')) corBg = '#2D5A38';
         item.innerHTML = `<div class="legenda-cor" style="background:${corBg};"></div> ${u.nome}`;
         container.appendChild(item);
       });
@@ -673,7 +673,7 @@
       if (n.includes('karine')) return 'pro-karine';
       if (n.includes('natália') || n.includes('natalia')) return 'pro-natalia';
       if (n.includes('marília') || n.includes('marilia')) return 'pro-marilia';
-      if (n.includes('katia')) return 'pro-katia';
+      if (n.includes('catia') || n.includes('cátia')) return 'pro-catia';
       return 'pro-outros';
     }
 
@@ -894,13 +894,14 @@
       if (nova.length < 6) return alert('A senha deve ter no mínimo 6 caracteres.');
       if (nova !== conf) return alert('As senhas não coincidem.');
       
-      const { error } = await supabase.auth.updateUser({ password: nova });
+      const { error } = await dbSupabase.auth.updateUser({ password: nova });
       if(error) alert('Erro ao atualizar senha no servidor.');
       else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
     }
 
     // --- INICIALIZAÇÃO DE SEGURANÇA ---
     document.addEventListener('DOMContentLoaded', () => {
+      atualizarSelectUsuariosLogin();
       verificarSessao();
     });
   </script>
