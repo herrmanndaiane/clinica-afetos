@@ -410,9 +410,6 @@
   </div>
 
   <script>
-    // =========================================================
-    // CONFIGURAÇÕES DO SUPABASE CORRIGIDAS (URL e Chave)
-    // =========================================================
     const SUPABASE_CONFIG = {
       url: 'https://pqijrhqindehawsvqxdp.supabase.co', 
       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxaWpyaHFpbmRlaGF3c3ZxeGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MTU0NTksImV4cCI6MjEwNzQ5MTQ1OX0.YNPNTcAm7iXa2zBByIolgRSsKm8UPIlrrM_matBGRyY' 
@@ -420,7 +417,6 @@
 
     const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
-    // Mapeamento dos usuários para os e-mails criados no Supabase Auth
     const MAPA_USUARIOS = {
       'karine':   { nome: 'Karine', email: 'karine@clinica.local' },
       'natalia':  { nome: 'Natália', email: 'natalia@clinica.local' },
@@ -429,7 +425,7 @@
       'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
     };
 
-    const CHAVE_CRIPTOGRAFIA = 'ChaveExtraClinica2026'; // Mantém dados criptografados mesmo dentro do Supabase
+    const CHAVE_CRIPTOGRAFIA = 'ChaveExtraClinica2026';
     const VALOR_TURNO_MENSAL = 350.00;
     const TURNOS = [
       { id: 'manha', nome: 'Manhã', horario: '08:00 - 12:00' },
@@ -438,14 +434,12 @@
     ];
 
     let userKeyAtual = null;
-    let authUserAtual = null; // ID oficial gerado pelo Supabase
+    let authUserAtual = null;
     let abaAtual = 'home';
     let dataAtual = new Date();
     
-    // Objeto local para manipulação da tela
     let dadosJsonBin = { reservas: [], despesas: [], pacientes: [], lancamentosPacientes: {}, escalaLimpeza: {} };
 
-    // --- Criptografia Extra de Segurança (AES) ---
     function encriptarTexto(texto) {
       if (!texto) return '';
       return CryptoJS.AES.encrypt(texto, CHAVE_CRIPTOGRAFIA).toString();
@@ -459,35 +453,51 @@
       } catch (e) { return ciphertext; }
     }
 
-    // --- Lógica Central de Banco de Dados (Supabase) ---
+    // --- Lógica Central de Banco de Dados ---
     async function carregarDados() {
       try {
-        // 1. Puxa os dados compartilhados da clínica (Salas, Limpeza, Despesas)
         const { data: pubData, error: pubErr } = await dbSupabase.from('clinica_compartilhada').select('*').eq('id', 1).single();
         if (pubErr) throw pubErr;
 
-        // 2. Puxa APENAS os pacientes da psicóloga logada (Protegido via RLS)
+        const { data: resData, error: resErr } = await dbSupabase.from('reservas_clinica').select('*');
+        if (resErr) throw resErr;
+
+        // Puxa pacientes da NOVA tabela segura (o Supabase já filtra para vir só os da psicóloga logada)
+        const { data: pacData, error: pacErr } = await dbSupabase.from('pacientes_clinica').select('*');
+        if (pacErr) throw pacErr;
+
+        // Puxa apenas os lançamentos financeiros antigos da tabela privada
         let { data: privData, error: privErr } = await dbSupabase.from('clinica_privada').select('*').eq('user_id', authUserAtual.id).single();
-        
-        // Se for o primeiro acesso da psicóloga, ela não terá linha na tabela. Criamos agora:
         if (!privData && privErr && privErr.code === 'PGRST116') {
           const { data: newPriv } = await dbSupabase.from('clinica_privada').insert({ user_id: authUserAtual.id }).select().single();
-          privData = newPriv || { pacientes: [], lancamentos: {} };
+          privData = newPriv || { lancamentos: {} };
         } else if (privErr) {
           throw privErr;
         }
 
-        // Monta o objeto na memória do jeito que a tela já espera
+        const reservasConvertidas = resData.map(r => ({
+            id: r.id, data: r.data_reserva, turno: r.turno_id, sala: r.sala_id, psicologa: r.psicologa_nome, observacao: r.observacao
+        }));
+
+        // Desencripta os pacientes vindos da nova tabela
+        const pacientesConvertidos = pacData.map(p => ({
+            id: p.id,
+            nome: decriptarTexto(p.nome_cripto),
+            cpf: decriptarTexto(p.cpf_cripto),
+            cep: decriptarTexto(p.cep_cripto),
+            email: decriptarTexto(p.email_cripto)
+        }));
+
         dadosJsonBin = {
-          reservas: pubData.reservas || [],
+          reservas: reservasConvertidas,
           despesas: pubData.despesas || [],
           escalaLimpeza: pubData.escala_limpeza || {},
-          pacientes: privData.pacientes || [],
+          pacientes: pacientesConvertidos,
           lancamentosPacientes: privData.lancamentos || {}
         };
 
         populasSelectsMeses();
-        mudarAba('home');
+        mudarAba(abaAtual);
 
       } catch (err) {
         console.error('Erro ao carregar banco de dados:', err);
@@ -497,28 +507,18 @@
     async function guardarDados() {
       try {
         await dbSupabase.from('clinica_compartilhada').update({
-          reservas: dadosJsonBin.reservas,
           despesas: dadosJsonBin.despesas,
           escala_limpeza: dadosJsonBin.escalaLimpeza
         }).eq('id', 1);
 
-        const pacientesCriptografados = dadosJsonBin.pacientes.map(p => ({
-          ...p,
-          nome: encriptarTexto(p.nome),
-          cpf: encriptarTexto(p.cpf),
-          cep: encriptarTexto(p.cep),
-          email: encriptarTexto(p.email)
-        }));
-
+        // Atualiza apenas os lançamentos financeiros
         await dbSupabase.from('clinica_privada').update({
-          pacientes: pacientesCriptografados,
           lancamentos: dadosJsonBin.lancamentosPacientes
         }).eq('user_id', authUserAtual.id);
 
         if (abaAtual === 'financeiro') renderizarFinanceiro();
         else if (abaAtual === 'pacientes') renderizarPacientes();
         else if (abaAtual === 'limpeza') renderizarEscalaLimpeza();
-        else if (abaAtual === 'sala1' || abaAtual === 'sala2') renderizarCalendario();
 
       } catch (err) {
         console.error(err);
@@ -526,7 +526,6 @@
       }
     }
 
-    // --- Sistema de Autenticação Real ---
     function atualizarSelectUsuariosLogin() {
       const select = document.getElementById('loginUsuario');
       if (!select) return;
@@ -666,7 +665,6 @@
       });
     }
 
-    // --- MÓDULO CALENDÁRIO ---
     function getClasseCorProfissional(nome) {
       if (!nome) return 'pro-outros';
       const n = nome.toLowerCase();
@@ -760,32 +758,49 @@
     function fecharModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
 
     async function salvarReserva() {
-      const dataIso = document.getElementById('inputData').value; const turnoId = document.getElementById('inputTurno').value;
-      const psicologa = document.getElementById('inputPsicologa').value; const obs = document.getElementById('inputObs').value.trim();
-      const rec = document.getElementById('chkRecorrente').checked; const dfim = document.getElementById('inputDataFimRecorrencia').value;
+      const dataIso = document.getElementById('inputData').value;
+      const turnoId = document.getElementById('inputTurno').value;
+      const psicologa = document.getElementById('inputPsicologa').value;
+      const obs = document.getElementById('inputObs').value.trim();
+      const rec = document.getElementById('chkRecorrente').checked;
+      const dfim = document.getElementById('inputDataFimRecorrencia').value;
 
-      if (rec && dfim) {
-        let temp = new Date(dataIso + 'T00:00:00'); const limit = new Date(dfim + 'T23:59:59');
-        while (temp <= limit) {
-          const iso = temp.toISOString().split('T')[0];
-          dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === iso && r.turno === turnoId && r.sala === abaAtual));
-          dadosJsonBin.reservas.push({ id: 'res_'+Date.now()+Math.random(), data: iso, turno: turnoId, sala: abaAtual, psicologa, observacao: obs });
-          temp.setDate(temp.getDate() + 7);
+      fecharModal('modalReserva');
+
+      try {
+        if (rec && dfim) {
+          let temp = new Date(dataIso + 'T00:00:00');
+          const limit = new Date(dfim + 'T23:59:59');
+          const inserts = [];
+          const datasParaApagar = [];
+
+          while (temp <= limit) {
+            const iso = temp.toISOString().split('T')[0];
+            datasParaApagar.push(iso);
+            inserts.push({ data_reserva: iso, turno_id: turnoId, sala_id: abaAtual, psicologa_nome: psicologa, observacao: obs });
+            temp.setDate(temp.getDate() + 7);
+          }
+          await dbSupabase.from('reservas_clinica').delete().in('data_reserva', datasParaApagar).eq('turno_id', turnoId).eq('sala_id', abaAtual);
+          await dbSupabase.from('reservas_clinica').insert(inserts);
+        } else {
+          await dbSupabase.from('reservas_clinica').delete().eq('data_reserva', dataIso).eq('turno_id', turnoId).eq('sala_id', abaAtual);
+          await dbSupabase.from('reservas_clinica').insert([{ data_reserva: dataIso, turno_id: turnoId, sala_id: abaAtual, psicologa_nome: psicologa, observacao: obs }]);
         }
-      } else {
-        dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && r.sala === abaAtual));
-        dadosJsonBin.reservas.push({ id: 'res_'+Date.now(), data: dataIso, turno: turnoId, sala: abaAtual, psicologa, observacao: obs });
-      }
-      fecharModal('modalReserva'); await guardarDados();
+        await carregarDados();
+      } catch (e) { console.error(e); alert('Erro ao salvar a reserva no banco de dados.'); }
     }
 
     async function excluirReserva() {
       if (!confirm('Deseja excluir?')) return;
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === document.getElementById('inputData').value && r.turno === document.getElementById('inputTurno').value && r.sala === abaAtual));
-      fecharModal('modalReserva'); await guardarDados();
+      const dataIso = document.getElementById('inputData').value;
+      const turnoId = document.getElementById('inputTurno').value;
+      fecharModal('modalReserva');
+      try {
+        await dbSupabase.from('reservas_clinica').delete().eq('data_reserva', dataIso).eq('turno_id', turnoId).eq('sala_id', abaAtual);
+        await carregarDados();
+      } catch (e) { console.error(e); alert('Erro ao apagar a reserva.'); }
     }
 
-    // --- MÓDULO LIMPEZA ---
     function renderizarEscalaLimpeza() {
       const mes = document.getElementById('selectMesLimpeza').value; if (!mes) return;
       const tbody = document.getElementById('tbodyEscalaLimpeza'); tbody.innerHTML = '';
@@ -811,21 +826,48 @@
     }
     async function atualizarEscalaLimpeza(c, cp, v) { dadosJsonBin.escalaLimpeza[c][cp] = v; await guardarDados(); }
 
-    // --- MÓDULO PACIENTES ---
     function abrirModalNovoPaciente() {
       ['IdEdit','Nome','CPF','CEP','Email'].forEach(x => document.getElementById('paciente'+x).value = '');
       document.getElementById('modalPaciente').style.display = 'flex';
     }
+
+    // --- Salvamento de Pacientes na NOVA tabela (E2EE) ---
     async function salvarPaciente() {
       const nome = document.getElementById('pacienteNome').value.trim();
       if (!nome) return alert('Informe o nome.');
-      dadosJsonBin.pacientes.push({ id: 'pac_'+Date.now(), nome, cpf: document.getElementById('pacienteCPF').value, cep: document.getElementById('pacienteCEP').value, email: document.getElementById('pacienteEmail').value });
-      fecharModal('modalPaciente'); await guardarDados();
+      
+      const cpf = document.getElementById('pacienteCPF').value;
+      const cep = document.getElementById('pacienteCEP').value;
+      const email = document.getElementById('pacienteEmail').value;
+      
+      fecharModal('modalPaciente');
+      
+      try {
+        await dbSupabase.from('pacientes_clinica').insert([{
+          nome_cripto: encriptarTexto(nome),
+          cpf_cripto: encriptarTexto(cpf),
+          cep_cripto: encriptarTexto(cep),
+          email_cripto: encriptarTexto(email)
+        }]);
+        await carregarDados(); 
+      } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar paciente de forma segura.');
+      }
     }
+
+    // --- Exclusão de Pacientes da NOVA tabela ---
     async function excluirPaciente(id) {
-      if(!confirm('Deseja excluir o paciente?')) return;
-      dadosJsonBin.pacientes = dadosJsonBin.pacientes.filter(p => p.id !== id); await guardarDados();
+      if(!confirm('Deseja excluir o paciente? Essa ação é irreversível.')) return;
+      try {
+        await dbSupabase.from('pacientes_clinica').delete().eq('id', id);
+        await carregarDados();
+      } catch (e) {
+        console.error(e);
+        alert('Erro ao excluir paciente.');
+      }
     }
+
     function renderizarPacientes() {
       const mes = document.getElementById('selectMesPacientes').value; const tb = document.getElementById('tbodyPacientes'); tb.innerHTML = '';
       if(dadosJsonBin.pacientes.length === 0) return tb.innerHTML = '<tr><td colspan="8" style="text-align:center">Nenhum paciente cadastrado.</td></tr>';
@@ -837,9 +879,9 @@
         const l = dadosJsonBin.lancamentosPacientes[chave];
         tot += parseFloat(l.valor.replace(',','.')||0);
         
-        tb.innerHTML += `<tr><td><strong>${decriptarTexto(p.nome)}</strong></td><td>${decriptarTexto(p.cpf)}</td>
+        tb.innerHTML += `<tr><td><strong>${p.nome}</strong></td><td>${p.cpf}</td>
           <td><input type="text" style="width:90px;padding:4px" value="${l.valor}" onchange="altLanc('${chave}','valor',this.value)"></td>
-          <td>${decriptarTexto(p.cep)}</td><td>${decriptarTexto(p.email)}</td>
+          <td>${p.cep}</td><td>${p.email}</td>
           <td><select style="padding:4px" onchange="altLanc('${chave}','tipo',this.value)">
             <option ${l.tipo==='Nota fiscal'?'selected':''}>Nota fiscal</option><option ${l.tipo==='Carnê leão'?'selected':''}>Carnê leão</option><option ${l.tipo==='Não precisa'?'selected':''}>Não precisa</option>
           </select></td>
@@ -848,9 +890,12 @@
       });
       document.getElementById('tfootTotalRecebidoPacientes').innerHTML = `<strong>R$ ${tot.toFixed(2).replace('.',',')}</strong>`;
     }
-    async function altLanc(c, cp, v) { dadosJsonBin.lancamentosPacientes[c][cp] = v; await guardarDados(); }
+    
+    async function altLanc(c, cp, v) { 
+      dadosJsonBin.lancamentosPacientes[c][cp] = v; 
+      await guardarDados(); 
+    }
 
-    // --- MÓDULO FINANCEIRO ---
     function renderizarFinanceiro() {
       const mes = document.getElementById('selectMesFinanceiro').value;
       const turnos = {}; let totS=0, totD=0;
@@ -887,7 +932,6 @@
     }
     async function exclDesp(id) { dadosJsonBin.despesas = dadosJsonBin.despesas.filter(d=>d.id!==id); await guardarDados(); }
 
-    // --- MÓDULO SENHA ---
     function abrirModalSenha() { document.getElementById('modalSenha').style.display='flex'; }
     async function salvarNovaSenha() {
       const nova = document.getElementById('novaSenha').value; const conf = document.getElementById('confirmarNovaSenha').value;
@@ -899,7 +943,6 @@
       else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
     }
 
-    // --- INICIALIZAÇÃO DE SEGURANÇA ---
     document.addEventListener('DOMContentLoaded', () => {
       atualizarSelectUsuariosLogin();
       verificarSessao();
