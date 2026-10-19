@@ -43,7 +43,7 @@
     .slot-card.pro-karine { background-color: #501422 !important; border: 1px solid #3A0F19 !important; color: #FFFFFF !important; }
     .slot-card.pro-natalia { background-color: #14361E !important; border: 1px solid #0D2413 !important; color: #FFFFFF !important; }
     .slot-card.pro-marilia { background-color: #80263B !important; border: 1px solid #5C1A29 !important; color: #FFFFFF !important; }
-    .slot-card.pro-catia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
+    .slot-card.pro-katia { background-color: #2D5A38 !important; border: 1px solid #1E3D25 !important; color: #FFFFFF !important; }
     .slot-card.pro-recepcao { background-color: #6B1D2F !important; border: 1px solid #4A1220 !important; color: #FFFFFF !important; }
     .slot-card.pro-outros { background-color: #4A4A4A !important; border: 1px solid #333333 !important; color: #FFFFFF !important; }
 
@@ -411,7 +411,7 @@
 
   <script>
     // =========================================================
-    // ⬇️ COLE AQUI OS DADOS DO SEU PAINEL SUPABASE ⬇️
+    // CONFIGURAÇÕES DO SUPABASE CORRIGIDAS (URL e Chave)
     // =========================================================
     const SUPABASE_CONFIG = {
       url: 'https://pqijrhqindehawsvqxdp.supabase.co', 
@@ -425,7 +425,7 @@
       'karine':   { nome: 'Karine', email: 'karine@clinica.local' },
       'natalia':  { nome: 'Natália', email: 'natalia@clinica.local' },
       'marilia':  { nome: 'Marília', email: 'marilia@clinica.local' },
-      'catia':    { nome: 'Catia', email: 'catia@clinica.local' },
+      'katia':    { nome: 'Katia', email: 'katia@clinica.local' },
       'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
     };
 
@@ -660,7 +660,7 @@
         if (n.includes('karine')) corBg = '#501422';
         else if (n.includes('natalia') || n.includes('natália')) corBg = '#14361E';
         else if (n.includes('marilia') || n.includes('marília')) corBg = '#80263B';
-        else if (n.includes('catia')) corBg = '#2D5A38';
+        else if (n.includes('katia')) corBg = '#2D5A38';
         item.innerHTML = `<div class="legenda-cor" style="background:${corBg};"></div> ${u.nome}`;
         container.appendChild(item);
       });
@@ -673,7 +673,7 @@
       if (n.includes('karine')) return 'pro-karine';
       if (n.includes('natália') || n.includes('natalia')) return 'pro-natalia';
       if (n.includes('marília') || n.includes('marilia')) return 'pro-marilia';
-      if (n.includes('catia')) return 'pro-catia';
+      if (n.includes('katia')) return 'pro-katia';
       return 'pro-outros';
     }
 
@@ -762,143 +762,4 @@
     async function salvarReserva() {
       const dataIso = document.getElementById('inputData').value; const turnoId = document.getElementById('inputTurno').value;
       const psicologa = document.getElementById('inputPsicologa').value; const obs = document.getElementById('inputObs').value.trim();
-      const rec = document.getElementById('chkRecorrente').checked; const dfim = document.getElementById('inputDataFimRecorrencia').value;
-
-      if (rec && dfim) {
-        let temp = new Date(dataIso + 'T00:00:00'); const limit = new Date(dfim + 'T23:59:59');
-        while (temp <= limit) {
-          const iso = temp.toISOString().split('T')[0];
-          dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === iso && r.turno === turnoId && r.sala === abaAtual));
-          dadosJsonBin.reservas.push({ id: 'res_'+Date.now()+Math.random(), data: iso, turno: turnoId, sala: abaAtual, psicologa, observacao: obs });
-          temp.setDate(temp.getDate() + 7);
-        }
-      } else {
-        dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === dataIso && r.turno === turnoId && r.sala === abaAtual));
-        dadosJsonBin.reservas.push({ id: 'res_'+Date.now(), data: dataIso, turno: turnoId, sala: abaAtual, psicologa, observacao: obs });
-      }
-      fecharModal('modalReserva'); await guardarDados();
-    }
-
-    async function excluirReserva() {
-      if (!confirm('Deseja excluir?')) return;
-      dadosJsonBin.reservas = dadosJsonBin.reservas.filter(r => !(r.data === document.getElementById('inputData').value && r.turno === document.getElementById('inputTurno').value && r.sala === abaAtual));
-      fecharModal('modalReserva'); await guardarDados();
-    }
-
-    // --- MÓDULO LIMPEZA ---
-    function renderizarEscalaLimpeza() {
-      const mes = document.getElementById('selectMesLimpeza').value; if (!mes) return;
-      const tbody = document.getElementById('tbodyEscalaLimpeza'); tbody.innerHTML = '';
-      const p = Object.values(MAPA_USUARIOS).map(u=>u.nome).filter(n=>!n.toLowerCase().includes('recepção'));
-      
-      let [anoStr, mesStr] = mes.split('-'); let d = new Date(anoStr, mesStr - 1, 1);
-      while (d.getDay() !== 6 && d.getMonth() == mesStr - 1) d.setDate(d.getDate() + 1);
-      
-      let sem = 1;
-      while (d.getMonth() == mesStr - 1) {
-        const d2 = new Date(d); d2.setDate(d2.getDate() + 6);
-        const chave = `${mes}_semana${sem}`;
-        if (!dadosJsonBin.escalaLimpeza[chave]) dadosJsonBin.escalaLimpeza[chave] = { responsavel: p[(sem-1)%p.length], concluido: false };
-        
-        const reg = dadosJsonBin.escalaLimpeza[chave];
-        const opts = p.map(x => `<option value="${x}" ${reg.responsavel===x?'selected':''}>${x}</option>`).join('');
-        
-        tbody.innerHTML += `<tr><td>Semana ${sem} (${d.toLocaleDateString('pt-BR')} - ${d2.toLocaleDateString('pt-BR')})</td>
-          <td><select style="padding:4px" onchange="atualizarEscalaLimpeza('${chave}', 'responsavel', this.value)">${opts}</select></td>
-          <td style="text-align:center;"><input type="checkbox" ${reg.concluido?'checked':''} onchange="atualizarEscalaLimpeza('${chave}', 'concluido', this.checked)"></td></tr>`;
-        d.setDate(d.getDate() + 7); sem++;
-      }
-    }
-    async function atualizarEscalaLimpeza(c, cp, v) { dadosJsonBin.escalaLimpeza[c][cp] = v; await guardarDados(); }
-
-    // --- MÓDULO PACIENTES ---
-    function abrirModalNovoPaciente() {
-      ['IdEdit','Nome','CPF','CEP','Email'].forEach(x => document.getElementById('paciente'+x).value = '');
-      document.getElementById('modalPaciente').style.display = 'flex';
-    }
-    async function salvarPaciente() {
-      const nome = document.getElementById('pacienteNome').value.trim();
-      if (!nome) return alert('Informe o nome.');
-      dadosJsonBin.pacientes.push({ id: 'pac_'+Date.now(), nome, cpf: document.getElementById('pacienteCPF').value, cep: document.getElementById('pacienteCEP').value, email: document.getElementById('pacienteEmail').value });
-      fecharModal('modalPaciente'); await guardarDados();
-    }
-    async function excluirPaciente(id) {
-      if(!confirm('Deseja excluir o paciente?')) return;
-      dadosJsonBin.pacientes = dadosJsonBin.pacientes.filter(p => p.id !== id); await guardarDados();
-    }
-    function renderizarPacientes() {
-      const mes = document.getElementById('selectMesPacientes').value; const tb = document.getElementById('tbodyPacientes'); tb.innerHTML = '';
-      if(dadosJsonBin.pacientes.length === 0) return tb.innerHTML = '<tr><td colspan="8" style="text-align:center">Nenhum paciente cadastrado.</td></tr>';
-      
-      let tot = 0;
-      dadosJsonBin.pacientes.forEach(p => {
-        const chave = `${mes}_${p.id}`;
-        if (!dadosJsonBin.lancamentosPacientes[chave]) dadosJsonBin.lancamentosPacientes[chave] = { valor: '', tipo: 'Nota fiscal', emitido: false };
-        const l = dadosJsonBin.lancamentosPacientes[chave];
-        tot += parseFloat(l.valor.replace(',','.')||0);
-        
-        tb.innerHTML += `<tr><td><strong>${decriptarTexto(p.nome)}</strong></td><td>${decriptarTexto(p.cpf)}</td>
-          <td><input type="text" style="width:90px;padding:4px" value="${l.valor}" onchange="altLanc('${chave}','valor',this.value)"></td>
-          <td>${decriptarTexto(p.cep)}</td><td>${decriptarTexto(p.email)}</td>
-          <td><select style="padding:4px" onchange="altLanc('${chave}','tipo',this.value)">
-            <option ${l.tipo==='Nota fiscal'?'selected':''}>Nota fiscal</option><option ${l.tipo==='Carnê leão'?'selected':''}>Carnê leão</option><option ${l.tipo==='Não precisa'?'selected':''}>Não precisa</option>
-          </select></td>
-          <td style="text-align:center"><input type="checkbox" ${l.emitido?'checked':''} onchange="altLanc('${chave}','emitido',this.checked)"></td>
-          <td class="no-print"><button class="btn btn-danger" onclick="excluirPaciente('${p.id}')">X</button></td></tr>`;
-      });
-      document.getElementById('tfootTotalRecebidoPacientes').innerHTML = `<strong>R$ ${tot.toFixed(2).replace('.',',')}</strong>`;
-    }
-    async function altLanc(c, cp, v) { dadosJsonBin.lancamentosPacientes[c][cp] = v; await guardarDados(); }
-
-    // --- MÓDULO FINANCEIRO ---
-    function renderizarFinanceiro() {
-      const mes = document.getElementById('selectMesFinanceiro').value;
-      const turnos = {}; let totS=0, totD=0;
-      document.getElementById('tbodyEntradas').innerHTML=''; document.getElementById('tbodyDespesas').innerHTML='';
-      
-      dadosJsonBin.reservas.forEach(r => {
-        if(r.data.startsWith(mes)) {
-          if(!turnos[r.psicologa]) turnos[r.psicologa] = 0;
-          turnos[r.psicologa]++;
-        }
-      });
-
-      Object.keys(turnos).forEach(p => {
-        let v = p.toLowerCase().includes('karine') ? 0 : turnos[p]*VALOR_TURNO_MENSAL;
-        totS += v;
-        document.getElementById('tbodyEntradas').innerHTML += `<tr><td>${p}</td><td colspan="2">-</td><td>${turnos[p]}</td><td>R$ ${v.toFixed(2)}</td></tr>`;
-      });
-
-      dadosJsonBin.despesas.forEach(d => {
-        if(d.mesAno === mes) {
-          totD += parseFloat(d.valor);
-          document.getElementById('tbodyDespesas').innerHTML += `<tr><td>${d.descricao}</td><td>${d.categoria}</td><td>R$ ${parseFloat(d.valor).toFixed(2)}</td><td><button class="btn btn-danger" onclick="exclDesp('${d.id}')">Excluir</button></td></tr>`;
-        }
-      });
-
-      document.getElementById('txtTotalEntrada').innerText = `R$ ${totS.toFixed(2)}`;
-      document.getElementById('txtTotalSaida').innerText = `R$ ${totD.toFixed(2)}`;
-      document.getElementById('txtLucroLiquido').innerText = `R$ ${(totS-totD).toFixed(2)}`;
-    }
-    function abrirModalDespesa() { document.getElementById('modalDespesa').style.display='flex'; }
-    async function salvarDespesa() {
-      dadosJsonBin.despesas.push({ id:'d_'+Date.now(), mesAno: document.getElementById('selectMesFinanceiro').value, descricao: document.getElementById('despesaDescricao').value, categoria: document.getElementById('despesaCategoria').value, valor: document.getElementById('despesaValor').value });
-      fecharModal('modalDespesa'); await guardarDados();
-    }
-    async function exclDesp(id) { dadosJsonBin.despesas = dadosJsonBin.despesas.filter(d=>d.id!==id); await guardarDados(); }
-
-    // --- MÓDULO SENHA ---
-    function abrirModalSenha() { document.getElementById('modalSenha').style.display='flex'; }
-    async function salvarNovaSenha() {
-      const nova = document.getElementById('novaSenha').value; const conf = document.getElementById('confirmarNovaSenha').value;
-      if (nova.length < 6) return alert('A senha deve ter no mínimo 6 caracteres.');
-      if (nova !== conf) return alert('As senhas não coincidem.');
-      
-      const { error } = await supabase.auth.updateUser({ password: nova });
-      if(error) alert('Erro ao atualizar senha no servidor.');
-      else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
-    }
-    verificarSessao();
-  </script>
-</body>
-</html>
+      const rec = document.getElementById('chkRecorrente').checked; const dfim = document.getElementById('inputDataFimRec
