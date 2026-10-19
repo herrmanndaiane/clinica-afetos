@@ -41,7 +41,7 @@
     .card-login h2 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
     .form-group { margin-bottom: 1.2rem; }
     .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
-    .form-group select, .form-group input {
+    .form-group input {
       width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
       border-radius: 6px; font-size: 1rem; outline: none;
     }
@@ -87,13 +87,6 @@
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); }
     th { background: var(--bg-main); color: var(--primary); }
-
-    /* Modal */
-    .modal {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
-    }
-    .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 100%; max-width: 500px; }
   </style>
 </head>
 <body>
@@ -104,7 +97,8 @@
       <h2>Acesso à Agenda</h2>
       <div class="form-group">
         <label for="loginUsuario">Usuário</label>
-        <select id="loginUsuario"></select>
+        <!-- Alterado para campo de texto para evitar a enumeração de usuários -->
+        <input type="text" id="loginUsuario" placeholder="Ex: karine">
       </div>
       <div class="form-group">
         <label for="loginSenha">Senha</label>
@@ -129,7 +123,7 @@
       <div class="user-profile">
         <div>
           <strong id="nomeUsuarioLogado">-</strong>
-          <div style="font-size: 0.8rem; color: var(--text-muted);" id="perfilUsuarioLogado">Psicóloga</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);" id="perfilUsuarioLogado">Sistema Clínico</div>
         </div>
         <button class="btn" onclick="fazerLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
       </div>
@@ -194,7 +188,7 @@
 
   <script>
     // =========================================================================
-    // CONFIGURAÇÃO DO SUPABASE (OFICIAL COM TOKEN JWT ANON PUBLIC)
+    // CONFIGURAÇÃO DO SUPABASE
     // =========================================================================
     const SUPABASE_CONFIG = {
       url: 'https://pqijrhqindehawsvqxdp.supabase.co',
@@ -203,52 +197,33 @@
 
     const dbSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
-    // Mapeamento dos usuários para o Supabase Auth (@clinica.local)
-    const MAPA_USUARIOS = {
-      'karine':   { nome: 'Karine',   email: 'karine@clinica.local' },
-      'natalia':  { nome: 'Natália',  email: 'natalia@clinica.local' },
-      'marilia':  { nome: 'Marília',  email: 'marilia@clinica.local' },
-      'catia':    { nome: 'Catia',    email: 'catia@clinica.local' },
-      'recepcao': { nome: 'Recepção', email: 'recepcao@clinica.local' }
-    };
-
     let usuarioAtual = null;
     let dadosCompartilhados = { reservas: [], escalaLimpeza: {} };
     let dadosPrivadosPacientes = [];
     let dadosPrivadosFinanceiro = [];
 
-    // --- MONTAGEM DO MENU SUSPENSO ---
-    function atualizarSelectUsuariosLogin() {
-      const select = document.getElementById('loginUsuario');
-      if (!select) return;
-      select.innerHTML = '';
-      Object.keys(MAPA_USUARIOS).forEach(chave => {
-        const opt = document.createElement('option');
-        opt.value = chave;
-        opt.textContent = MAPA_USUARIOS[chave].nome;
-        select.appendChild(opt);
-      });
-    }
-
     // --- AUTENTICAÇÃO E SESSÃO ---
     async function fazerLogin() {
-      const chaveUsuario = document.getElementById('loginUsuario').value;
+      const nomeDigitado = document.getElementById('loginUsuario').value.trim().toLowerCase();
       const senha = document.getElementById('loginSenha').value;
-      const configUser = MAPA_USUARIOS[chaveUsuario];
 
-      if (!senha) return alert('Por favor, informe a senha.');
+      if (!nomeDigitado || !senha) return alert('Por favor, informe usuário e senha.');
+
+      const emailMontado = `${nomeDigitado}@clinica.local`;
 
       const { data, error } = await dbSupabase.auth.signInWithPassword({
-        email: configUser.email,
+        email: emailMontado,
         password: senha
       });
 
       if (error) {
-        alert('Senha incorreta ou erro ao autenticar.');
+        alert('Usuário ou senha incorretos.');
         console.error(error);
       } else {
         usuarioAtual = data.user;
-        inicializarPainel(configUser.nome);
+        // Transforma 'karine' em 'Karine' para exibir no painel
+        const nomeExibicao = nomeDigitado.charAt(0).toUpperCase() + nomeDigitado.slice(1);
+        inicializarPainel(nomeExibicao);
       }
     }
 
@@ -256,9 +231,9 @@
       const { data: { session } } = await dbSupabase.auth.getSession();
       if (session) {
         usuarioAtual = session.user;
-        const e = session.user.email;
-        const chaveEncontrada = Object.keys(MAPA_USUARIOS).find(k => MAPA_USUARIOS[k].email === e);
-        const nomeExibicao = chaveEncontrada ? MAPA_USUARIOS[chaveEncontrada].nome : 'Usuária';
+        const email = session.user.email;
+        const nomeParte = email.split('@')[0];
+        const nomeExibicao = nomeParte.charAt(0).toUpperCase() + nomeParte.slice(1);
         inicializarPainel(nomeExibicao);
       }
     }
@@ -267,6 +242,8 @@
       await dbSupabase.auth.signOut();
       document.getElementById('app').style.display = 'none';
       document.getElementById('telaLogin').style.display = 'flex';
+      document.getElementById('loginUsuario').value = '';
+      document.getElementById('loginSenha').value = '';
     }
 
     function inicializarPainel(nome) {
@@ -279,8 +256,6 @@
     }
 
     // --- CARREGAMENTO DE DADOS DO SUPABASE ---
-
-    // 1. Dados Compartilhados (Reserva + Limpeza)
     async function carregarDadosCompartilhados() {
       const { data, error } = await dbSupabase
         .from('clinica_compartilhada')
@@ -296,7 +271,6 @@
       }
     }
 
-    // 2. Dados Privados por Psicóloga (Pacientes + Financeiro)
     async function carregarDadosPrivados() {
       if (!usuarioAtual) return;
 
@@ -388,7 +362,6 @@
 
     // --- INICIALIZAÇÃO SEGURA DA PÁGINA ---
     document.addEventListener('DOMContentLoaded', () => {
-      atualizarSelectUsuariosLogin();
       verificarSessao();
     });
   </script>
