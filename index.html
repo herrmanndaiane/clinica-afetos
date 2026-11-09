@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write("""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -269,7 +270,7 @@
               <svg class="custom-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             
-            <!-- NOVO: Importação de CSV -->
+            <!-- Importação de CSV -->
             <input type="file" id="inputCsvPacientes" accept=".csv" style="display: none;" onchange="processarCSV(event)">
             <button class="btn btn-outline" onclick="document.getElementById('inputCsvPacientes').click()">📁 Importar CSV</button>
             
@@ -358,10 +359,13 @@
       <div class="form-group"><label>Data e Horário</label><input type="text" id="inputInfoDataHorario" readonly style="background: #F8FAFC;"></div>
       <div class="form-group"><label>Profissional</label><select id="inputPsicologa"></select></div>
       <div class="form-group"><label>Observação</label><textarea id="inputObs" rows="2"></textarea></div>
+      
+      <!-- Box de Recorrência sempre visível com a última correção -->
       <div class="recorrencia-box" id="boxRecorrencia">
-        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente</label>
+        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente até a data final</label>
         <div id="divDataFimRecorrencia" style="display: none; margin-top: 10px;"><input type="date" id="inputDataFimRecorrencia"></div>
       </div>
+      
       <div class="modal-actions" style="margin-top: 20px;">
         <button class="btn btn-danger" id="btnExcluir" onclick="excluirReserva()" style="display:none;">Excluir</button>
         <button class="btn" onclick="fecharModal('modalReserva')">Cancelar</button>
@@ -726,9 +730,13 @@
     function semanaAtual() { dataAtual = new Date(); renderizarCalendario(); }
     function alternarDataFimRecorrencia() { document.getElementById('divDataFimRecorrencia').style.display = document.getElementById('chkRecorrente').checked ? 'block' : 'none'; }
 
+    // --- NOVA FUNÇÃO DE ABRIR RESERVA (BOX RECORRÊNCIA SEMPRE ABERTO E FUSO HORÁRIO SEGURO) ---
     function abrirModalReserva(dataIso, turno, reserva) {
-      document.getElementById('inputData').value = dataIso; document.getElementById('inputTurno').value = turno.id;
-      document.getElementById('inputInfoDataHorario').value = `${abaAtual === 'sala1' ? 'Sala 01' : 'Sala 02'} | ${new Date(dataIso + 'T00:00:00').toLocaleDateString('pt-BR')} (${turno.nome})`;
+      document.getElementById('inputData').value = dataIso; 
+      document.getElementById('inputTurno').value = turno.id;
+      
+      // Ajustado para meio-dia (T12) para evitar que o fuso horário diminua o dia
+      document.getElementById('inputInfoDataHorario').value = `${abaAtual === 'sala1' ? 'Sala 01' : 'Sala 02'} | ${new Date(dataIso + 'T12:00:00').toLocaleDateString('pt-BR')} (${turno.nome})`;
 
       const campoPsicologa = document.getElementById('inputPsicologa');
       campoPsicologa.innerHTML = '';
@@ -738,25 +746,30 @@
       });
 
       const eRecepcao = userKeyAtual === 'recepcao';
-      document.getElementById('chkRecorrente').checked = false; document.getElementById('divDataFimRecorrencia').style.display = 'none';
+      document.getElementById('chkRecorrente').checked = false; 
+      document.getElementById('divDataFimRecorrencia').style.display = 'none';
+      
+      // Agora a caixa de recorrência aparece sempre
+      document.getElementById('boxRecorrencia').style.display = 'block'; 
 
       if (reserva) {
         document.getElementById('modalTitulo').innerText = 'Alterar / Excluir Reserva';
         campoPsicologa.value = reserva.psicologa; campoPsicologa.disabled = !eRecepcao;
         document.getElementById('inputObs').value = reserva.observacao || '';
-        document.getElementById('btnExcluir').style.display = 'inline-block'; document.getElementById('boxRecorrencia').style.display = 'none';
+        document.getElementById('btnExcluir').style.display = 'inline-block';
       } else {
         document.getElementById('modalTitulo').innerText = 'Nova Reserva';
         if (!eRecepcao) campoPsicologa.value = MAPA_USUARIOS[userKeyAtual].nome;
         campoPsicologa.disabled = !eRecepcao;
         document.getElementById('inputObs').value = '';
-        document.getElementById('btnExcluir').style.display = 'none'; document.getElementById('boxRecorrencia').style.display = 'block';
+        document.getElementById('btnExcluir').style.display = 'none'; 
       }
       document.getElementById('modalReserva').style.display = 'flex';
     }
 
     function fecharModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
 
+    // --- NOVA FUNÇÃO DE SALVAR RESERVA (FORMATAÇÃO MANUAL YYYY-MM-DD PARA EVITAR BUG DE FUSO) ---
     async function salvarReserva() {
       const dataIso = document.getElementById('inputData').value;
       const turnoId = document.getElementById('inputTurno').value;
@@ -769,25 +782,39 @@
 
       try {
         if (rec && dfim) {
-          let temp = new Date(dataIso + 'T00:00:00');
+          // O horário do meio-dia (T12) impede bugs de fuso horário
+          let temp = new Date(dataIso + 'T12:00:00');
           const limit = new Date(dfim + 'T23:59:59');
           const inserts = [];
           const datasParaApagar = [];
 
           while (temp <= limit) {
-            const iso = temp.toISOString().split('T')[0];
+            // Monta a data manualmente com Zeros para garantir YYYY-MM-DD exato
+            const yyyy = temp.getFullYear();
+            const mm = String(temp.getMonth() + 1).padStart(2, '0');
+            const dd = String(temp.getDate()).padStart(2, '0');
+            const iso = `${yyyy}-${mm}-${dd}`;
+            
             datasParaApagar.push(iso);
             inserts.push({ data_reserva: iso, turno_id: turnoId, sala_id: abaAtual, psicologa_nome: psicologa, observacao: obs });
+            
             temp.setDate(temp.getDate() + 7);
           }
-          await dbSupabase.from('reservas_clinica').delete().in('data_reserva', datasParaApagar).eq('turno_id', turnoId).eq('sala_id', abaAtual);
+          
+          if(datasParaApagar.length > 0) {
+            await dbSupabase.from('reservas_clinica').delete().in('data_reserva', datasParaApagar).eq('turno_id', turnoId).eq('sala_id', abaAtual);
+          }
           await dbSupabase.from('reservas_clinica').insert(inserts);
+
         } else {
           await dbSupabase.from('reservas_clinica').delete().eq('data_reserva', dataIso).eq('turno_id', turnoId).eq('sala_id', abaAtual);
           await dbSupabase.from('reservas_clinica').insert([{ data_reserva: dataIso, turno_id: turnoId, sala_id: abaAtual, psicologa_nome: psicologa, observacao: obs }]);
         }
         await carregarDados();
-      } catch (e) { console.error(e); alert('Erro ao salvar a reserva no banco de dados.'); }
+      } catch (e) { 
+        console.error(e); 
+        alert('Erro ao salvar a reserva no banco de dados.'); 
+      }
     }
 
     async function excluirReserva() {
@@ -949,7 +976,7 @@
       const reader = new FileReader();
       reader.onload = async function(e) {
         const text = e.target.result;
-        const linhas = text.split('\n').filter(linha => linha.trim() !== '');
+        const linhas = text.split('\\n').filter(linha => linha.trim() !== '');
         if (linhas.length < 2) return alert('O CSV está vazio ou sem dados válidos.');
 
         const delimitador = linhas[0].includes(';') ? ';' : ',';
@@ -996,4 +1023,4 @@
     });
   </script>
 </body>
-</html>
+</html>""")
