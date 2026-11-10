@@ -1,5 +1,4 @@
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write("""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -270,9 +269,10 @@ with open("index.html", "w", encoding="utf-8") as f:
               <svg class="custom-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             
-            <!-- Importação de CSV -->
+            <!-- Importação e Exportação de CSV -->
             <input type="file" id="inputCsvPacientes" accept=".csv" style="display: none;" onchange="processarCSV(event)">
             <button class="btn btn-outline" onclick="document.getElementById('inputCsvPacientes').click()">📁 Importar CSV</button>
+            <button class="btn btn-outline" onclick="exportarCSV()">⬇️ Exportar CSV</button>
             
             <button class="btn btn-verde" onclick="abrirModalNovoPaciente()">+ Cadastrar Paciente</button>
             <button class="btn btn-outline" onclick="window.print()">🖨 Imprimir PDF</button>
@@ -288,7 +288,7 @@ with open("index.html", "w", encoding="utf-8") as f:
               <th>E_mail</th>
               <th style="width: 190px;">Nota fiscal ou carnê leão</th>
               <th style="width: 90px; text-align: center;">Emitido</th>
-              <th style="width: 60px; text-align: center;" class="no-print">Ação</th>
+              <th style="width: 90px; text-align: center;" class="no-print">Ações</th>
             </tr>
           </thead>
           <tbody id="tbodyPacientes"></tbody>
@@ -336,7 +336,7 @@ with open("index.html", "w", encoding="utf-8") as f:
           <div class="box-resumo box-saidas"><h4>Saídas (Custos)</h4><span id="txtTotalSaida">R$ 0,00</span></div>
           <div class="box-resumo box-lucro"><h4>Lucro Líquido</h4><span id="txtLucroLiquido">R$ 0,00</span></div>
         </div>
-        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas (R$ 350,00 por turno)</h4>
+        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas (R$ 350,00 por bloco mensal)</h4>
         <table class="data-table">
           <thead><tr><th>Profissional</th><th>Turnos Sala 01</th><th>Turnos Sala 02</th><th>Total Turnos</th><th>Valor Devido</th></tr></thead>
           <tbody id="tbodyEntradas"></tbody>
@@ -493,6 +493,9 @@ with open("index.html", "w", encoding="utf-8") as f:
             email: decriptarTexto(p.email_cripto)
         }));
 
+        // Ordenar os pacientes por nome em ordem alfabética para facilitar a visualização
+        pacientesConvertidos.sort((a, b) => a.nome.localeCompare(b.nome));
+
         dadosJsonBin = {
           reservas: reservasConvertidas,
           despesas: pubData.despesas || [],
@@ -591,7 +594,8 @@ with open("index.html", "w", encoding="utf-8") as f:
       document.getElementById('painelCalendario').style.display = 'flex';
       document.getElementById('nomeUsuarioLogado').innerText = MAPA_USUARIOS[userKeyAtual].nome;
 
-      if (userKeyAtual === 'karine' || userKeyAtual === 'recepcao') {
+      // ATUALIZAÇÃO: Se for a Recepção, esconde o Financeiro
+      if (userKeyAtual === 'karine') {
         document.getElementById('tabFinanceiro').style.display = 'flex';
       } else {
         document.getElementById('tabFinanceiro').style.display = 'none';
@@ -853,13 +857,36 @@ with open("index.html", "w", encoding="utf-8") as f:
     }
     async function atualizarEscalaLimpeza(c, cp, v) { dadosJsonBin.escalaLimpeza[c][cp] = v; await guardarDados(); }
 
+    // --- NOVA LÓGICA DE EDITAR PACIENTE ---
     function abrirModalNovoPaciente() {
-      ['IdEdit','Nome','CPF','CEP','Email'].forEach(x => document.getElementById('paciente'+x).value = '');
+      document.getElementById('pacienteIdEdit').value = '';
+      document.getElementById('pacienteNome').value = '';
+      document.getElementById('pacienteCPF').value = '';
+      document.getElementById('pacienteCEP').value = '';
+      document.getElementById('pacienteEmail').value = '';
+      
+      document.getElementById('modalPacienteTitulo').innerText = 'Cadastrar Novo Paciente';
+      document.getElementById('modalPaciente').style.display = 'flex';
+    }
+
+    function editarPaciente(id) {
+      const paciente = dadosJsonBin.pacientes.find(p => p.id === id);
+      if(!paciente) return;
+      
+      document.getElementById('pacienteIdEdit').value = paciente.id;
+      document.getElementById('pacienteNome').value = paciente.nome;
+      document.getElementById('pacienteCPF').value = paciente.cpf;
+      document.getElementById('pacienteCEP').value = paciente.cep;
+      document.getElementById('pacienteEmail').value = paciente.email;
+      
+      document.getElementById('modalPacienteTitulo').innerText = 'Editar Paciente';
       document.getElementById('modalPaciente').style.display = 'flex';
     }
 
     async function salvarPaciente() {
+      const idEdit = document.getElementById('pacienteIdEdit').value;
       const nome = document.getElementById('pacienteNome').value.trim();
+      
       if (!nome) return alert('Informe o nome.');
       
       const cpf = document.getElementById('pacienteCPF').value;
@@ -869,12 +896,21 @@ with open("index.html", "w", encoding="utf-8") as f:
       fecharModal('modalPaciente');
       
       try {
-        await dbSupabase.from('pacientes_clinica').insert([{
+        const dadosCripto = {
           nome_cripto: encriptarTexto(nome),
           cpf_cripto: encriptarTexto(cpf),
           cep_cripto: encriptarTexto(cep),
           email_cripto: encriptarTexto(email)
-        }]);
+        };
+
+        if (idEdit) {
+          // Atualiza registro existente (E2EE)
+          await dbSupabase.from('pacientes_clinica').update(dadosCripto).eq('id', idEdit);
+        } else {
+          // Insere novo registro (E2EE)
+          await dbSupabase.from('pacientes_clinica').insert([dadosCripto]);
+        }
+        
         await carregarDados(); 
       } catch (e) {
         console.error(e);
@@ -904,6 +940,7 @@ with open("index.html", "w", encoding="utf-8") as f:
         const l = dadosJsonBin.lancamentosPacientes[chave];
         tot += parseFloat(l.valor.replace(',','.')||0);
         
+        // Incluído botão de edição e botão de excluir na mesma célula
         tb.innerHTML += `<tr><td><strong>${p.nome}</strong></td><td>${p.cpf}</td>
           <td><input type="text" style="width:90px;padding:4px" value="${l.valor}" onchange="altLanc('${chave}','valor',this.value)"></td>
           <td>${p.cep}</td><td>${p.email}</td>
@@ -911,7 +948,10 @@ with open("index.html", "w", encoding="utf-8") as f:
             <option ${l.tipo==='Nota fiscal'?'selected':''}>Nota fiscal</option><option ${l.tipo==='Carnê leão'?'selected':''}>Carnê leão</option><option ${l.tipo==='Não precisa'?'selected':''}>Não precisa</option>
           </select></td>
           <td style="text-align:center"><input type="checkbox" ${l.emitido?'checked':''} onchange="altLanc('${chave}','emitido',this.checked)"></td>
-          <td class="no-print"><button class="btn btn-danger" onclick="excluirPaciente('${p.id}')">X</button></td></tr>`;
+          <td class="no-print" style="display: flex; gap: 4px;">
+            <button class="btn btn-outline" style="padding: 4px 8px;" onclick="editarPaciente('${p.id}')">✏️</button>
+            <button class="btn btn-danger" style="padding: 4px 8px;" onclick="excluirPaciente('${p.id}')">X</button>
+          </td></tr>`;
       });
       document.getElementById('tfootTotalRecebidoPacientes').innerHTML = `<strong>R$ ${tot.toFixed(2).replace('.',',')}</strong>`;
     }
@@ -923,32 +963,62 @@ with open("index.html", "w", encoding="utf-8") as f:
 
     function renderizarFinanceiro() {
       const mes = document.getElementById('selectMesFinanceiro').value;
-      const turnos = {}; let totS=0, totD=0;
-      document.getElementById('tbodyEntradas').innerHTML=''; document.getElementById('tbodyDespesas').innerHTML='';
+      const turnosObj = {}; 
+      let totS = 0, totD = 0;
+      
+      document.getElementById('tbodyEntradas').innerHTML = ''; 
+      document.getElementById('tbodyDespesas').innerHTML = '';
       
       dadosJsonBin.reservas.forEach(r => {
         if(r.data.startsWith(mes)) {
-          if(!turnos[r.psicologa]) turnos[r.psicologa] = 0;
-          turnos[r.psicologa]++;
+          // Extrai o dia da semana (usando T12:00:00 para evitar desvios de fuso horário)
+          const dataObj = new Date(r.data + 'T12:00:00');
+          const diaSemana = dataObj.getDay(); 
+          
+          // Cria uma chave única para não duplicar a cobrança. Ex: "sala1_1_tarde" (Sala 1, Segunda, Tarde)
+          const chaveUnica = `${r.sala}_${diaSemana}_${r.turno}`;
+
+          if(!turnosObj[r.psicologa]) {
+            turnosObj[r.psicologa] = { sala1: new Set(), sala2: new Set() };
+          }
+          
+          // Adiciona ao "Set", que automaticamente ignora repetições do mesmo dia/turno no mês
+          if(r.sala === 'sala1') {
+            turnosObj[r.psicologa].sala1.add(chaveUnica);
+          } else {
+            turnosObj[r.psicologa].sala2.add(chaveUnica);
+          }
         }
       });
 
-      Object.keys(turnos).forEach(p => {
-        let v = p.toLowerCase().includes('karine') ? 0 : turnos[p]*VALOR_TURNO_MENSAL;
+      // Desenha a tabela com a soma exata dos turnos únicos
+      Object.keys(turnosObj).forEach(p => {
+        const qtdSala1 = turnosObj[p].sala1.size;
+        const qtdSala2 = turnosObj[p].sala2.size;
+        const totalTurnos = qtdSala1 + qtdSala2;
+        
+        let v = p.toLowerCase().includes('karine') ? 0 : totalTurnos * VALOR_TURNO_MENSAL;
         totS += v;
-        document.getElementById('tbodyEntradas').innerHTML += `<tr><td>${p}</td><td colspan="2">-</td><td>${turnos[p]}</td><td>R$ ${v.toFixed(2)}</td></tr>`;
+        
+        document.getElementById('tbodyEntradas').innerHTML += `<tr>
+          <td>${p}</td>
+          <td>${qtdSala1}</td>
+          <td>${qtdSala2}</td>
+          <td>${totalTurnos}</td>
+          <td>R$ ${v.toFixed(2).replace('.', ',')}</td>
+        </tr>`;
       });
 
       dadosJsonBin.despesas.forEach(d => {
         if(d.mesAno === mes) {
           totD += parseFloat(d.valor);
-          document.getElementById('tbodyDespesas').innerHTML += `<tr><td>${d.descricao}</td><td>${d.categoria}</td><td>R$ ${parseFloat(d.valor).toFixed(2)}</td><td><button class="btn btn-danger" onclick="exclDesp('${d.id}')">Excluir</button></td></tr>`;
+          document.getElementById('tbodyDespesas').innerHTML += `<tr><td>${d.descricao}</td><td>${d.categoria}</td><td>R$ ${parseFloat(d.valor).toFixed(2).replace('.', ',')}</td><td><button class="btn btn-danger" onclick="exclDesp('${d.id}')">Excluir</button></td></tr>`;
         }
       });
 
-      document.getElementById('txtTotalEntrada').innerText = `R$ ${totS.toFixed(2)}`;
-      document.getElementById('txtTotalSaida').innerText = `R$ ${totD.toFixed(2)}`;
-      document.getElementById('txtLucroLiquido').innerText = `R$ ${(totS-totD).toFixed(2)}`;
+      document.getElementById('txtTotalEntrada').innerText = `R$ ${totS.toFixed(2).replace('.', ',')}`;
+      document.getElementById('txtTotalSaida').innerText = `R$ ${totD.toFixed(2).replace('.', ',')}`;
+      document.getElementById('txtLucroLiquido').innerText = `R$ ${(totS-totD).toFixed(2).replace('.', ',')}`;
     }
     function abrirModalDespesa() { document.getElementById('modalDespesa').style.display='flex'; }
     async function salvarDespesa() {
@@ -976,7 +1046,8 @@ with open("index.html", "w", encoding="utf-8") as f:
       const reader = new FileReader();
       reader.onload = async function(e) {
         const text = e.target.result;
-        const linhas = text.split('\\n').filter(linha => linha.trim() !== '');
+        const linhas = text.split('
+').filter(linha => linha.trim() !== '');
         if (linhas.length < 2) return alert('O CSV está vazio ou sem dados válidos.');
 
         const delimitador = linhas[0].includes(';') ? ';' : ',';
@@ -1017,10 +1088,54 @@ with open("index.html", "w", encoding="utf-8") as f:
       event.target.value = ''; 
     }
 
+    // --- NOVA FUNÇÃO: EXPORTAR PARA CSV ---
+    function exportarCSV() {
+      if (dadosJsonBin.pacientes.length === 0) return alert('Não há pacientes para exportar.');
+      
+      const mes = document.getElementById('selectMesPacientes').value;
+      
+      // Cabeçalhos (Separados por ponto e vírgula para abrir nativamente no Excel PT-BR)
+      let csvContent = "Nome;CPF;Valor (R$);CEP;E-mail;Tipo Recibo;Emitido
+";
+      
+      // Função para garantir que os dados não quebram o CSV se tiverem vírgulas ou aspas
+      const escapeCsv = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
+      
+      dadosJsonBin.pacientes.forEach(p => {
+        const chave = `${mes}_${p.id}`;
+        // Procura os lançamentos financeiros deste paciente no mês selecionado
+        const l = dadosJsonBin.lancamentosPacientes[chave] || { valor: '', tipo: 'Nota fiscal', emitido: false };
+        
+        const row = [
+          escapeCsv(p.nome),
+          escapeCsv(p.cpf),
+          escapeCsv(l.valor),
+          escapeCsv(p.cep),
+          escapeCsv(p.email),
+          escapeCsv(l.tipo),
+          l.emitido ? 'Sim' : 'Não'
+        ];
+        
+        csvContent += row.join(';') + '
+';
+      });
+
+      // Adiciona o BOM (﻿) para garantir que o Excel abra com acentos corretos (UTF-8)
+      const blob = new Blob(["﻿" + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Pacientes_${mes}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       atualizarSelectUsuariosLogin();
       verificarSessao();
     });
   </script>
 </body>
-</html>""")
+</html>
