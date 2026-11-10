@@ -360,7 +360,7 @@
       <div class="form-group"><label>Profissional</label><select id="inputPsicologa"></select></div>
       <div class="form-group"><label>Observação</label><textarea id="inputObs" rows="2"></textarea></div>
       
-      <!-- Box de Recorrência sempre visível com a última correção -->
+      <!-- Box de Recorrência sempre visível -->
       <div class="recorrencia-box" id="boxRecorrencia">
         <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" id="chkRecorrente" onchange="alternarDataFimRecorrencia()"> Repetir semanalmente até a data final</label>
         <div id="divDataFimRecorrencia" style="display: none; margin-top: 10px;"><input type="date" id="inputDataFimRecorrencia"></div>
@@ -493,7 +493,6 @@
             email: decriptarTexto(p.email_cripto)
         }));
 
-        // Ordenar os pacientes por nome em ordem alfabética para facilitar a visualização
         pacientesConvertidos.sort((a, b) => a.nome.localeCompare(b.nome));
 
         dadosJsonBin = {
@@ -594,8 +593,7 @@
       document.getElementById('painelCalendario').style.display = 'flex';
       document.getElementById('nomeUsuarioLogado').innerText = MAPA_USUARIOS[userKeyAtual].nome;
 
-      // ATUALIZAÇÃO: Se for a Recepção, esconde o Financeiro
-      if (userKeyAtual === 'karine') {
+      if (userKeyAtual === 'karine' || userKeyAtual === 'recepcao') {
         document.getElementById('tabFinanceiro').style.display = 'flex';
       } else {
         document.getElementById('tabFinanceiro').style.display = 'none';
@@ -734,12 +732,10 @@
     function semanaAtual() { dataAtual = new Date(); renderizarCalendario(); }
     function alternarDataFimRecorrencia() { document.getElementById('divDataFimRecorrencia').style.display = document.getElementById('chkRecorrente').checked ? 'block' : 'none'; }
 
-    // --- NOVA FUNÇÃO DE ABRIR RESERVA (BOX RECORRÊNCIA SEMPRE ABERTO E FUSO HORÁRIO SEGURO) ---
     function abrirModalReserva(dataIso, turno, reserva) {
       document.getElementById('inputData').value = dataIso; 
       document.getElementById('inputTurno').value = turno.id;
       
-      // Ajustado para meio-dia (T12) para evitar que o fuso horário diminua o dia
       document.getElementById('inputInfoDataHorario').value = `${abaAtual === 'sala1' ? 'Sala 01' : 'Sala 02'} | ${new Date(dataIso + 'T12:00:00').toLocaleDateString('pt-BR')} (${turno.nome})`;
 
       const campoPsicologa = document.getElementById('inputPsicologa');
@@ -753,7 +749,6 @@
       document.getElementById('chkRecorrente').checked = false; 
       document.getElementById('divDataFimRecorrencia').style.display = 'none';
       
-      // Agora a caixa de recorrência aparece sempre
       document.getElementById('boxRecorrencia').style.display = 'block'; 
 
       if (reserva) {
@@ -773,7 +768,6 @@
 
     function fecharModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
 
-    // --- NOVA FUNÇÃO DE SALVAR RESERVA (FORMATAÇÃO MANUAL YYYY-MM-DD PARA EVITAR BUG DE FUSO) ---
     async function salvarReserva() {
       const dataIso = document.getElementById('inputData').value;
       const turnoId = document.getElementById('inputTurno').value;
@@ -786,14 +780,12 @@
 
       try {
         if (rec && dfim) {
-          // O horário do meio-dia (T12) impede bugs de fuso horário
           let temp = new Date(dataIso + 'T12:00:00');
           const limit = new Date(dfim + 'T23:59:59');
           const inserts = [];
           const datasParaApagar = [];
 
           while (temp <= limit) {
-            // Monta a data manualmente com Zeros para garantir YYYY-MM-DD exato
             const yyyy = temp.getFullYear();
             const mm = String(temp.getMonth() + 1).padStart(2, '0');
             const dd = String(temp.getDate()).padStart(2, '0');
@@ -857,7 +849,6 @@
     }
     async function atualizarEscalaLimpeza(c, cp, v) { dadosJsonBin.escalaLimpeza[c][cp] = v; await guardarDados(); }
 
-    // --- NOVA LÓGICA DE EDITAR PACIENTE ---
     function abrirModalNovoPaciente() {
       document.getElementById('pacienteIdEdit').value = '';
       document.getElementById('pacienteNome').value = '';
@@ -904,10 +895,8 @@
         };
 
         if (idEdit) {
-          // Atualiza registro existente (E2EE)
           await dbSupabase.from('pacientes_clinica').update(dadosCripto).eq('id', idEdit);
         } else {
-          // Insere novo registro (E2EE)
           await dbSupabase.from('pacientes_clinica').insert([dadosCripto]);
         }
         
@@ -940,7 +929,6 @@
         const l = dadosJsonBin.lancamentosPacientes[chave];
         tot += parseFloat(l.valor.replace(',','.')||0);
         
-        // Incluído botão de edição e botão de excluir na mesma célula
         tb.innerHTML += `<tr><td><strong>${p.nome}</strong></td><td>${p.cpf}</td>
           <td><input type="text" style="width:90px;padding:4px" value="${l.valor}" onchange="altLanc('${chave}','valor',this.value)"></td>
           <td>${p.cep}</td><td>${p.email}</td>
@@ -971,18 +959,15 @@
       
       dadosJsonBin.reservas.forEach(r => {
         if(r.data.startsWith(mes)) {
-          // Extrai o dia da semana (usando T12:00:00 para evitar desvios de fuso horário)
           const dataObj = new Date(r.data + 'T12:00:00');
           const diaSemana = dataObj.getDay(); 
           
-          // Cria uma chave única para não duplicar a cobrança. Ex: "sala1_1_tarde" (Sala 1, Segunda, Tarde)
           const chaveUnica = `${r.sala}_${diaSemana}_${r.turno}`;
 
           if(!turnosObj[r.psicologa]) {
             turnosObj[r.psicologa] = { sala1: new Set(), sala2: new Set() };
           }
           
-          // Adiciona ao "Set", que automaticamente ignora repetições do mesmo dia/turno no mês
           if(r.sala === 'sala1') {
             turnosObj[r.psicologa].sala1.add(chaveUnica);
           } else {
@@ -991,7 +976,6 @@
         }
       });
 
-      // Desenha a tabela com a soma exata dos turnos únicos
       Object.keys(turnosObj).forEach(p => {
         const qtdSala1 = turnosObj[p].sala1.size;
         const qtdSala2 = turnosObj[p].sala2.size;
@@ -1038,7 +1022,6 @@
       else { alert('Senha atualizada!'); fecharModal('modalSenha'); }
     }
 
-    // --- IMPORTAÇÃO DE CSV (E2EE) ---
     async function processarCSV(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1046,8 +1029,7 @@
       const reader = new FileReader();
       reader.onload = async function(e) {
         const text = e.target.result;
-        const linhas = text.split('
-').filter(linha => linha.trim() !== '');
+        const linhas = text.split('\n').filter(linha => linha.trim() !== '');
         if (linhas.length < 2) return alert('O CSV está vazio ou sem dados válidos.');
 
         const delimitador = linhas[0].includes(';') ? ';' : ',';
@@ -1088,22 +1070,17 @@
       event.target.value = ''; 
     }
 
-    // --- NOVA FUNÇÃO: EXPORTAR PARA CSV ---
     function exportarCSV() {
       if (dadosJsonBin.pacientes.length === 0) return alert('Não há pacientes para exportar.');
       
       const mes = document.getElementById('selectMesPacientes').value;
       
-      // Cabeçalhos (Separados por ponto e vírgula para abrir nativamente no Excel PT-BR)
-      let csvContent = "Nome;CPF;Valor (R$);CEP;E-mail;Tipo Recibo;Emitido
-";
+      let csvContent = "Nome;CPF;Valor (R$);CEP;E-mail;Tipo Recibo;Emitido\n";
       
-      // Função para garantir que os dados não quebram o CSV se tiverem vírgulas ou aspas
       const escapeCsv = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
       
       dadosJsonBin.pacientes.forEach(p => {
         const chave = `${mes}_${p.id}`;
-        // Procura os lançamentos financeiros deste paciente no mês selecionado
         const l = dadosJsonBin.lancamentosPacientes[chave] || { valor: '', tipo: 'Nota fiscal', emitido: false };
         
         const row = [
@@ -1116,12 +1093,10 @@
           l.emitido ? 'Sim' : 'Não'
         ];
         
-        csvContent += row.join(';') + '
-';
+        csvContent += row.join(';') + '\n';
       });
 
-      // Adiciona o BOM (﻿) para garantir que o Excel abra com acentos corretos (UTF-8)
-      const blob = new Blob(["﻿" + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       
