@@ -34,9 +34,10 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 18px;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.03);
-      --shadow-md: 0 6px 16px rgba(107, 29, 47, 0.06);
-      --shadow-lg: 0 14px 32px rgba(0,0,0,0.08);
+      /* ITEM 2: Sombras Suaves e Profundidade (Elevação) */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
     }
 
     /* Cores das Profissionais na Agenda */
@@ -135,14 +136,26 @@
     .slot-title { font-weight: 700; font-size: 0.85rem; }
     .slot-info { font-size: 0.78rem; margin-top: 4px; opacity: 0.9; }
 
-    /* Painéis de Conteúdo (Tabelas) */
+    /* ITEM 3: Tabelas Minimalistas e Funcionais (Sticky Headers) */
     .panel-card { background: var(--off-white-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-md); }
-    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 18px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); }
-    .data-table th, .data-table td { padding: 14px 16px; text-align: left; font-size: 0.875rem; border-bottom: 1px solid var(--border-color); }
-    .data-table th { background-color: var(--bordo-primary); color: #ffffff; font-weight: 700; }
-    .data-table tfoot td { background-color: var(--bordo-light); font-weight: 800; color: var(--bordo-primary); border-top: 2px solid var(--bordo-primary); }
-    .data-table tr:nth-child(even) { background-color: #FAF9F6; }
+    
+    /* Container para permitir o scroll nas tabelas */
+    .table-responsive { width: 100%; overflow-x: auto; max-height: 60vh; /* Altura máxima para ativar o scroll vertical */ overflow-y: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    
+    .data-table { width: 100%; border-collapse: collapse; /* Mudar de separate para collapse para linhas finas funcionarem bem */ margin-top: 0; /* Margem movida para o container */ }
+    
+    /* Linhas horizontais muito finas e em cinza claro */
+    .data-table th, .data-table td { padding: 14px 16px; text-align: left; font-size: 0.875rem; border-bottom: 1px solid #F1F5F9; /* Linha sutil */ border-left: none; /* Remover linhas verticais */ border-right: none; /* Remover linhas verticais */ }
+    
+    /* Sticky Headers */
+    .data-table th { background-color: var(--off-white-bg); /* Cor mais clara para o cabeçalho moderno */ color: var(--text-main); font-weight: 700; position: sticky; top: 0; z-index: 2; /* Garante que fique acima das linhas da tabela ao rolar */ border-bottom: 2px solid var(--border-color); /* Linha mais forte no cabeçalho */ }
+    
+    .data-table tfoot td { background-color: var(--off-white-bg); font-weight: 800; color: var(--bordo-primary); border-top: 2px solid var(--border-color); position: sticky; bottom: 0; z-index: 2; }
+    
+    /* Zebra striping mais suave */
+    .data-table tr:nth-child(even) { background-color: rgba(248, 247, 244, 0.5); }
     .data-table tr:hover { background-color: #F3F0EC; }
+    
     .card-resumo-financeiro { display: flex; gap: 18px; margin-bottom: 28px; flex-wrap: wrap; }
     .box-resumo { padding: 20px; border-radius: var(--radius-md); flex: 1; min-width: 200px; border: 1px solid var(--border-color); background: var(--off-white-card); box-shadow: var(--shadow-sm); }
     .box-resumo h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
@@ -161,7 +174,14 @@
     .modal-content h3 { margin-top: 0; color: var(--bordo-primary); font-weight: 800; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.875rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.875rem; transition: border-color 0.2s, box-shadow 0.2s; /* Adicionado transição para focus ring suave */ }
+    
+    /* Focus Ring para inputs */
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--bordo-primary);
+        box-shadow: 0 0 0 3px rgba(107, 29, 47, 0.15); /* Anel de foco mais suave */
+    }
 
     @media print {
       .sidebar { display: none !important; }
@@ -170,6 +190,7 @@
       #containerPacientes, #containerPacientes * { visibility: visible; }
       #containerPacientes { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
+      .table-responsive { max-height: none !important; overflow: visible !important; border: none !important; } /* Remover limites no print */
     }
   </style>
 </head>
@@ -278,28 +299,32 @@
             <button class="btn btn-outline" onclick="window.print()">🖨 Imprimir PDF</button>
           </div>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>CPF</th>
-              <th style="width: 130px;">Valor (R$)</th>
-              <th>CEP</th>
-              <th>E_mail</th>
-              <th style="width: 190px;">Nota fiscal ou carnê leão</th>
-              <th style="width: 90px; text-align: center;">Emitido</th>
-              <th style="width: 90px; text-align: center;" class="no-print">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyPacientes"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"><strong>TOTAL RECEBIDO NO MÊS</strong></td>
-              <td id="tfootTotalRecebidoPacientes"><strong>R$ 0,00</strong></td>
-              <td colspan="5"></td>
-            </tr>
-          </tfoot>
-        </table>
+        
+        <!-- Envolvendo a tabela na nova div table-responsive -->
+        <div class="table-responsive" style="margin-top: 18px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th style="width: 130px;">Valor (R$)</th>
+                  <th>CEP</th>
+                  <th>E_mail</th>
+                  <th style="width: 190px;">Nota fiscal ou carnê leão</th>
+                  <th style="width: 90px; text-align: center;">Emitido</th>
+                  <th style="width: 90px; text-align: center;" class="no-print">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPacientes"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"><strong>TOTAL RECEBIDO NO MÊS</strong></td>
+                  <td id="tfootTotalRecebidoPacientes"><strong>R$ 0,00</strong></td>
+                  <td colspan="5"></td>
+                </tr>
+              </tfoot>
+            </table>
+        </div>
       </div>
 
       <!-- Escala Limpeza -->
@@ -310,16 +335,19 @@
             <select id="selectMesLimpeza" class="custom-select" onchange="renderizarEscalaLimpeza()"></select>
           </div>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="background-color: #EA580C; color: white;">Semana / Período</th>
-              <th style="background-color: #EA580C; color: white;">Psicóloga Responsável</th>
-              <th style="width: 120px; text-align: center; background-color: #EA580C; color: white;">Concluído?</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyEscalaLimpeza"></tbody>
-        </table>
+        
+        <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="background-color: var(--off-white-bg); color: var(--text-main);">Semana / Período</th>
+                  <th style="background-color: var(--off-white-bg); color: var(--text-main);">Psicóloga Responsável</th>
+                  <th style="width: 120px; text-align: center; background-color: var(--off-white-bg); color: var(--text-main);">Concluído?</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyEscalaLimpeza"></tbody>
+            </table>
+        </div>
       </div>
 
       <!-- Financeiro Clínica -->
@@ -336,16 +364,22 @@
           <div class="box-resumo box-saidas"><h4>Saídas (Custos)</h4><span id="txtTotalSaida">R$ 0,00</span></div>
           <div class="box-resumo box-lucro"><h4>Lucro Líquido</h4><span id="txtLucroLiquido">R$ 0,00</span></div>
         </div>
-        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas</h4>
-        <table class="data-table">
-          <thead><tr><th>Profissional</th><th>Turnos Sala 01</th><th>Turnos Sala 02</th><th>Total Turnos</th><th>Valor Devido</th></tr></thead>
-          <tbody id="tbodyEntradas"></tbody>
-        </table>
-        <h4 style="margin-top: 30px; color: #991B1B;">Despesas e Custos</h4>
-        <table class="data-table">
-          <thead><tr><th style="background-color: #991B1B; color: white;">Descrição</th><th style="background-color: #991B1B; color: white;">Categoria</th><th style="background-color: #991B1B; color: white;">Valor (R$)</th><th style="background-color: #991B1B; color: white;">Ação</th></tr></thead>
-          <tbody id="tbodyDespesas"></tbody>
-        </table>
+        <h4 style="color: var(--bordo-primary); margin-top: 24px; margin-bottom: 12px;">Locação de Salas (Valores Adaptáveis)</h4>
+        
+        <div class="table-responsive">
+            <table class="data-table">
+              <thead><tr><th>Profissional</th><th>Turnos Sala 01</th><th>Turnos Sala 02</th><th>Total Turnos</th><th>Valor Devido</th></tr></thead>
+              <tbody id="tbodyEntradas"></tbody>
+            </table>
+        </div>
+        
+        <h4 style="margin-top: 30px; margin-bottom: 12px; color: #991B1B;">Despesas e Custos</h4>
+        <div class="table-responsive">
+            <table class="data-table">
+              <thead><tr><th>Descrição</th><th>Categoria</th><th>Valor (R$)</th><th>Ação</th></tr></thead>
+              <tbody id="tbodyDespesas"></tbody>
+            </table>
+        </div>
       </div>
     </main>
   </div>
@@ -1049,7 +1083,8 @@
       const reader = new FileReader();
       reader.onload = async function(e) {
         const text = e.target.result;
-        const linhas = text.split('\n').filter(linha => linha.trim() !== '');
+        const linhas = text.split('
+').filter(linha => linha.trim() !== '');
         if (linhas.length < 2) return alert('O CSV está vazio ou sem dados válidos.');
 
         const delimitador = linhas[0].includes(';') ? ';' : ',';
@@ -1095,7 +1130,8 @@
       
       const mes = document.getElementById('selectMesPacientes').value;
       
-      let csvContent = "Nome;CPF;Valor (R$);CEP;E-mail;Tipo Recibo;Emitido\n";
+      let csvContent = "Nome;CPF;Valor (R$);CEP;E-mail;Tipo Recibo;Emitido
+";
       
       const escapeCsv = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
       
@@ -1113,10 +1149,11 @@
           l.emitido ? 'Sim' : 'Não'
         ];
         
-        csvContent += row.join(';') + '\n';
+        csvContent += row.join(';') + '
+';
       });
 
-      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(["﻿" + csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       
