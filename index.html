@@ -336,7 +336,7 @@
           <div class="box-resumo box-saidas"><h4>Saídas (Custos)</h4><span id="txtTotalSaida">R$ 0,00</span></div>
           <div class="box-resumo box-lucro"><h4>Lucro Líquido</h4><span id="txtLucroLiquido">R$ 0,00</span></div>
         </div>
-        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas (R$ 350,00 por bloco mensal)</h4>
+        <h4 style="color: var(--bordo-primary); margin-top: 24px;">Locação de Salas</h4>
         <table class="data-table">
           <thead><tr><th>Profissional</th><th>Turnos Sala 01</th><th>Turnos Sala 02</th><th>Total Turnos</th><th>Valor Devido</th></tr></thead>
           <tbody id="tbodyEntradas"></tbody>
@@ -435,7 +435,7 @@
     };
 
     const CHAVE_CRIPTOGRAFIA = 'ChaveExtraClinica2026';
-    const VALOR_TURNO_MENSAL = 350.00;
+    const VALOR_TURNO_MENSAL = 300.00;
     const TURNOS = [
       { id: 'manha', nome: 'Manhã', horario: '08:00 - 12:00' },
       { id: 'tarde', nome: 'Tarde', horario: '13:00 - 17:00' },
@@ -593,7 +593,7 @@
       document.getElementById('painelCalendario').style.display = 'flex';
       document.getElementById('nomeUsuarioLogado').innerText = MAPA_USUARIOS[userKeyAtual].nome;
 
-      if (userKeyAtual === 'karine' || userKeyAtual === 'recepcao') {
+      if (userKeyAtual === 'karine') {
         document.getElementById('tabFinanceiro').style.display = 'flex';
       } else {
         document.getElementById('tabFinanceiro').style.display = 'none';
@@ -981,7 +981,27 @@
         const qtdSala2 = turnosObj[p].sala2.size;
         const totalTurnos = qtdSala1 + qtdSala2;
         
-        let v = p.toLowerCase().includes('karine') ? 0 : totalTurnos * VALOR_TURNO_MENSAL;
+        let v = 0;
+        const profNome = p.toLowerCase();
+        
+        if (profNome.includes('karine') || profNome.includes('recepção')) {
+          v = 0;
+        } else {
+          // Valor padrão a partir de Janeiro de 2027 (R$ 300,00 por bloco de turno)
+          v = totalTurnos * VALOR_TURNO_MENSAL;
+          
+          // Exceção temporária: Cátia, Marília e Natália pagam cota fixa de R$ 350,00/mês até Dez/2026
+          if (mes <= '2026-12') {
+            if (profNome.includes('catia') || profNome.includes('cátia') || 
+                profNome.includes('marilia') || profNome.includes('marília') || 
+                profNome.includes('natalia') || profNome.includes('natália')) {
+              if (totalTurnos > 0) {
+                v = 350.00;
+              }
+            }
+          }
+        }
+        
         totS += v;
         
         document.getElementById('tbodyEntradas').innerHTML += `<tr>
